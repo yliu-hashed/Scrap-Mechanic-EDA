@@ -1,0 +1,145 @@
+bram SM_PSUDO_BRAM_TIMER_2
+  abits  2
+  dbits  1
+  dbits  1
+  groups 2
+  ports  1 16
+  wrmode 1 0
+  enable 1 0
+  transp 0 1
+  clocks 1 0
+  clkpol 2 0
+endbram
+bram SM_PSUDO_BRAM_TIMER_3
+  abits  3
+  dbits  1
+  dbits  1
+  groups 2
+  ports  1 16
+  wrmode 1 0
+  enable 1 0
+  transp 0 1
+  clocks 1 0
+  clkpol 2 0
+endbram
+bram SM_PSUDO_BRAM_TIMER_4
+  abits  4
+  dbits  1
+  dbits  1
+  groups 2
+  ports  1 16
+  wrmode 1 0
+  enable 1 0
+  transp 0 1
+  clocks 1 0
+  clkpol 2 0
+endbram
+bram SM_PSUDO_BRAM_TIMER_5
+  abits  5
+  dbits  1
+  dbits  1
+  groups 2
+  ports  1 16
+  wrmode 1 0
+  enable 1 0
+  transp 0 1
+  clocks 1 0
+  clkpol 2 0
+endbram
+bram SM_PSUDO_BRAM_TIMER_6
+  abits  6
+  dbits  1
+  dbits  1
+  groups 2
+  ports  1 16
+  wrmode 1 0
+  enable 1 0
+  transp 0 1
+  clocks 1 0
+  clkpol 2 0
+endbram
+bram SM_PSUDO_BRAM_TIMER_7
+  abits  7
+  dbits  1
+  dbits  1
+  groups 2
+  ports  1 16
+  wrmode 1 0
+  enable 1 0
+  transp 0 1
+  clocks 1 0
+  clkpol 2 0
+endbram
+bram SM_PSUDO_BRAM_TIMER_8
+  abits  8
+  dbits  1
+  dbits  1
+  groups 2
+  ports  1 16
+  wrmode 1 0
+  enable 1 0
+  transp 0 1
+  clocks 1 0
+  clkpol 2 0
+endbram
+bram SM_PSUDO_BRAM_TIMER_9
+  abits  9
+  dbits  1
+  dbits  1
+  groups 2
+  ports  1 16
+  wrmode 1 0
+  enable 1 0
+  transp 0 1
+  clocks 1 0
+  clkpol 2 0
+endbram
+bram SM_PSUDO_BRAM_TIMER_10
+  abits  10
+  dbits  1
+  dbits  1
+  groups 2
+  ports  1 16
+  wrmode 1 0
+  enable 1 0
+  transp 0 1
+  clocks 1 0
+  clkpol 2 0
+endbram
+
+match SM_PSUDO_BRAM_TIMER_2
+  attribute timer=4
+  max waste 0
+endmatch
+match SM_PSUDO_BRAM_TIMER_3
+  attribute timer=8
+  max waste 0
+endmatch
+match SM_PSUDO_BRAM_TIMER_4
+  attribute timer=16
+  max waste 0
+endmatch
+match SM_PSUDO_BRAM_TIMER_5
+  attribute timer=32
+  max waste 0
+endmatch
+match SM_PSUDO_BRAM_TIMER_6
+  attribute timer=64
+  max waste 0
+endmatch
+match SM_PSUDO_BRAM_TIMER_7
+  attribute timer=128
+  max waste 0
+endmatch
+match SM_PSUDO_BRAM_TIMER_8
+  attribute timer=256
+  max waste 0
+endmatch
+match SM_PSUDO_BRAM_TIMER_9
+  attribute timer=512
+  max waste 0
+endmatch
+match SM_PSUDO_BRAM_TIMER_10
+  attribute timer=1024
+  max waste 0
+endmatch

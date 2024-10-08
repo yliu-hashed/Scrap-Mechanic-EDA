@@ -1,0 +1,13 @@
+strash
+&get -n
+ifraig
+dfraig
+&put
+
+scorr
+istrash
+
+&get -n
+&dch -r
+&nf -K 6 -C 32 -p -F 16 -a -A 16
+&put

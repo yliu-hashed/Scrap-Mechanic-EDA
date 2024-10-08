@@ -1,0 +1,365 @@
+library(sm_gates) {
+  cell(SM_OR_1) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0)";
+    }
+  }
+  cell(SM_OR_2) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0+A1)";
+    }
+  }
+  cell(SM_OR_3) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0+A1+A2)";
+    }
+  }
+  cell(SM_OR_4) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0+A1+A2+A3)";
+    }
+  }
+  cell(SM_OR_5) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(A4) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0+A1+A2+A3+A4)";
+    }
+  }
+  cell(SM_OR_6) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(A4) { direction: input; }
+    pin(A5) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0+A1+A2+A3+A4+A5)";
+    }
+  }
+  cell(SM_AND_2) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0*A1)";
+    }
+  }
+  cell(SM_AND_3) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0*A1*A2)";
+    }
+  }
+  cell(SM_AND_4) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0*A1*A2*A3)";
+    }
+  }
+  cell(SM_AND_5) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(A4) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0*A1*A2*A3*A4)";
+    }
+  }
+  cell(SM_AND_6) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(A4) { direction: input; }
+    pin(A5) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0*A1*A2*A3*A4*A5)";
+    }
+  }
+  cell(SM_NOR_1) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0)";
+    }
+  }
+  cell(SM_NOR_2) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0+A1)";
+    }
+  }
+  cell(SM_NOR_3) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0+A1+A2)";
+    }
+  }
+  cell(SM_NOR_4) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0+A1+A2+A3)";
+    }
+  }
+  cell(SM_NOR_5) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(A4) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0+A1+A2+A3+A4)";
+    }
+  }
+  cell(SM_NOR_6) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(A4) { direction: input; }
+    pin(A5) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0+A1+A2+A3+A4+A5)";
+    }
+  }
+  cell(SM_NAND_2) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0*A1)";
+    }
+  }
+  cell(SM_NAND_3) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0*A1*A2)";
+    }
+  }
+  cell(SM_NAND_4) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0*A1*A2*A3)";
+    }
+  }
+  cell(SM_NAND_5) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(A4) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0*A1*A2*A3*A4)";
+    }
+  }
+  cell(SM_NAND_6) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(A4) { direction: input; }
+    pin(A5) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0*A1*A2*A3*A4*A5)";
+    }
+  }
+  cell(SM_XOR_2) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0^A1)";
+    }
+  }
+  cell(SM_XOR_3) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0^A1^A2)";
+    }
+  }
+  cell(SM_XOR_4) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0^A1^A2^A3)";
+    }
+  }
+  cell(SM_XOR_5) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(A4) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0^A1^A2^A3^A4)";
+    }
+  }
+  cell(SM_XOR_6) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(A4) { direction: input; }
+    pin(A5) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "(A0^A1^A2^A3^A4^A5)";
+    }
+  }
+  cell(SM_XNOR_2) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0^A1)";
+    }
+  }
+  cell(SM_XNOR_3) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0^A1^A2)";
+    }
+  }
+  cell(SM_XNOR_4) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0^A1^A2^A3)";
+    }
+  }
+  cell(SM_XNOR_5) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(A4) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0^A1^A2^A3^A4)";
+    }
+  }
+  cell(SM_XNOR_6) {
+    area: 1;
+    pin(A0) { direction: input; }
+    pin(A1) { direction: input; }
+    pin(A2) { direction: input; }
+    pin(A3) { direction: input; }
+    pin(A4) { direction: input; }
+    pin(A5) { direction: input; }
+    pin(Y) {
+      direction: output;
+      function: "!(A0^A1^A2^A3^A4^A5)";
+    }
+  }
+  cell(SM_PSUDO_DFFE) {
+    area: 6;
+    ff(IQ, IQN) { clocked_on: C; next_state: "(E*D)+(E'*IQ)"; }
+    pin(C) { direction: input; clock: true; }
+    pin(E) { direction: input; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output; function: IQ; }
+  }
+  cell(SM_PSUDO_DFFER) {
+    area: 8;
+    ff(IQ, IQN) { clocked_on: C; next_state: "(E*D)+(E'*IQ)"; clear: R; }
+    pin(C) { direction: input; clock: true; }
+    pin(R) { direction: input; }
+    pin(E) { direction: input; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output; function: IQ; }
+  }
+}

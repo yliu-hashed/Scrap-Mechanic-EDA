@@ -1,0 +1,21 @@
+# load modules
+read_verilog src/alu.v
+read_verilog src/cpu.v
+read_verilog src/soc.v
+hierarchy -top soc
+
+# standard synthesis steps
+flatten
+proc; opt -full; clean
+memory -bram /flow/bram.rule; opt -full
+techmap; opt
+
+# optimize and map into cell library
+dfflegalize -cell $_DFF_P_ 0 -cell $_DFFE_PP_ 0 -cell $_DFF_PP0_ 0 -cell $_DFFE_PP0P_ 0
+techmap -map /flow/techmap_sm_dff.v
+abc -liberty /flow/sm_cells.lib -script /flow/script.abc
+
+clean -purge
+
+# write out design to json
+write_json tmp/soc_synth.json

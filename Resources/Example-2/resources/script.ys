@@ -5,7 +5,7 @@ read_verilog src/soc.v
 hierarchy -top soc
 
 # standard synthesis steps
-flatten
+flatten -noscopeinfo
 proc; opt -full; clean
 memory -bram /flow/bram.rule; opt -full
 techmap; opt

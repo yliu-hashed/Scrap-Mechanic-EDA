@@ -5,8 +5,8 @@ export PREFIX=/yosys
 apt-get update -qq
 apt-get -y install --no-install-recommends \
   build-essential clang lld ca-certificates curl \
-  libffi-dev libreadline-dev tcl-dev python3 \
-  bison flex gawk git iverilog pkg-config
+  libffi-dev libreadline-dev zlib1g-dev python3 \
+  bison flex gawk git iverilog pkg-config make
 apt-get autoclean
 apt-get clean
 apt-get -y autoremove
@@ -18,5 +18,6 @@ git clone https://github.com/YosysHQ/yosys repo
 cd repo
 git checkout 0.48
 git submodule update --init
-make -j 4 config-clang
+
+cp /Docker/yosys-make.conf Makefile.conf
 make -j 4 install

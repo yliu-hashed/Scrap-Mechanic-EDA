@@ -60,9 +60,7 @@ func emitDFF(builder: SMNetBuilder) -> DFFTarget {
     )
 
     // connect primary store loop
-    builder.connect(target.xlp0, to: target.xlp1)
-    builder.connect(target.xlp1, to: target.xlp2)
-    builder.connect(target.xlp2, to: target.xlp0)
+    builder.connect(chain: target.xlp0, target.xlp1, target.xlp2, target.xlp0)
     // connect edge detection
     builder.connect(target.cInv, to: target.filt)
     // connect change detection
@@ -70,9 +68,7 @@ func emitDFF(builder: SMNetBuilder) -> DFFTarget {
     // connect change handel
     builder.connect(target.diff, to: target.filt)
     // connect change circuit
-    builder.connect(target.filt, to: target.xlp0)
-    builder.connect(target.filt, to: target.xlp1)
-    builder.connect(target.filt, to: target.xlp2)
+    builder.connect(target.filt, to: [target.xlp0, target.xlp1, target.xlp2])
 
     return target
 }
@@ -155,9 +151,7 @@ func emitDFFWithAsyncReset(builder: SMNetBuilder) -> DFFWithAsyncResetTarget {
     )
 
     // connect primary store loop
-    builder.connect(target.xlp0, to: target.xlp1)
-    builder.connect(target.xlp1, to: target.xlp2)
-    builder.connect(target.xlp2, to: target.xlp0)
+    builder.connect(chain: target.xlp0, target.xlp1, target.xlp2, target.xlp0)
 
     // connect edge detection
     builder.connect(target.cInv, to: target.filt)
@@ -166,9 +160,7 @@ func emitDFFWithAsyncReset(builder: SMNetBuilder) -> DFFWithAsyncResetTarget {
     // connect change handel
     builder.connect(target.diff, to: target.filt)
     // connect change circuit
-    builder.connect(target.filt, to: target.xlp0)
-    builder.connect(target.filt, to: target.xlp1)
-    builder.connect(target.filt, to: target.xlp2)
+    builder.connect(target.filt, to: [target.xlp0, target.xlp1, target.xlp2])
 
     // connect reset edge detection
     builder.connect(target.rInv, to: target.rFlt)
@@ -177,9 +169,7 @@ func emitDFFWithAsyncReset(builder: SMNetBuilder) -> DFFWithAsyncResetTarget {
 
     builder.connect(target.rFlt, to: target.sbuf)
     // connect reset circuit
-    builder.connect(target.sbuf, to: target.xlp0)
-    builder.connect(target.sbuf, to: target.xlp1)
-    builder.connect(target.sbuf, to: target.xlp2)
+    builder.connect(target.sbuf, to: [target.xlp0, target.xlp1, target.xlp2])
 
     return target
 }

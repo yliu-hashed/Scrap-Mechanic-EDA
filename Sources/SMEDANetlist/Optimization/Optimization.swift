@@ -3,17 +3,6 @@
 //  Scrap Mechanic EDA
 //
 
-func isInLoop(module: SMModule, nodeId: UInt64) -> Bool {
-    for srcId in module.gates[nodeId]!.srcs {
-        for srcId2 in module.gates[srcId]!.srcs {
-            if module.gates[srcId2]!.srcs.contains(nodeId) {
-                return true
-            }
-        }
-    }
-    return false
-}
-
 public func optimize(_ module: inout SMModule) {
 
     let builder = SMNetBuilder(module: module)

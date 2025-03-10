@@ -175,14 +175,6 @@ public enum SourceAggrigationType: Int {
     case logicalOr
     case logicalChain
 
-    public var aggrigatables: [Set<SMLogicType>] {
-        switch self {
-            case .logicalAnd:   return [[.and], [.nor]]
-            case .logicalOr:    return [[.or],  [.nand]]
-            case .logicalChain: return [[.xor, .xnor]]
-        }
-    }
-
     /// the equivalent front part of the gate
     public var equivGate: SMLogicType {
         switch self {

@@ -39,8 +39,6 @@ public func peepoptReduceBuffers(builder: SMNetBuilder, keeping: Set<UInt64>) ->
               !builder.module.sequentialNodes.contains(gateId)
         else { continue }
 
-        guard !isInLoop(module: builder.module, nodeId: gateId) else { continue }
-
         let transfer = gate.dsts
         let srcId = gate.srcs.first!
 
@@ -70,8 +68,6 @@ public func peepoptReduceInverters(builder: SMNetBuilder, keeping: Set<UInt64>) 
               gate.srcs.count == 1,
               !builder.module.sequentialNodes.contains(gateId)
         else { continue }
-
-        guard !isInLoop(module: builder.module, nodeId: gateId) else { continue }
 
         let srcId = gate.srcs.first!
 

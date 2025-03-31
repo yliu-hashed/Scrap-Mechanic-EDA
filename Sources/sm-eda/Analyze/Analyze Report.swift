@@ -22,8 +22,8 @@ private let deltaPercentFormatter: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.localizesFormat = false
     formatter.numberStyle = .percent
-    formatter.plusSign = "+"
-    formatter.minusSign = "-"
+    formatter.positivePrefix = "+"
+    formatter.negativePrefix = "-"
     formatter.maximumFractionDigits = 2
     formatter.minimumFractionDigits = 2
     return formatter
@@ -33,8 +33,8 @@ private let deltaFloatFormatter: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.localizesFormat = false
     formatter.numberStyle = .decimal
-    formatter.plusSign = "+"
-    formatter.minusSign = "-"
+    formatter.positivePrefix = "+"
+    formatter.negativePrefix = "-"
     formatter.maximumFractionDigits = 2
     formatter.minimumFractionDigits = 2
     return formatter
@@ -44,8 +44,8 @@ private let deltaIntFormatter: NumberFormatter = {
     let formatter = NumberFormatter()
     formatter.localizesFormat = false
     formatter.numberStyle = .decimal
-    formatter.plusSign = "+"
-    formatter.minusSign = "-"
+    formatter.positivePrefix = "+"
+    formatter.negativePrefix = "-"
     return formatter
 }()
 

@@ -19,7 +19,7 @@ RUN cd sm-eda && find bin -type f -executable -exec bash -c '{} --generate-compl
 # build yosys and yosys-abc executable -----------------------------------------
 FROM ubuntu:latest AS yosys-builder
 
-ADD /Docker /Docker
+ADD /Docker/yosys /Docker
 RUN bash /Docker/build-yosys.bash
 
 # setup base image -------------------------------------------------------------

@@ -16,7 +16,7 @@ rm -rf /var/lib/apt/lists
 git clone https://github.com/YosysHQ/yosys repo
 
 cd repo
-git checkout v0.50
+git checkout v0.51
 git submodule update --init
 
 cp /Docker/yosys-make.conf Makefile.conf

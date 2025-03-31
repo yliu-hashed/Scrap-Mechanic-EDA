@@ -59,6 +59,19 @@ struct FlowCMD: ParsableCommand {
             encoder.outputFormatting = [.sortedKeys]
         }
 
+        // load old report (if any)
+        let oldReport: FullSynthesisReport?
+        if printlevel == .verbose, let oldReportURL = outputReportURL {
+            do {
+                let data = try Data(contentsOf: oldReportURL)
+                oldReport = try decoder.decode(FullSynthesisReport.self, from: data)
+            } catch {
+                oldReport = nil
+            }
+        } else {
+            oldReport = nil
+        }
+
         // read yosys json
         let yosysData = try Data(contentsOf: sourceYosysURL)
 
@@ -132,6 +145,11 @@ struct FlowCMD: ParsableCommand {
         )
         try blueprintData.write(to: outputBlueprintURL)
         if printlevel == .verbose { print("Blueprint written successfully to \"\(outputBlueprintURL)\"") }
+
+        // check difference
+        if printlevel == .verbose, let old = oldReport {
+            printDifference(old: old, new: report)
+        }
 
         // write report
         if let outputReportURL = outputReportURL {

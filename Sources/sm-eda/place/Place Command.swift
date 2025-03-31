@@ -69,6 +69,7 @@ struct PlaceCMD: ParsableCommand {
 
         // create coders
         let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
         if prettyPrint {
             encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
         } else {
@@ -77,6 +78,19 @@ struct PlaceCMD: ParsableCommand {
 
         let module = try fetchModule(file: sourceNetJsonFile)
         try module.check()
+
+        // load old report (if any)
+        let oldReport: FullSynthesisReport?
+        if printlevel == .verbose, let oldReportURL = outputReportURL, fileManager.fileExists(atPath: oldReportURL.path()) {
+            do {
+                let data = try Data(contentsOf: oldReportURL)
+                oldReport = try decoder.decode(FullSynthesisReport.self, from: data)
+            } catch {
+                oldReport = nil
+            }
+        } else {
+            oldReport = nil
+        }
 
         // report stats
         var report = FullSynthesisReport()
@@ -122,6 +136,11 @@ struct PlaceCMD: ParsableCommand {
         )
         try blueprintData.write(to: outputBlueprintURL)
         if printlevel == .verbose { print("Blueprint written successfully to \"\(outputBlueprintURL)\"") }
+
+        // check difference
+        if printlevel == .verbose, let old = oldReport {
+            printDifference(old: old, new: report)
+        }
 
         // write report
         if let outputReportURL = outputReportURL {

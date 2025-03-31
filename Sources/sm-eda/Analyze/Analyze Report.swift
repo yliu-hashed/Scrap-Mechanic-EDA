@@ -158,6 +158,26 @@ func printLiteReport(_ report: FullSynthesisReport) {
     print("   gate count: \(report.complexityReport.gateCount), conn. count: \(report.complexityReport.connectionCount)")
 }
 
+// MARK: Difference
+func printDifference(old: FullSynthesisReport, new: FullSynthesisReport) {
+    // check size difference
+    let oldUtil = old.placementReport.utilization
+    let newUtil = new.placementReport.utilization
+    if !oldUtil.isNaN, !newUtil.isNaN, oldUtil > 0, abs(newUtil - oldUtil) > 0.005 {
+        let improvement = (newUtil - oldUtil) / oldUtil
+        print("Utilization changed by \(deltaPercentFormatter.string(from: NSNumber(value: improvement))!)")
+    }
+    // check time difference
+    let oldTime = old.timingReport.criticalDepth ?? 0
+    let newTime = new.timingReport.criticalDepth ?? 0
+    if oldTime != 0, newTime != 0, newTime != oldTime {
+        let improvement = (Float(newTime) - Float(oldTime)) / Float(oldTime)
+        let deltaString = deltaIntFormatter.string(from: NSNumber(value: newTime - oldTime))!
+        let deltaPercentString = deltaPercentFormatter.string(from: NSNumber(value: improvement))!
+        print("Critical depth changed by \(deltaString) (\(deltaPercentString))")
+    }
+}
+
 // MARK: Utility
 private func printItems(title: String = "", _ dict: [String: String], minKeyWidth: Int = 27) {
     print(title + ": ")

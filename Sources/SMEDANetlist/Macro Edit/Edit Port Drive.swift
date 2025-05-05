@@ -5,7 +5,7 @@
 
 func editPortDrive(
     _ mainModule: inout SMModule,
-    drives: [EditPortDrive],
+    drive: EditPortDrive,
     invalidInputGates: inout Set<UInt64>
 ) throws {
 
@@ -36,30 +36,28 @@ func editPortDrive(
         mainModule.gates[dstId]!.srcs.update(with: srcId)
     }
 
-    for drive in drives {
-        guard let gateIds = mainModule.inputs[drive.dstPort.port]?.gates else {
-            throw EditError.noInputPort(port: drive.dstPort.port)
+    guard let gateIds = mainModule.inputs[drive.dstPort.port]?.gates else {
+        throw EditError.noInputPort(port: drive.dstPort.port)
+    }
+    for i in 0..<drive.dstPort.width {
+        let index = drive.dstPort.lsb + i
+        let gateId = gateIds[index]
+        // make sure its not already driven
+        guard mainModule.gates[gateId]!.srcs.isEmpty else {
+            throw EditError.repeatSink(port: drive.dstPort.port, index: index)
         }
-        for i in 0..<drive.dstPort.width {
-            let index = drive.dstPort.lsb + i
-            let gateId = gateIds[index]
-            // make sure its not already driven
-            guard mainModule.gates[gateId]!.srcs.isEmpty else {
-                throw EditError.repeatSink(port: drive.dstPort.port, index: index)
-            }
-            // calculate state
-            let mask: UInt64 = 1 << i
-            let state = (mask & drive.constant) != 0
-            // drive the bit if it need to be on
-            if state {
-                mainModule.gates[gateId]!.type = .logic(type: .nor)
-                let dummy = getInvertSource()
-                connect(srcId: dummy, dstId: gateId)
-            } else {
-                mainModule.gates[gateId]!.type = .logic(type: .or)
-            }
-            // remove from input list
-            invalidInputGates.insert(gateId)
+        // calculate state
+        let mask: UInt64 = 1 << i
+        let state = (mask & drive.constant) != 0
+        // drive the bit if it need to be on
+        if state {
+            mainModule.gates[gateId]!.type = .logic(type: .nor)
+            let dummy = getInvertSource()
+            connect(srcId: dummy, dstId: gateId)
+        } else {
+            mainModule.gates[gateId]!.type = .logic(type: .or)
         }
+        // remove from input list
+        invalidInputGates.insert(gateId)
     }
 }

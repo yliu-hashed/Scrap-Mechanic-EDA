@@ -7,7 +7,7 @@ import Foundation
 import ArgumentParser
 import SMEDANetlist
 
-private let discussion = "This command can perform editions on a sm netlist file, like merging different modules and connecting (shorting) ports. The edit commands are not specified in the order that they are declared. The order of the commands is `merge`, `connect`, `share`, `drive`, and `remove`"
+private let discussion = "This command can perform editions on a sm netlist file, like merging different modules and connecting (shorting) ports. When edit commands are specified by the command line arguments, edit commands are not specified in the order that they are declared. The order of the commands is `merge`, `connect`, `share`, `drive`, and `remove`. Use `--script <script>` specify a script, and to perform more complex edits."
 
 private let mergeHelp = ArgumentHelp(
     "Merge many netlist into the main netlist.",
@@ -41,7 +41,7 @@ private let portRemoveHelp = ArgumentHelp(
 
 private let editScriptHelp = ArgumentHelp(
     "The edit script to run.",
-    discussion: "Use this option to specify a text file as the edit script. The file contains a list of commands seperated by new lines and semicolon `;`. Each command is specified in the form of <operation> <argument>. The commands used in scripting is identical to the command line arguments. For example, the script `r A[7:0]` is the same as the command line argument `-r \"A[7:0]\"`. The editing command line arguments will be ignored if a script is specified.",
+    discussion: "Use this option to specify a text file as the edit script. The file contains a list of commands seperated by new lines and semicolon `;`. Each command is specified in the form of <operation> <argument>. The commands used in scripting is identical to the command line arguments. For example, the script `r A[7:0]` is the same as the command line argument `-r \"A[7:0]\"`. The editing command line arguments will be ignored if a script is specified. Commands are always executed in the program order.",
     valueName: "script-file"
 )
 
@@ -131,13 +131,23 @@ struct EditCMD: ParsableCommand {
             function = try parseScript(script)
         } else {
             let mergeModules = try fetchModule(files: mergeNetlistFiles)
-            function = EditFunction(
-                merge: mergeModules,
-                connect: portConnect,
-                share: portShare,
-                drive: portDrive,
-                remove: portRemove
-            )
+            var list: [EditCommand] = []
+            for target in mergeModules {
+                list.append(.merge(target: target))
+            }
+            for route in portConnect {
+                list.append(.connect(route: route))
+            }
+            for share in portShare {
+                list.append(.share(route: share))
+            }
+            for drive in portDrive {
+                list.append(.drive(drive: drive))
+            }
+            for port in portRemove {
+                list.append(.remove(port: port))
+            }
+            function = EditFunction(commands: list)
         }
 
         // read file

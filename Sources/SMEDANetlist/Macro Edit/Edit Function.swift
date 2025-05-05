@@ -45,72 +45,77 @@ public struct EditPortDrive: CustomStringConvertible {
     public var description: String { "\(constant)->" + dstPort.description }
 }
 
+public enum EditCommand {
+    indirect case merge(target: SMModule)
+    case connect(route: EditPortRoute)
+    case share(route: EditPortRoute)
+    case drive(drive: EditPortDrive)
+    case remove(port: EditPort)
+    case solidify
+}
+
 public struct EditFunction {
-    public let mergeNetlists: [SMModule]
-    public let portConnect: [EditPortRoute]
-    public let portShare: [EditPortRoute]
-    public let portDrive: [EditPortDrive]
-    public let portRemove: [EditPort]
+    public let commands: [EditCommand]
     public let force: Bool
 
     public init(
-        merge: [SMModule] = [],
-        connect: [EditPortRoute] = [],
-        share: [EditPortRoute] = [],
-        drive: [EditPortDrive] = [],
-        remove: [EditPort] = [],
+        commands: consuming [EditCommand],
         force: Bool = false
     ) {
-        mergeNetlists = merge
-        portConnect = connect
-        portShare = share
-        portDrive = drive
-        portRemove = remove
+        self.commands = commands
         self.force = force
     }
 
     public func run(_ module: inout SMModule) throws {
-        if !mergeNetlists.isEmpty {
-            try editMerge(&module, with: mergeNetlists)
-        }
         var invalidInputGates: Set<UInt64> = []
         var invalidOutputGates: Set<UInt64> = []
-        if !portConnect.isEmpty {
-            try editPortConnect(&module, portRouteTable: portConnect, invalidInputGates: &invalidInputGates)
-        }
-        if !portShare.isEmpty {
-            try editPortShare(&module, portRouteTable: portConnect, invalidInputGates: &invalidInputGates)
-        }
-        if !portDrive.isEmpty {
-            try editPortDrive(&module, drives: portDrive, invalidInputGates: &invalidInputGates)
-        }
-        if !portRemove.isEmpty {
-            try editPortIgnore(&module, ports: portRemove, invalidOutputGates: &invalidOutputGates)
-        }
-        // rectify ports
-        var eliminatedInputPorts: Set<String> = []
-        for portName in module.inputs.keys {
-            module.inputs[portName]!.gates
-                .removeAll(where: { invalidInputGates.contains($0) })
-            if module.inputs[portName]!.gates.isEmpty {
-                eliminatedInputPorts.insert(portName)
+        func solidifyPorts() {
+            // rectify ports
+            var eliminatedInputPorts: Set<String> = []
+            for portName in module.inputs.keys {
+                module.inputs[portName]!.gates
+                    .removeAll(where: { invalidInputGates.contains($0) })
+                if module.inputs[portName]!.gates.isEmpty {
+                    eliminatedInputPorts.insert(portName)
+                }
             }
-        }
-        for portName in eliminatedInputPorts {
-            module.inputs.removeValue(forKey: portName)
+            for portName in eliminatedInputPorts {
+                module.inputs.removeValue(forKey: portName)
+            }
+
+            var eliminatedOutputPorts: Set<String> = []
+            for portName in module.outputs.keys {
+                module.outputs[portName]!.gates
+                    .removeAll(where: { invalidOutputGates.contains($0) })
+                if module.outputs[portName]!.gates.isEmpty {
+                    eliminatedOutputPorts.insert(portName)
+                }
+            }
+            for portName in eliminatedOutputPorts {
+                module.outputs.removeValue(forKey: portName)
+            }
+            invalidInputGates.removeAll()
+            invalidOutputGates.removeAll()
         }
 
-        var eliminatedOutputPorts: Set<String> = []
-        for portName in module.outputs.keys {
-            module.outputs[portName]!.gates
-                .removeAll(where: { invalidOutputGates.contains($0) })
-            if module.outputs[portName]!.gates.isEmpty {
-                eliminatedOutputPorts.insert(portName)
+        for command in commands {
+            switch command {
+                case .merge(let target):
+                    try editMerge(&module, with: target)
+                case .connect(let route):
+                    try editPortConnect(&module, route: route, invalidInputGates: &invalidInputGates)
+                case .share(let route):
+                    try editPortShare(&module, route: route, invalidInputGates: &invalidInputGates)
+                case .drive(let drive):
+                    try editPortDrive(&module, drive: drive, invalidInputGates: &invalidInputGates)
+                case .remove(let port):
+                    try editPortIgnore(&module, port: port, invalidOutputGates: &invalidOutputGates)
+                case .solidify:
+                    solidifyPorts()
             }
         }
-        for portName in eliminatedOutputPorts {
-            module.outputs.removeValue(forKey: portName)
-        }
+
+        solidifyPorts()
 
         syncClock(&module)
     }

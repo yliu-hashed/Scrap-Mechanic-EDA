@@ -14,6 +14,7 @@ func parseScript(_ script: String) throws -> EditFunction {
     for (index, line) in lines.enumerated() {
         let trimmedLine = line.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmedLine.isEmpty { continue }
+        if trimmedLine.hasPrefix("#") { continue }
         guard let firstSeperator = trimmedLine.firstIndex(of: " ") else {
             throw EditScriptError.cannotParseScript(line: index, content: trimmedLine)
         }

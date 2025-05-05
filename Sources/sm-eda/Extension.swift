@@ -11,7 +11,7 @@ extension BRAMPortConfig: ExpressibleByArgument {}
 
 extension EditPort: ExpressibleByArgument {
     public init?(argument: String) {
-        let matchPortRegex = #/([0-9a-zA-Z-_.]+)\[([0-9]+)\:([0-9]+)\]/#
+        let matchPortRegex = #/([0-9a-zA-Z-_.]+)\s*\[\s*([0-9]+)\s*\:\s*([0-9]+)\s*\]/#
 
         guard let match = try? matchPortRegex.wholeMatch(in: argument),
               let msb = Int(match.2),
@@ -23,7 +23,8 @@ extension EditPort: ExpressibleByArgument {
 
 extension EditPortRoute: ExpressibleByArgument {
     public init?(argument: String) {
-        let matchArrowRegex = #/([a-zA-Z0-9-_.:\[\]]+)->([a-zA-Z0-9-_.:\[\]]+)/#
+        let matchArrowRegex = #/([a-zA-Z0-9-_.]+\s*\[[0-9:\s]+\])\s*->\s*([a-zA-Z0-9-_.]+\s*\[[0-9:\s]+\])/#
+
         guard let match = try? matchArrowRegex.wholeMatch(in: argument),
               let srcPort = EditPort(argument: String(match.1)),
               let dstPort = EditPort(argument: String(match.2))
@@ -35,7 +36,7 @@ extension EditPortRoute: ExpressibleByArgument {
 
 extension EditPortDrive: ExpressibleByArgument {
     public init?(argument: String) {
-        let matchArrowRegex = #/([a-zA-Z0-9-_.:\[\]]+)->([a-zA-Z0-9-_.:\[\]]+)/#
+        let matchArrowRegex = #/([a-fA-F0-9]+)\s*->\s*([a-zA-Z0-9-_.]+\s*\[[0-9:\s]+\])/#
         let matchConstRegex = #/(0x|0b|0d|0o|)([0-9a-fA-F]+)/#
 
         // match

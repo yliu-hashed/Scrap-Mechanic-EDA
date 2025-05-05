@@ -82,6 +82,9 @@ private func locateLZ4(verbose: Bool) -> URL? {
     let outputPipe = Pipe()
     process.standardOutput = outputPipe
 
+    let wait = DispatchSemaphore(value: 0)
+    process.terminationHandler = { _ in wait.signal() }
+
     do {
         try process.run()
     } catch {
@@ -89,7 +92,8 @@ private func locateLZ4(verbose: Bool) -> URL? {
         return nil
     }
 
-    process.waitUntilExit()
+    let result = wait.wait(timeout: .now() + 2)
+    guard result == .success else { return nil }
 
     let data = outputPipe.fileHandleForReading.availableData
     guard let string = String(data: data, encoding: .utf8) else { return nil }
@@ -104,10 +108,6 @@ private func locateLZ4(verbose: Bool) -> URL? {
 #endif
 
 private func lz4BlueprintSize(data: borrowing Data, lz4Path: String?, verbose: Bool) -> Int? {
-#if os(Linux)
-    return nil
-#endif
-
     let lz4URL: URL
     if let lz4Path = lz4Path {
         lz4URL = URL(fileURLWithPath: lz4Path)

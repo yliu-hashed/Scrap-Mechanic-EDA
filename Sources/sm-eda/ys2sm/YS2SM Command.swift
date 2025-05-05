@@ -30,10 +30,22 @@ struct YS2SMCMD: ParsableCommand {
     @Argument(help: kOutNetFileArgHelp, completion: .file(extensions: ["json"]))
     var outputNetJsonFile: String
 
+    @Option(name: [.customShort("R"), .customLong("report")],
+            help: kOutReportFileArgHelp,
+            completion: .file(extensions: ["json"]))
+    var outputReportJsonFile: String?
+
     func run() throws {
         let sourceYosysURL = URL(fileURLWithPath: sourceYosysJsonFile, isDirectory: false)
 
         let outputNetURL = URL(fileURLWithPath: outputNetJsonFile, isDirectory: false)
+
+        let outputReportURL: URL?
+        if let outputReportJsonFile = outputReportJsonFile {
+            outputReportURL = URL(fileURLWithPath: outputReportJsonFile, isDirectory: false)
+        } else {
+            outputReportURL = nil
+        }
 
         // create coders
         let decoder = JSONDecoder()
@@ -73,8 +85,32 @@ struct YS2SMCMD: ParsableCommand {
             syncClock(&module)
         }
 
+        // report status
+        var report = FullSynthesisReport()
+        // analyze timing
+        if printlevel == .verbose {
+            print("Analyzing Design")
+        }
+
+        report.timingReport = analyzeTiming(module)
+        report.complexityReport = analyzeComplexity(module)
+
+        if printlevel == .verbose {
+            printTimingReport(report.timingReport)
+            printComplexityReport(report.complexityReport)
+        } else if printlevel == .lite {
+            printLiteReport(report)
+        }
+
         let data = try encoder.encode(module)
         try data.write(to: outputNetURL)
         if printlevel == .verbose { print("Net written successfully to \"\(outputNetURL)\"") }
+
+        // write report
+        if let outputReportURL = outputReportURL {
+            let netData = try encoder.encode(report)
+            try netData.write(to: outputReportURL)
+            if printlevel == .verbose { print("Report written successfully to \"\(outputReportURL)\"") }
+        }
     }
 }

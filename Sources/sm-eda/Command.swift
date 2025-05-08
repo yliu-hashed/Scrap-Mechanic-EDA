@@ -13,7 +13,6 @@ private let discussion = "This is the Scrap Mechanic EDA command line toolset."
         commandName: "sm-eda",
         discussion: discussion,
         subcommands: [
-            FlowCMD.self,
             YS2SMCMD.self,
             PlaceCMD.self,
             BRAMCMD.self,

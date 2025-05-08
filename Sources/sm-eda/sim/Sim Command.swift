@@ -35,8 +35,8 @@ struct SimCMD: ParsableCommand {
         CommandConfiguration(commandName: "sim", discussion: "This command perform simulation on a sm netlist file interactively.")
     }
 
-    @Argument(help: kSrcNetFileArgHelp, completion: .file(extensions: ["json"]))
-    var inputNetlistFile: String
+    @OptionGroup(title: "Load Module")
+    var loadModuleOptions: LoadModuleArgGroup
 
     @Option(name: [.customShort("s"), .customLong("script")],
             help: "The path of the script file to run",
@@ -44,37 +44,23 @@ struct SimCMD: ParsableCommand {
     var inputScriptFile: String? = nil
 
     func run() throws {
-        // setup
-        let inputNetlistURL = URL(fileURLWithPath: inputNetlistFile, isDirectory: false)
-
-        let inputScriptURL: URL?
-        if let inputScriptFile = inputScriptFile {
-            inputScriptURL = URL(fileURLWithPath: inputScriptFile, isDirectory: false)
-        } else {
-            inputScriptURL = nil
-        }
-
-        // create coders
-        let decoder = JSONDecoder()
-
         // print welcome
         print("Welcome to sm-net-sim!")
 
         // read file
-        let netlistData = try Data(contentsOf: inputNetlistURL)
-        print("Simulating `\(inputNetlistURL)`")
-        let netlist = try decoder.decode(SMModule.self, from: netlistData)
+        let netlist = try loadModuleOptions.work()
 
         let model = SimulationModel(module: netlist)
-        let controller = Controller(model: model, isRepl: inputScriptURL == nil)
+        let controller = Controller(model: model, isRepl: inputScriptFile == nil)
 
         // begin repl
-        if let inputScriptURL = inputScriptURL {
-            let scriptData = try Data(contentsOf: inputScriptURL)
+        if let inputScriptFile = inputScriptFile {
+            let url = URL(fileURLWithPath: inputScriptFile, isDirectory: false)
+            let scriptData = try Data(contentsOf: url)
             guard let script = String(data: scriptData, encoding: .utf8) else {
-                throw CommandError.invalidFormat(fileURL: inputScriptURL)
+                throw CommandError.invalidFormat(fileURL: url)
             }
-            print("Running script `\(inputScriptURL)`")
+            print("Running script `\(inputScriptFile)`")
             try runScript(controller: controller, script: script)
         } else {
             repl(controller: controller)

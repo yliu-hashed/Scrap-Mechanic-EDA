@@ -17,9 +17,8 @@ struct ShowCMD: ParsableCommand {
         CommandConfiguration(commandName: "show", discussion: "This command generate .dot file from a netlist.")
     }
 
-    @Argument(help: "The path of the netlist file to read",
-              completion: .file(extensions: ["json"]))
-    var inputNetlistFile: String
+    @OptionGroup(title: "Load Module")
+    var loadModuleOptions: LoadModuleArgGroup
 
     @Flag(help: "Show gate id for each gate in the netlist")
     var showID: Bool = false
@@ -30,18 +29,11 @@ struct ShowCMD: ParsableCommand {
     var outputDotFile: String? = nil
 
     func run() throws {
-        // setup
-        let inputNetlistURL = URL(fileURLWithPath: inputNetlistFile, isDirectory: false)
-
-        // create coders
-        let decoder = JSONDecoder()
-
-        // read file
-        let netlistData = try Data(contentsOf: inputNetlistURL)
-        let netlist = try decoder.decode(SMModule.self, from: netlistData)
+        // load module
+        let module = try loadModuleOptions.work()
 
         // generate dot file
-        let dotFile = showDot(module: netlist, showID: showID)
+        let dotFile = showDot(module: module, showID: showID)
 
         // store or print
         if let outputDotFile = outputDotFile {

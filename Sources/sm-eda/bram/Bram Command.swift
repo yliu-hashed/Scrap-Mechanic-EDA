@@ -73,18 +73,14 @@ struct BRAMCMD: ParsableCommand {
             help: multiplexityArgHelp)
     var multiplexity: Int = 0
 
-    @Argument(help: "The path of the netlist file to write",
-              completion: .file(extensions: ["json"]))
-    var outputNetlistFile: String
-
     @Option(name: [.customShort("n"), .customLong("name")],
             help: "Rename the output module")
     var name: String = "Untitled"
 
-    func run() throws {
-        // setup
-        let outputNetlistURL = URL(fileURLWithPath: outputNetlistFile, isDirectory: false)
+    @OptionGroup(title: "Store Module")
+    var storeModuleOptions: StoreModuleArgGroup
 
+    func run() throws {
         // guard against port misconfiguration
         guard ports.contains(where: { $0.hasRead }) else {
             throw CommandError.invalidInput(description: "No read ports configured")
@@ -159,9 +155,7 @@ struct BRAMCMD: ParsableCommand {
         }
 
         // write
-        let data = try encoder.encode(module)
-        try data.write(to: outputNetlistURL)
-        if printlevel == .verbose { print("Netlist written successfully to \"\(outputNetlistURL)\"") }
+        try storeModuleOptions.work(module: module, printlevel: printlevel)
     }
 
     enum MemoryType: EnumerableFlag, CustomStringConvertible {

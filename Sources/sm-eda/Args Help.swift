@@ -73,11 +73,6 @@ let kOutNetFileArgHelp = ArgumentHelp(
     valueName: "out-net-json"
 )
 
-let kOutOptNetFileArgHelp = ArgumentHelp(
-    "The path of the netlist json file to write. If not specified, the input file is overwritten.",
-    valueName: "out-net-json"
-)
-
 let kSrcYSJsonFileArgHelp = ArgumentHelp(
     "The path of the yosys json file to read",
     discussion: "SM-EDA uses Yosys as its detached HDL frontend. Use `write_json` in Yosys to generate a json file.",

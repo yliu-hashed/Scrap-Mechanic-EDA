@@ -76,40 +76,17 @@ struct EditCMD: ParsableCommand {
             help: ArgumentHelp("Set name of the output module.", valueName: "new-name"))
     var newName: String? = nil
 
-    @Flag(name: [.customLong("no-opt")])
-    var noOptimize: Bool = false
+    @OptionGroup(title: "Optimization")
+    var optimizerOptions: OptimizerArgGroup
 
-    @Argument(help: kSrcNetFileArgHelp, completion: .file(extensions: ["json"]))
-    var inputNetlistFile: String
+    @OptionGroup(title: "Load Module")
+    var loadModuleOptions: LoadModuleArgGroup
 
-    @Option(name: [.customShort("O"), .customLong("output")],
-            help: kOutOptNetFileArgHelp,
-            completion: .file(extensions: ["json"]))
-    var outputNetlistFile: String? = nil
+    @OptionGroup(title: "Store Module")
+    var storeModuleOptions: StoreModuleArgGroup
 
-    mutating func run() throws {
-        // setup
-        let fileManager = FileManager.default
-        let inputNetlistURL = URL(fileURLWithPath: inputNetlistFile, isDirectory: false)
-        let outputNetlistURL: URL
-        if let outputNetlistFile = outputNetlistFile {
-            outputNetlistURL = URL(fileURLWithPath: outputNetlistFile, isDirectory: false)
-        } else {
-            outputNetlistURL = inputNetlistURL
-        }
-
-        // warn the user if a overwrite will occure
-        if printlevel == .verbose, fileManager.fileExists(atPath: outputNetlistFile ?? inputNetlistFile) {
-            print("File \"\(outputNetlistURL)\" will be overwritten")
-        }
-
-        // create coders
-        let encoder = JSONEncoder()
-        let decoder = JSONDecoder()
-        encoder.outputFormatting = .sortedKeys
-
+    func run() throws {
         let function: EditFunction
-
         // read script
         if let scriptFile = scriptFile {
             // make sure input file exist and readable
@@ -151,8 +128,7 @@ struct EditCMD: ParsableCommand {
         }
 
         // read file
-        let netlistData = try Data(contentsOf: inputNetlistURL)
-        var module = try decoder.decode(SMModule.self, from: netlistData)
+        var module = try loadModuleOptions.work()
 
         try function.run(&module)
 
@@ -161,13 +137,8 @@ struct EditCMD: ParsableCommand {
             module.name = newName
         }
 
-        if !noOptimize {
-            optimize(&module)
-        }
+        try optimizerOptions.work(module: &module)
 
-        // write netlist
-        let outData = try encoder.encode(module)
-        try outData.write(to: outputNetlistURL)
-        if printlevel == .verbose { print("Netlist written successfully to \"\(outputNetlistURL)\"") }
+        try storeModuleOptions.work(module: module, printlevel: printlevel)
     }
 }

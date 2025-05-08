@@ -35,19 +35,6 @@ struct PlaceCMD: ParsableCommand {
     var outputReportJsonFile: String?
 
     func run() throws {
-        // Guard against invalid input
-        let sizeConstraint = 64
-        if let blueprintDepth = placementOptions.blueprintDepth {
-            guard blueprintDepth > 0, blueprintDepth <= sizeConstraint else {
-                throw CommandError.invalidInput(description: "blueprint depth must be within 1...\(sizeConstraint)")
-            }
-        }
-        if let blueprintWidth = placementOptions.blueprintWidth {
-            guard blueprintWidth > 0, blueprintWidth <= sizeConstraint else {
-                throw CommandError.invalidInput(description: "blueprint wrapping must be within 1...\(sizeConstraint)")
-            }
-        }
-
         // form URL
         let fileManager = FileManager.default
 
@@ -110,26 +97,19 @@ struct PlaceCMD: ParsableCommand {
             printLiteReport(report)
         }
 
+        // load port configs
+        let config = try fetchPlacementConfig(file: placementOptions.config)
+
         // place blueprint
         if printlevel == .verbose { print("Placing Blueprint") }
-        let blueprint = try simplePlace(
-            module,
-            defaultInputDevice: placementOptions.inputDeviceType.device,
-            depth: placementOptions.blueprintDepth,
-            widthWrap: placementOptions.blueprintWidth,
-            portLocation: placementOptions.portLocation,
-            packPort: placementOptions.packPort,
-            facade: !placementOptions.noFacade,
-            report: &report.placementReport,
-            doPrint: printlevel == .verbose || outputReportURL == nil
-        )
+        let blueprint = try place(module, config: config, report: &report.placementReport)
         if printlevel == .verbose { print("Blueprint Generation Successfully") }
 
         // check size & write blueprint
         let blueprintData = try encoder.encode(blueprint)
         checkSize(
             data: blueprintData,
-            facade: !placementOptions.noFacade,
+            facade: config.facade,
             report: &report.placementReport,
             verbose: printlevel == .verbose,
             lz4Path: placementOptions.lz4Path

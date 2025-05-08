@@ -51,6 +51,12 @@ let kPackPortArgHelp = ArgumentHelp(
     valueName: "pack-port"
 )
 
+let kConfigArgHelp = ArgumentHelp(
+    "The placement configuration for the module",
+    discussion: "Use this option to influence the placement of the module. The placement configuration is a JSON file that defines the placement rules for the module. When this option is specified, the module placement is only determined by the rules defined in the JSON file, and command line options are ignored.",
+    valueName: "config"
+)
+
 let kLZ4PathArgHelp = ArgumentHelp(
     "The path to the LZ4 executable",
     discussion: "Use this parameter to specify the path to LZ4 to accurately estimate blueprint size. If not specified, the path to the LZ4 executable is searched by asking the shell `which lz4`.",

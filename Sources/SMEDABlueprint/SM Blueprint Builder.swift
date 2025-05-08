@@ -143,7 +143,7 @@ public class SMBlueprintBuilder {
     }
 }
 
-public enum SMInputDevice: String, CaseIterable {
+public enum SMInputDevice: String, Codable, CaseIterable {
     case button = "button"
     case `switch` = "switch"
 }

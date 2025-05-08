@@ -8,7 +8,7 @@ public struct EditPort: CustomStringConvertible {
     public let msb: Int
     public let lsb: Int
 
-    public var width: Int { msb - lsb + 1 }
+    public var width: Int { abs(msb - lsb) + 1 }
 
     public init(port: String, msb: Int, lsb: Int) {
         self.port = port

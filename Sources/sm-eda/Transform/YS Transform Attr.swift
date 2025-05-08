@@ -30,7 +30,7 @@ func recordColorToAttribute(ysModule: YSModule, smModule: inout SMModule) {
             if port.direction == .input {
                 smModule.inputs[portName]?.colorHex = color.hex
             } else {
-                smModule.inputs[portName]?.colorHex = color.hex
+                smModule.outputs[portName]?.colorHex = color.hex
             }
         } else {
             print("Warning: color literal \(colorString) for port \(portName) is invalid. Using default color")

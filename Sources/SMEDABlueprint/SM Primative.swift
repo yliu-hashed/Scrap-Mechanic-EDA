@@ -5,11 +5,6 @@
 
 import Foundation
 
-private func mod<T: BinaryInteger>(_ x: T, _ y: T) -> T {
-    let r = x % y
-    return (r < 0) ? (r + y) : r
-}
-
 public struct SMVector: Codable, Equatable, Hashable {
 
     public var x: Int
@@ -127,9 +122,8 @@ public enum SMDirection: Int, Codable, CaseIterable {
 
     /// Rotate the direction around another direction by 90 degrees by a given number of times
     public func rotated(around direction: SMDirection, amount: Int) -> SMDirection {
-        let a = mod(amount, 4)
         var direction: SMDirection = self
-        for _ in 0..<a {
+        for _ in 0..<(amount & 3) {
             direction = direction.rotated(around: direction)
         }
         return self

@@ -54,7 +54,7 @@ struct PlacementArgGroup: ParsableArguments {
             lz4Path: lz4Path
         )
         try blueprintData.write(to: URL(fileURLWithPath: blueprintFile, isDirectory: false))
-        if printlevel == .verbose { print("Blueprint written successfully to \"\(configPath)\"") }
+        if printlevel == .verbose { print("Blueprint written successfully to \"\(blueprintFile)\"") }
 
         return placementReport
     }

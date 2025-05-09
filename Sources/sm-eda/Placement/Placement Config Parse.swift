@@ -188,7 +188,7 @@ private func generatePortConfigLines(for config: PortConfig) -> [String] {
         var lastName: String? = nil
         var lastMSB: Int = 0
         var lastLSB: Int = 0
-        var lastH: Int? = nil
+        var lastH: Int = -1
         for (h, bit) in portline {
             if lastName == bit.name, lastH == h - 1,
                lastMSB == lastLSB || lastMSB + (lastMSB > lastLSB ? 1 : -1) == bit.index {
@@ -198,8 +198,8 @@ private func generatePortConfigLines(for config: PortConfig) -> [String] {
                 lastMSB = bit.index
                 continue
             }
-            if let lastH = lastH, lastH != h - 1 {
-                line.append("\(h - lastH + 1)")
+            if lastH != h - 1 {
+                line.append("\(h - lastH - 1)")
             }
             line.append("\(bit.name)[\(bit.index):\(bit.index)]")
             lastName = bit.name

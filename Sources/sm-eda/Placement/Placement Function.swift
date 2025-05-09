@@ -10,10 +10,6 @@ import SMEDAResult
 import SMEDABlueprint
 
 struct PlacementArgGroup: ParsableArguments {
-    @Option(name: [.customShort("c"), .customLong("config")],
-            help: kConfigArgHelp,
-            completion: .file(extensions: ["json"]))
-    var configPath: String
 
     @Option(name: [.customLong("lz4-path")],
             help: kLZ4PathArgHelp,
@@ -23,7 +19,7 @@ struct PlacementArgGroup: ParsableArguments {
     @Argument(help: kOutBPFileArgHelp, completion: .file(extensions: ["json"]))
     var blueprintFile: String
 
-    func work(module: borrowing SMModule, printlevel: PrintLevel) throws -> PlacementReport {
+    func work(module: borrowing SMModule, config: borrowing PlacementConfig, printlevel: PrintLevel) throws -> PlacementReport {
         let fileManager = FileManager.default
 
         // make sure lz4 can be accessed
@@ -35,9 +31,6 @@ struct PlacementArgGroup: ParsableArguments {
 
         let encoder = JSONEncoder()
         encoder.outputFormatting = [ .sortedKeys ]
-        // load port configs
-        let config = try fetchPlacementConfig(file: configPath)
-
         // place blueprint
         if printlevel == .verbose { print("Placing Blueprint") }
         var placementReport = PlacementReport()

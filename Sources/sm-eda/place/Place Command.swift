@@ -20,6 +20,9 @@ struct PlaceCMD: ParsableCommand {
     @OptionGroup(title: "Load Module")
     var loadModuleOptions: LoadModuleArgGroup
 
+    @OptionGroup(title: "Load Placement Config")
+    var loadConfigOptions: LoadPlacementConfigArgGroup
+
     @OptionGroup(title: "Placement")
     var placementOptions: PlacementArgGroup
 
@@ -28,7 +31,8 @@ struct PlaceCMD: ParsableCommand {
 
     func run() throws {
         let module = try loadModuleOptions.work()
-        let placementReport = try placementOptions.work(module: module, printlevel: printlevel)
+        let config = try loadConfigOptions.work()
+        let placementReport = try placementOptions.work(module: module, config: config, printlevel: printlevel)
         try analyzeOptions.work(module: module, placementReport: placementReport, printlevel: printlevel)
     }
 }

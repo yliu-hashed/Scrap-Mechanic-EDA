@@ -11,11 +11,11 @@ extension BRAMPortConfig: ExpressibleByArgument {}
 
 extension EditPort: ExpressibleByArgument {
     public init?(argument: String) {
-        let matchPortRegex = #/([0-9a-zA-Z-_.]+)\s*\[\s*([0-9]+)\s*\:\s*([0-9]+)\s*\]/#
+        let matchPortRegex = #/([0-9a-zA-Z-_.]+)\s*\[\s*([0-9]+)\s*(?:\:\s*([0-9]+)\s*)?\]/#
 
         guard let match = try? matchPortRegex.wholeMatch(in: argument),
               let msb = Int(match.2),
-              let lsb = Int(match.3)
+              let lsb = if let lsbStr = match.3 { Int(lsbStr) } else { msb }
         else { return nil }
         self = EditPort(port: String(match.1), msb: msb, lsb: lsb)
     }

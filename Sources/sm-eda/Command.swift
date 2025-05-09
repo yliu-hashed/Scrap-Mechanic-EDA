@@ -15,6 +15,7 @@ private let discussion = "This is the Scrap Mechanic EDA command line toolset."
         subcommands: [
             YS2SMCMD.self,
             PlaceCMD.self,
+            AutoPlanCMD.self,
             BRAMCMD.self,
             EditCMD.self,
             SimCMD.self,

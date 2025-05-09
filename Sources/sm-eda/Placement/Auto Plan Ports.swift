@@ -17,7 +17,16 @@ private func layoutPortsPacked(ports: borrowing [String: SMModule.Port], width: 
     var table: [PortBit: PortConfig.Coordinate] = [:]
 
     var layers: [Int] = []
-    let ranked = ports.lazy.sorted { $0.value.gates.count > $1.value.gates.count }
+    let ranked = ports.lazy.sorted { (lhs, rhs) in
+        let lhsCount = lhs.value.gates.count
+        let rhsCount = rhs.value.gates.count
+        if lhsCount != rhsCount {
+            return lhsCount > rhsCount
+        } else {
+            return lhs.key > rhs.key
+        }
+    }
+
     for (name, port) in ranked {
         let portSize = port.gates.count
         // if can fit, add

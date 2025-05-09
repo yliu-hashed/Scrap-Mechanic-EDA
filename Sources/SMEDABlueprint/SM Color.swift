@@ -51,14 +51,14 @@ public enum SMColorShade: Int, CaseIterable {
     ]
 
     static func extractShade(shadeToken: String, hueToken: String) -> SMColorShade? {
-        guard !shadeToken.isEmpty else { return .regular }
         switch hueToken {
             case "white": return .light
             case "black": return .veryDark
             case "brown": return .dark
-            default:
-                return SMColorShade.shadeNameTable[shadeToken]
+            default: break
         }
+        guard !shadeToken.isEmpty else { return .regular }
+        return SMColorShade.shadeNameTable[shadeToken]
     }
 }
 

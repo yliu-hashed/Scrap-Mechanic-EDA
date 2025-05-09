@@ -29,7 +29,7 @@ private extension PlacementConfig.Volume {
         let ry = sum.y >= 0 ? sum.y - 1 : sum.y + size.y
         let rz = sum.z >= 0 ? sum.z - 1 : sum.z + size.z
 
-        return SMVector(x: rx, y: ry, z: rz)
+        return position + SMVector(x: rx, y: ry, z: rz)
     }
 }
 

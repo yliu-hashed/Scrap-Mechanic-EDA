@@ -7,6 +7,18 @@ import Foundation
 import ArgumentParser
 import SMEDANetlist
 
+private let kSrcYSJsonFileArgHelp = ArgumentHelp(
+    "The path of the yosys json file to read",
+    discussion: "SM-EDA uses Yosys as its detached HDL frontend. Use `write_json` in Yosys to generate a json file.",
+    valueName: "in-yosys-json"
+)
+
+private let kClockDomainArgHelp = ArgumentHelp(
+    "The clock domain of the design",
+    discussion: "Repeat the same argument to specify multiple clock domains.",
+    valueName: "clock-domain"
+)
+
 struct TransformArgGroup: ParsableArguments {
     @Option(name: [.customLong("clk")], help: kClockDomainArgHelp)
     var clockDomainNames: [String] = []

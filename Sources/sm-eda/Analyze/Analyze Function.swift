@@ -8,6 +8,11 @@ import ArgumentParser
 import SMEDANetlist
 import SMEDAResult
 
+private let kOutReportFileArgHelp = ArgumentHelp(
+    "The path of the json report to write",
+    valueName: "out-report"
+)
+
 struct AnalyzeArgGroup: ParsableArguments {
     @Flag(name: [.customShort("p"), .customLong("pretty-json")], help: kPrettyPrintArgHelp)
     var prettyPrint: Bool = false

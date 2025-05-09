@@ -9,6 +9,17 @@ import SMEDANetlist
 import SMEDAResult
 import SMEDABlueprint
 
+private let kLZ4PathArgHelp = ArgumentHelp(
+    "The path to the LZ4 executable",
+    discussion: "Use this parameter to specify the path to LZ4 to accurately estimate blueprint size. If not specified, the path to the LZ4 executable is searched by asking the shell `which lz4`.",
+    valueName: "lz4-path"
+)
+
+private let kOutBPFileArgHelp = ArgumentHelp(
+    "The path of the blueprint json file to write",
+    valueName: "out-blueprint"
+)
+
 struct PlacementArgGroup: ParsableArguments {
 
     @Option(name: [.customLong("lz4-path")],

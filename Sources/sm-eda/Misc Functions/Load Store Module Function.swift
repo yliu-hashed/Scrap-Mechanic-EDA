@@ -7,6 +7,16 @@ import Foundation
 import ArgumentParser
 import SMEDANetlist
 
+private let kOutNetFileArgHelp = ArgumentHelp(
+    "The path of the netlist json file to write",
+    valueName: "out-net-json"
+)
+
+private let kSrcNetFileArgHelp = ArgumentHelp(
+    "The path of the netlist json file to read",
+    valueName: "in-net-json"
+)
+
 struct LoadModuleArgGroup: ParsableArguments {
     @Argument(help: kSrcNetFileArgHelp, completion: .file(extensions: ["json"]))
     var netlistFile: String

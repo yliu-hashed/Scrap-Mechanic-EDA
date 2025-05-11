@@ -56,6 +56,7 @@ extension PlacementConfig.Volume: Codable {
 
 extension PlacementConfig.PortSurface: Codable {
     enum CodingKeys: CodingKey {
+        case name
         case ports
         case position
         case directionLeft
@@ -65,6 +66,7 @@ extension PlacementConfig.PortSurface: Codable {
 
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decodeIfPresent(String.self, forKey: .name)
         self.ports = try container.decode(PortConfig.self, forKey: .ports)
         self.position = try container.decode(SMVector.self, forKey: .position)
         self.directionLeft = try container.decode(SMDirection.self, forKey: .directionLeft)
@@ -74,6 +76,7 @@ extension PlacementConfig.PortSurface: Codable {
 
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.name, forKey: .name)
         try container.encode(self.ports, forKey: .ports)
         try container.encode(self.position, forKey: .position)
         try container.encode(self.directionLeft, forKey: .directionLeft)

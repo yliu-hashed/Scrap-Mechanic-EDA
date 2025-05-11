@@ -91,6 +91,38 @@ func place(
         }
     }
 
+    // report placed surfaces and size info
+    for surface in config.surfaces {
+        let table = generateReportForConfig(for: surface.ports)
+        let baseName = surface.name ?? "Surface"
+        var index: Int? = nil
+        while true {
+            let name = if let index { "\(baseName) \(index)" } else { baseName }
+            if !report.surfaces.keys.contains(name) { break }
+            index = (index ?? 0) + 1
+        }
+        let name = if let index { "\(baseName) \(index)" } else { baseName }
+        report.surfaces[name] = table
+    }
+
+    var maxX: Int = 0
+    var minX: Int = 0
+    var maxY: Int = 0
+    var minY: Int = 0
+    var maxZ: Int = 0
+    var minZ: Int = 0
+    for pos in occupied {
+        maxX = max(maxX, pos.x)
+        minX = min(minX, pos.x)
+        maxY = max(maxY, pos.y)
+        minY = min(minY, pos.y)
+        maxZ = max(maxZ, pos.z)
+        minZ = min(minZ, pos.z)
+    }
+    report.depth  = maxX - minX + 1
+    report.width  = maxY - minY + 1
+    report.height = maxZ - minZ + 1
+
     return SMBlueprint(bodies: [builder.blueprintBody])
 }
 

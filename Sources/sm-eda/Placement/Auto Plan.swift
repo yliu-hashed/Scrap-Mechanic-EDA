@@ -91,6 +91,7 @@ func autoPlan(
 
     var surfaces: [PlacementConfig.PortSurface] = []
     surfaces.append(PlacementConfig.PortSurface(
+        name: portDoubleSided ? "Inputs" : "Ports",
         ports: surfaceFront,
         position: SMVector(x: sinkPort ? 0 : -1),
         directionLeft: .posY,
@@ -99,6 +100,7 @@ func autoPlan(
 
     if let surfaceBack = surfaceBack {
         surfaces.append(PlacementConfig.PortSurface(
+            name: "Outputs",
             ports: surfaceBack,
             position: SMVector(x: sinkPort ? planDepth - 1 : planDepth),
             directionLeft: .posY,
@@ -126,6 +128,7 @@ private extension PlacementConfig.PortSurface {
         }
 
         return PlacementConfig.PortSurface(
+            name: name,
             ports: PortConfig(table: table),
             position: pos,
             directionLeft: directionLeft.opposite,

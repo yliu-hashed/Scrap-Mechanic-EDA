@@ -16,6 +16,7 @@ struct PlacementConfig {
     }
 
     struct PortSurface {
+        var name: String?
         var ports: PortConfig
         var position: SMVector
         var directionLeft: SMDirection

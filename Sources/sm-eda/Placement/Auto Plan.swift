@@ -79,13 +79,11 @@ func autoPlan(
         let planeSize = max(portHeight, 1) * planWidth
         planDepth = min(max(counts / planeSize, 1), 32)
     }
-    let surface = planWidth * planDepth
-    let planHeight = max((logicCount + timerCount + surface - 1) / surface, 1)
 
     // create config
     let volume = PlacementConfig.Volume(
         position: .zero,
-        size: SMVector(x: planDepth, y: planWidth, z: planHeight),
+        size: SMVector(x: planDepth, y: planWidth, z: 1000000),
         fillDirectionPrimary: .posZ,
         fillDirectionSecondary: .posY,
         fillDirectionTertiary: .posX

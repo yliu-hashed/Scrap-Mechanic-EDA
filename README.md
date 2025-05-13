@@ -92,7 +92,11 @@ SM-EDA is a collection of custom tools that enable Electronic Design Automation 
 - `sm-eda ys2sm`
   - Read Yosys JSON and convert it into SM netlist JSON
 - `sm-eda place`
-  - Read sm netlist JSON and generate a blueprint from it
+  - Read a sm netlist JSON and a placement configuration, then generate a blueprint from them
+- `sm-eda autoplace`
+  - Read a sm netlist JSON and generate a blueprint from it
+- `sm-eda autoplan`
+  - Generate a barebone placement configuration given a netlist
 - `sm-eda bram`
   - Generate a ram module netlist JSON using XOR-based DFF or timer-based memory with arbitrary size, addressability, and port configuration
 - `sm-eda edit`
@@ -103,7 +107,7 @@ SM-EDA is a collection of custom tools that enable Electronic Design Automation 
   - Visualize the netlist by exporting to [graphvis](https://graphviz.org) `.dot` format
   - Can be used to explore netlists visually
 
-Almost all tools work by operating on a JSON netlist format tailored to Scrap Mechanic logic. This interchanged represents the logic network without solidifying them into a blueprint. It is designed to be passed around different tools. For example, you may run `sm-eda bram` first to generate a timer memory netlist, then use `sm-eda place` to create a blueprint.
+Almost all tools work by operating on a JSON netlist format tailored to Scrap Mechanic logic. This interchanged represents the logic network without solidifying them into a blueprint. It is designed to be passed around different tools. For example, you may run `sm-eda bram` first to generate a timer memory netlist, then use `sm-eda autoplace` to create a blueprint.
 
 # The SM-EDA Bundle
 

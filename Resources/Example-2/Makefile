@@ -11,7 +11,6 @@ DOCKER_ARGS = run --rm --mount type=bind,source="$(MKFILE_DIR)",target=/working 
 DOCKER_RUN = docker $(DOCKER_ARGS) bash -l -c "cd working && $(1)"
 
 # Argument for blueprint generation
-BP_ARGS = --depth 8 --width 8 --port-front-only --pack
 
 # Synthesis for soc ------------------------------------------------------------
 ## verilog --yosys-> synth
@@ -23,8 +22,8 @@ tmp/soc_model.json: tmp/soc_synth.json
 	$(call DOCKER_RUN,sm-eda ys2sm --clk clk tmp/soc_synth.json tmp/soc_model.json)
 
 ## model --place-> blueprint
-blueprints/soc.json: tmp/soc_model.json
-	$(call DOCKER_RUN,sm-eda place $(BP_ARGS) -v tmp/soc_model.json blueprints/soc.json > logs/soc.log)
+blueprints/soc.json: tmp/soc_model.json resources/config.json
+	$(call DOCKER_RUN,sm-eda place -v --config resources/config.json tmp/soc_model.json blueprints/soc.json > logs/soc.log)
 
 # Subcommands
 .PHONY: clean cleantmp

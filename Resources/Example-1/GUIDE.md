@@ -47,7 +47,7 @@ Then, use `sm-eda flow` to generate a blueprint using the following command:
 
 ```bash
 # Terminal 1
-sm-eda flow -v --depth 2 --width 8 --portFrontOnly /tmp/synth.json /working/blueprint.json
+sm-eda flow -v --depth 2 --width 8 /tmp/synth.json /working/blueprint.json
 ```
 
 Note: Use `sm-eda flow -h` to find out the meaning of each argument.

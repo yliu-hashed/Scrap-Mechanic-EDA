@@ -1,0 +1,42 @@
+{
+  "defaultInputDevice" : null,
+  "facade" : true,
+  "surfaces" : [
+    {
+      "defaultInputDevice" : null,
+      "directionLeft" : 2,
+      "directionUp" : 3,
+      "name" : "Ports",
+      "ports" : [
+        "i_we[0:0],4,hlt[0:0],rst[0:0],clk[0:0]",
+        "i_addr[7:0]",
+        "i_data[7:0]",
+        "o_data[7:0]"
+      ],
+      "position" : {
+        "x" : -1,
+        "y" : 0,
+        "z" : 0
+      }
+    }
+  ],
+  "volumes" : [
+    {
+      "fillDirectionPriority" : [
+        3,
+        2,
+        1
+      ],
+      "position" : {
+        "x" : 0,
+        "y" : 0,
+        "z" : 0
+      },
+      "size" : {
+        "x" : 32,
+        "y" : 8,
+        "z" : 1000000
+      }
+    }
+  ]
+}

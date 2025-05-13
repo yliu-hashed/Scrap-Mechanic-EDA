@@ -91,18 +91,25 @@ The second rule converts the Yosys JSON to SM netlist format. The `--clk clk` ar
 
 After this point, `tmp/soc_model.json` is created.
 
-This step can be fused with the next step by directly emitting a blueprint with the `-B <bp>` argument. However, it is kept separate to facilitate other potential operations you might need to do, like merging in other netlists or doing simulations with it.
-
 ### 3. Blueprint Generation
 
 ```Makefile
-blueprints/soc.json: tmp/soc_model.json
-	$(call DOCKER_RUN,sm-eda place $(BP_ARGS) -v tmp/soc_model.json blueprints/soc.json > logs/soc.log)
+blueprints/soc.json: tmp/soc_model.json resources/config.json
+	$(call DOCKER_RUN,sm-eda place --config resources/config.json -v tmp/soc_model.json blueprints/soc.json > logs/soc.log)
 ```
 
-The third rule converts the SM netlist into a blueprint `blueprints/soc.json`. `BP_ARGS` is a variable containing arguments that describe how the blueprint will be placed. Here, it's equal to `--depth 8 --width 8`.
+The third rule converts the SM netlist into a blueprint `blueprints/soc.json`. `resources/config.json` is another input to this command. It is the placement config that describes how the blueprint will be placed. In this config file, arrangement of ports are defined as the following:
 
-The extra `... > logs/soc.txt` suffix writes the output of the `place` command into a file in `logs/soc.txt`. This is so that the timing values and port locations of the blueprint are recorded for use later in-game.
+```json
+"ports" : [
+	"i_we[0:0],4,hlt[0:0],rst[0:0],clk[0:0]",
+	"i_addr[7:0]",
+	"i_data[7:0]",
+	"o_data[7:0]"
+],
+```
+
+The extra `... > logs/soc.txt` suffix writes the output of the `place` command into a file in `logs/soc.txt`. This is so that the timing values are recorded for use later in-game.
 
 ### What chains all this?
 
@@ -110,7 +117,7 @@ No place in this Makefile has the sequence that these commands need to run at. T
 
 It simply sees that:
 
-* to make `blueprints/soc.json` needs `tmp/soc_model.json`.
+* to make `blueprints/soc.json` needs `tmp/soc_model.json` and `resources/config.json`.
 * to make `tmp/soc_model.json` needs `tmp/soc_synth.json`
 * to make `tmp/soc_synth.json` needs `src/soc.v`, `src/cpu.v`, and `src/alu.v`
 

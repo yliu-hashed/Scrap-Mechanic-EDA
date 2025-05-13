@@ -99,6 +99,33 @@ struct AutoPlanArgGroup: ParsableArguments {
     @Flag(name: [.customLong("sink")], help: kPackPortArgHelp)
     var sinkPort: Bool = false
 
+    func validate() throws {
+        if let depth = blueprintDepth {
+            guard depth >= 1 else {
+                throw ValidationError.nonPositiveDepth
+            }
+        }
+        if let width = blueprintWidth {
+            guard width >= 1 else {
+                throw ValidationError.nonPositiveWidth
+            }
+        }
+    }
+
+    enum ValidationError: Error, CustomStringConvertible {
+        case nonPositiveDepth
+        case nonPositiveWidth
+
+        var description: String {
+            switch self {
+                case .nonPositiveDepth:
+                    return "Depth must be a positive integer."
+                case .nonPositiveWidth:
+                    return "Width must be a positive integer."
+            }
+        }
+    }
+
     func work(module: borrowing SMModule) throws -> PlacementConfig {
         return autoPlan(
             for: module,

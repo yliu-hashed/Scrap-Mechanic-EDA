@@ -5,8 +5,7 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIR := $(dir $(MKFILE_PATH))
 
 # Create a function to run command in the docker directory
-# DOCKER_IMAGE = ghcr.io/yliu-hashed/sm-eda-bundle:latest
-DOCKER_IMAGE = sm-eda:latest
+DOCKER_IMAGE = ghcr.io/yliu-hashed/sm-eda-bundle:latest
 DOCKER_ARGS = run --rm --mount type=bind,source="$(MKFILE_DIR)",target=/working $(DOCKER_IMAGE)
 DOCKER_RUN = docker $(DOCKER_ARGS) bash -l -c "cd working && $(1)"
 

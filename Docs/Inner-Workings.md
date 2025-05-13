@@ -3,9 +3,9 @@
 
 This document illustrates how Yosys and SM-EDA work together.
 
-I will be using a modified version of [Resources/Example-1](Resources/Example-1). The width of the register is reduced from 8 to 4 to reduce the size of the images. It's a non-trivial example containing some combinational and sequential logic.
+I will be using a modified version of [Resources/Example-1](Resources/Example-1). The width of the register is reduced from 8 to 4. This makes it easier for me to generate images in this guide. This example is chosen as it contains some combinational and sequential logic.
 
-You can follow along using the dedicated tutorial in Example-1 [GUIDE.md](Resources/Example-1/GUIDE.md). Keep in mind that images in this guide require additional tools to create.
+You can follow along using the dedicated tutorial in Example-1 [GUIDE.md](Resources/Example-1/GUIDE.md). Creating the images in this guide required additional tools and steps, which I excluded from this guide.
 
 ```verilog
 // Resources/Example-1/design.v
@@ -33,11 +33,11 @@ module counter(
 endmodule
 ```
 
-Also, note that the path names below can be abbreviated, and may differ with your setup.
+This guide assumes you are in the Docker environment with Verilog files located under `/working`, and flow files under `/flow`. This guide also assumes `/tmp` is available to place temporary files. The path names below may be abbreviated.
 
 ## Entering Yosys
 
-The first step is the invocation of the following command. This command tells Yosys to run the `script.ys` on `design.v`. In a broad sense, this runs synthesis.
+The first step is the invocation of the following command. This command tells Yosys to run the `script.ys` on `design.v`. In a broad sense, this runs the synthesis steps.
 
 ```bash
 yosys -s /flow/script.ys /working/src/design.v
@@ -55,7 +55,7 @@ flatten
 ...
 ```
 
-Although benign looking, these two commands do important jobs. The `hierarchy` command identifies a top-level module, resolves module references, and generally cleans up the design. For this example, there are no module references, and the only module named "counter" is the top-level module. If the verilog of Example 2 is loaded, the top-level module will be resolved to "soc". The relationship of "soc" using "cpu" and "cpu" using "alu" will be known at this point.
+Although benign-looking, these two commands do important jobs. The `hierarchy` command identifies a top-level module, resolves module references, and generally cleans up the design. For this example, there are no module references, and the only module named "counter" is the top-level module. If the Verilog of Example 2 is loaded, the top-level module will be resolved to "soc". The relationship of "soc" using "cpu" and "cpu" using "alu" will be known at this point.
 
 The `flatten` command collapses the hierarchy we just identified. In our case, it does nothing, but if we are using Example 2, it would instantiate "alu" into "cpu", and "cpu" into "soc". Now, there's no "alu" or "cpu", just one module that contains all there is to "soc".
 
@@ -75,9 +75,9 @@ The `proc` pass turns `always` blocks in Verilog into logic. After this pass, th
 
 ![](/Images/synth0.jpg)
 
-The `memory` pass turns memory into registers and things. It is a techmap for memory. The supplied `bram.rule` is to support Timer memory mapping. If the `memory` pass sees a memory with timer annotation, it will be turned into special modules instead. These special modules will be kept by Yosys. SM-EDA will later recognize it and generate the RAM. But here, we don't have any timer annotated memory. Thus it will do nothing.
+The `memory` pass turns memory into registers and things. It is a techmap for memory. The supplied `bram.rule` is to support Timer memory mapping. If the `memory` pass sees a memory with a timer annotation, it will be turned into special modules instead. These special modules will be kept by Yosys. SM-EDA will later recognize it and generate the RAM. But here, we don't have any timer-annotated memory. Thus, it will do nothing.
 
-The `techmap` pass turns these generic AST-based operators into Yosys internal generic gate-level operators. It turns high-level operators like *mux* and *add* into low-level operators like *nand* and *xor* for example.
+The `techmap` pass turns these generic AST-based operators into Yosys' internal generic gate-level operators. It turns high-level operators like *mux* and *add* into low-level operators like *nand* and *xor*, for example.
 
 ![](/Images/synth1.jpg)
 

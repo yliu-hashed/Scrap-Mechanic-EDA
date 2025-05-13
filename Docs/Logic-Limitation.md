@@ -56,7 +56,7 @@ These warnings are there to tell you that the blueprint
 2. is close to the limit.
 3. is above the limit.
 
-**Conservative Size** is the estimated size of the blueprint if its fields are randomly ordered. Hence, this is the size if the compression algorithm cannot compress the blueprint as effectively as before (like if you changed it heavily, or integrated it into an existing large design). As the name suggests, this is very conservative.
+**Conservative Size** is the estimated size of the blueprint calibrated to estimate the compressed size of a blueprint if all its fields are randomly ordered. Hence, this is the size if LZ4 cannot compress the blueprint as effectively as before. The size of a blueprint might increase if you modified it in game. As the name suggests, this is very conservative.
 
 ### Recommendations
 

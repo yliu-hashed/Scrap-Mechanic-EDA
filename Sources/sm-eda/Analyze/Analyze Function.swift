@@ -24,7 +24,11 @@ struct AnalyzeArgGroup: ParsableArguments {
 
     func work(module: borrowing SMModule, placementReport: consuming PlacementReport? = nil, printlevel: PrintLevel) throws {
         let encoder = JSONEncoder()
-        encoder.outputFormatting = [ .sortedKeys ]
+        if prettyPrint {
+            encoder.outputFormatting = [ .prettyPrinted, .sortedKeys ]
+        } else {
+            encoder.outputFormatting = [ .sortedKeys ]
+        }
 
         // report stats
         var report = FullSynthesisReport()

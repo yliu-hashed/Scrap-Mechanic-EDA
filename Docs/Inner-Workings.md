@@ -129,14 +129,15 @@ We now enter the generation stage of the flow. A blueprint is typically directly
 sm-eda flow /tmp/synth.json /working/blueprint.json
 ```
 
-But under the hood, it is two commands chained together.
+But under the hood, it is three commands chained together.
 
 ```bash
 sm-eda ys2sm /tmp/synth.json /tmp/net.json
-sm-eda place /tmp/net.json /working/blueprint.json
+sm-eda autoplan /tmp/synth.json /tmp/config.json
+sm-eda place /tmp/net.json --config /tmp/config.json /working/blueprint.json
 ```
 
-When you invoke `sm-eda flow` like above, `/tmp/net.json` is never made. It is passed from `ys2sm` to `place` internally.
+When you invoke `sm-eda flow` like above, `/tmp/net.json` and `/tmp/config.json` are never made. These data are passed in memory internally.
 
 ### Netlist Transformation
 
@@ -156,43 +157,48 @@ This command also balances the clock chain such that all registers will be synch
 
 This finally looks like something that can be made from scrap mechanic logic. The blue gates are marked as sequential. You can even identify the XOR loops that make up each register.
 
-### Blueprint Generation
-
-Now, it's just about generating blueprints from this net. This is what the `place` command is for.
-
-```bash
-sm-eda place /tmp/net.json /working/blueprint.json
-```
-
-Scrap Mechanic is an interesting game in that logic wirings don't take up space, and thus, a circuit can be built with any arbitrary placement of gates. Thus, SM-EDA doesn't need to do sophisticated PnR. What matters more here is usability and looks. The `place` command simply places the gates in a rectangular fashion. You can customize how placement happens with command-like arguments.
-
-Here, we don't provide any parameter to `place`. It will choose the default setting of placing ports on opposite sides arranged in alphabetical order (bottom-up), and rotate each gate randomly.
-
-After running this command, the following prints out:
+The printout of the ys2sm command is also important. For example, it tells you the length of the critical path of your circuit, as well as the number of gates generated.
 
 ```txt
 Design:
-   critical depth: 6 (0.15s)
-   gate count: 36, conn. count: 68
-Placement Info:
-   Depth: 7 + 2(for ports)
-   Width: 4
-   Height: 2
-      In Height: 1
-     Out Height: 1
-   Inputs:
-    2: RES
-    1: CLK
-┌─────────┐
-│ * * 2 1 │
-└─────────┘
-   Outputs:
-    1: C
-┌─────────┐
-│ 1-1-1-1 │
-└─────────┘
+   critical depth: 7 (0.175s)
+   gate count: 38, conn. count: 74
 ```
 
-The printout of this command is important. First, pay attention to `critical depth: 4`. This means the clock duration must be at least 6 ticks. Otherwise, you will run into a critical depth error. It also shows you what each port on the generated blueprint stands for. In this case, the input will have 2 bits, the left is `RES` and the right one is `CLK`. The output is 4 bits of `C` - the counter value.
+### Blueprint Generation
 
-Now, you can take `blueprint.json` and put it inside the game.
+Now, it's simply a matter of generating blueprints from this netlist. But before SM-EDA can create a blueprint, it needs to know what the physical geometry of the blueprint is going to be. A user can provide a Placement Config in the form of another JSON file to control the exact placement behavior, but SM-EDA can also generate a barebone one for you. You can use the `autoplan` command.
+
+```bash
+sm-eda autoplan /tmp/net.json /tmp/config.json
+```
+
+Scrap Mechanic is an interesting game in that logic wiring doesn't take up space, and thus, a circuit can be built with any arbitrary placement of gates. Thus, SM-EDA doesn't need to do sophisticated PnR. What matters more here is usability and looks. The `autoplace` command simply places the gates in a rectangular fashion. You can customize how placement happens with command-like arguments.
+
+For example, the `--facade` argument rotates the outside visible gates of the blueprint in random directions to make the blueprint look more organic. The `--pack` argument packs the ports more compactly, instead of ordering them in an otherwise strict alphabetical order.
+
+The generated Placement Config is important. It contains vital information, like how ports are automatically laid out. Without this config, you wouldn't know which gate is what port in the generated blueprint. Below is a snippet of `/tmp/config.json`, look how the ports are arranged.
+
+```txt
+"ports" : [
+  "C[3:0]",
+  "CLK[0:0],RES[0:0]"
+],
+```
+
+This tells you that the port is arranged in a 2x4 pattern like this:
+
+```txt
+  A[3]   A[2]   A[1]   A[0]
+UNUSED UNUSED CLK[0] RES[0]
+```
+
+Then, you can invoke the place command to use the generated config to turn the netlist into blueprints.
+
+```bash
+sm-eda place /tmp/net.json --config /tmp/config.json /working/blueprint.json
+```
+
+You should now see the `blueprint.json` in the working folder. Now, you can take this blueprint and use it inside the game.
+
+As a side note, the `autoplace` command performs `autoplan` and `place` in one go. The config is generated and passed in memory and never written to disk. Run `sm-eda autoplace -h` to learn more.

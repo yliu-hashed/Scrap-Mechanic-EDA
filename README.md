@@ -1,4 +1,4 @@
-[![Swift 5.10](https://img.shields.io/badge/swift-5.10-F05138?style=for-the-badge&logo=swift)](https://www.swift.org)
+[![Swift 6.1](https://img.shields.io/badge/swift-6.1-F05138?style=for-the-badge&logo=swift)](https://www.swift.org)
 [![Docker](https://img.shields.io/badge/docker-github%20package-blue?style=for-the-badge&logo=docker)](ghcr.io/yliu-hashed/sm-eda-bundle:latest)
 [![Scrap Mechanic](https://img.shields.io/badge/for%20game-scrap%20mechanic-orange?style=for-the-badge)](https://store.steampowered.com/app/387990/)
 

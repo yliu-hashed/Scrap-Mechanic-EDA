@@ -3,7 +3,7 @@
 //  Scrap Mechanic EDA
 //
 
-public struct EditPort: CustomStringConvertible {
+public struct EditPort: CustomStringConvertible, Sendable {
     public let port: String
     public let msb: Int
     public let lsb: Int
@@ -21,7 +21,7 @@ public struct EditPort: CustomStringConvertible {
     }
 }
 
-public struct EditPortRoute: CustomStringConvertible {
+public struct EditPortRoute: CustomStringConvertible, Sendable {
     public let srcPort: EditPort
     public let dstPort: EditPort
 
@@ -33,7 +33,7 @@ public struct EditPortRoute: CustomStringConvertible {
     public var description: String { srcPort.description + "->" + dstPort.description }
 }
 
-public struct EditPortDrive: CustomStringConvertible {
+public struct EditPortDrive: CustomStringConvertible, Sendable {
     public let constant: UInt64
     public let dstPort: EditPort
 

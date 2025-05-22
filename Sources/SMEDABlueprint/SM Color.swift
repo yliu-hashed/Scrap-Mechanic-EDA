@@ -5,7 +5,7 @@
 
 private let validHex: Set<Character> = Set("0123456789ABCDEF")
 
-public enum SMColor {
+public enum SMColor: Sendable {
     case custom(hex: String)
     case paint(shade: SMColorShade, hue: SMColorHue)
     case defaultOrange
@@ -37,7 +37,7 @@ public enum SMColor {
     }
 }
 
-public enum SMColorShade: Int, CaseIterable {
+public enum SMColorShade: Int, CaseIterable, Sendable {
     case light    = 0
     case regular  = 1
     case dark     = 2
@@ -62,7 +62,7 @@ public enum SMColorShade: Int, CaseIterable {
     }
 }
 
-public enum SMColorHue: String, CaseIterable {
+public enum SMColorHue: String, CaseIterable, Sendable {
     case gray    = "gray"
     case yellow  = "yellow"
     case lime    = "lime"

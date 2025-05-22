@@ -30,7 +30,7 @@ struct PlacementConfig {
     var defaultInputDevice: SMInputDevice? = nil
 }
 
-struct PortBit: Hashable, Equatable, CustomStringConvertible {
+struct PortBit: Hashable, Equatable, CustomStringConvertible, Sendable {
     var name: String
     var index: Int
 

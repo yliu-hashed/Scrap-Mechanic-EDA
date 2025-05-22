@@ -5,7 +5,7 @@
 
 import Foundation
 
-public struct SMVector: Codable, Equatable, Hashable {
+public struct SMVector: Codable, Equatable, Hashable, Sendable {
 
     public var x: Int
     public var y: Int
@@ -60,7 +60,7 @@ public struct SMVector: Codable, Equatable, Hashable {
     public static var one: Self { .init(x: 1, y: 1, z: 1) }
 }
 
-public enum SMDirection: Int, Codable, CaseIterable {
+public enum SMDirection: Int, Codable, CaseIterable, Sendable {
     case posX =  1
     case posY =  2
     case posZ =  3
@@ -143,7 +143,7 @@ public enum SMDirection: Int, Codable, CaseIterable {
     }
 }
 
-public struct SMRotation: Equatable, Hashable {
+public struct SMRotation: Equatable, Hashable, Sendable {
     /// The direction that the shape's x axis aligns with
     public var alignX: SMDirection
     /// The direction that the shape's z axis aligns with

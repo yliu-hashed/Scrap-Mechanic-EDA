@@ -8,8 +8,8 @@ import ArgumentParser
 
 private let discussion = "This is the Scrap Mechanic EDA command line toolset."
 
-@main struct SMEDA: ParsableCommand {
-    static var configuration = CommandConfiguration(
+@main struct SMEDA: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(
         commandName: "sm-eda",
         discussion: discussion,
         subcommands: [

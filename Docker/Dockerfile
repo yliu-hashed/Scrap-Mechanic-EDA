@@ -1,4 +1,4 @@
-ARG swift_version="6.0"
+ARG swift_version="6.1"
 ARG build_mode="release"
 
 # build sm-eda executable ------------------------------------------------------

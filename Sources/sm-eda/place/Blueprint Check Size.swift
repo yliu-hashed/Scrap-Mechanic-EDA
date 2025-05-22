@@ -4,8 +4,14 @@
 //
 
 import Foundation
+import Subprocess
 import SMEDABlueprint
 import SMEDAResult
+#if canImport(System)
+@preconcurrency import System
+#else
+@preconcurrency import SystemPackage
+#endif
 
 private let ratioFormatter: NumberFormatter = {
     let formatter = NumberFormatter()
@@ -25,11 +31,11 @@ private func estimateMaxPacketSize(dataSize: Int, facade: Bool) -> Float {
     return value * (facade ? 0.25 : 0.24)
 }
 
-func checkSize(data: borrowing Data, facade: Bool, report: inout PlacementReport, verbose: Bool, lz4Path: String?) {
+func checkSize(data: Data, facade: Bool, report: inout PlacementReport, verbose: Bool, lz4Path: String?) async {
     let maxEstimate = estimateMaxPacketSize(dataSize: data.count, facade: facade)
     let curSize: Float
     let tolarence: Float
-    if let value = lz4BlueprintSize(data: data, lz4Path: lz4Path, verbose: verbose) {
+    if let value = await lz4BlueprintSize(data: data, lz4Path: lz4Path, verbose: verbose) {
         curSize = Float(value)
         tolarence = 0.05
     } else {
@@ -65,79 +71,27 @@ func checkSize(data: borrowing Data, facade: Bool, report: inout PlacementReport
     }
 }
 
-#if os(Windows)
-private func locateLZ4(verbose: Bool) -> URL? {
-    if verbose { print("Warning: Automatically finding LZ4 is unsupported on Windows. Please specify the path to LZ4 manually.") }
-    return nil
-}
-#else
-private func locateLZ4(verbose: Bool) -> URL? {
-    let fileManager = FileManager.default
-
-    let process = Process()
-    process.executableURL = URL(fileURLWithPath: ProcessInfo.processInfo.environment["SHELL"] ?? "/bin/bash")
-    process.arguments = ["-l", "-c", "which lz4"]
-    process.environment = ProcessInfo.processInfo.environment
-
-    let outputPipe = Pipe()
-    process.standardOutput = outputPipe
-
-    let wait = DispatchSemaphore(value: 0)
-    process.terminationHandler = { _ in wait.signal() }
-
-    do {
-        try process.run()
-    } catch {
-        print(error.localizedDescription)
-        return nil
-    }
-
-    let result = wait.wait(timeout: .now() + 2)
-    guard result == .success else { return nil }
-
-    let data = outputPipe.fileHandleForReading.availableData
-    guard let string = String(data: data, encoding: .utf8) else { return nil }
-
-    let path = string.trimmingCharacters(in: .whitespacesAndNewlines)
-    guard !path.isEmpty else { return nil }
-
-    let url = URL(fileURLWithPath: path, isDirectory: false)
-    guard fileManager.isReadableFile(atPath: path) else { return nil }
-    return url
-}
-#endif
-
-private func lz4BlueprintSize(data: borrowing Data, lz4Path: String?, verbose: Bool) -> Int? {
-    let lz4URL: URL
+private func lz4BlueprintSize(data: Data, lz4Path: String?, verbose: Bool) async -> Int? {
+    let executable: Executable
     if let lz4Path = lz4Path {
-        lz4URL = URL(fileURLWithPath: lz4Path)
+        executable = .path(.init(lz4Path))
     } else {
-        guard let url = locateLZ4(verbose: verbose) else { return nil }
-        lz4URL = url
+        executable = .name("lz4")
     }
 
-    if verbose { print("LZ4 is located at \(lz4URL)") }
-
-    let process = Process()
-    process.executableURL = lz4URL
-    process.arguments = ["-1", "--no-frame-crc", "-BD", "stdin"]
-
-    let inputPipe = Pipe()
-    let outputPipe = Pipe()
-
-    process.standardInput = inputPipe
-    process.standardOutput = outputPipe
-
-    let outData: Data!
-    do {
-        try process.run()
-        try inputPipe.fileHandleForWriting.write(contentsOf: data)
-        try inputPipe.fileHandleForWriting.close()
-        outData = try? outputPipe.fileHandleForReading.readToEnd()
-    } catch {
-        if verbose { print("Unable to perform compression using LZ4: \(error.localizedDescription)") }
-        return nil
+    let result = try? await run(
+        executable,
+        arguments: ["-1", "--no-frame-crc", "-BD", "stdin"]
+    ) { (execution, input, output, _) in
+        _ = try await input.write(data)
+        try await input.finish()
+        var sum: Int = 0
+        for try await chunk in output {
+            sum += chunk.count
+        }
+        try? execution.send(signal: .kill)
+        return sum - 2
     }
 
-    return outData.count - 2
+    return result?.value
 }

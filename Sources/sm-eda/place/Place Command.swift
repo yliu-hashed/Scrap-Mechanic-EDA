@@ -9,7 +9,7 @@ import SMEDANetlist
 import SMEDAResult
 import SMEDABlueprint
 
-struct PlaceCMD: ParsableCommand {
+struct PlaceCMD: AsyncParsableCommand {
     static var configuration: CommandConfiguration {
         CommandConfiguration(commandName: "place", discussion: "Generate blueprint from a netlist file.")
     }
@@ -29,10 +29,10 @@ struct PlaceCMD: ParsableCommand {
     @OptionGroup(title: "Analyze")
     var analyzeOptions: AnalyzeArgGroup
 
-    func run() throws {
+    func run() async throws {
         let module = try loadModuleOptions.work()
         let config = try loadConfigOptions.work()
-        let placementReport = try placementOptions.work(module: module, config: config, printlevel: printlevel)
+        let placementReport = try await placementOptions.work(module: module, config: config, printlevel: printlevel)
         try analyzeOptions.work(module: module, placementReport: placementReport, printlevel: printlevel)
     }
 }

@@ -30,7 +30,7 @@ struct PlacementArgGroup: ParsableArguments {
     @Argument(help: kOutBPFileArgHelp, completion: .file(extensions: ["json"]))
     var blueprintFile: String
 
-    func work(module: borrowing SMModule, config: borrowing PlacementConfig, printlevel: PrintLevel) throws -> PlacementReport {
+    func work(module: borrowing SMModule, config: borrowing PlacementConfig, printlevel: PrintLevel) async throws -> PlacementReport {
         let fileManager = FileManager.default
 
         // make sure lz4 can be accessed
@@ -50,7 +50,7 @@ struct PlacementArgGroup: ParsableArguments {
 
         // check size & write blueprint
         let blueprintData = try encoder.encode(blueprint)
-        checkSize(
+        await checkSize(
             data: blueprintData,
             facade: config.facade,
             report: &placementReport,

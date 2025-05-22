@@ -10,7 +10,7 @@ import SMEDANetlist
 import SMEDABlueprint
 import SMEDAResult
 
-struct FlowCMD: ParsableCommand {
+struct FlowCMD: AsyncParsableCommand {
     static var configuration: CommandConfiguration {
         CommandConfiguration(commandName: "flow", discussion: "Perform the common synthesis steps. This is the entry point for most users. This commands takes a Yosys netlist file, transforms it into a SMEDA netlist module, then performs the auto planning, placement and analysis steps.")
     }
@@ -33,11 +33,11 @@ struct FlowCMD: ParsableCommand {
     @OptionGroup(title: "Analyze")
     var analyzeOptions: AnalyzeArgGroup
 
-    func run() throws {
+    func run() async throws {
         var module = try transformOptions.work(printlevel: printlevel)
         try optimizerOptions.work(module: &module)
         let config = try autoPlanOptions.work(module: module)
-        let placementReport = try placementOptions.work(module: module, config: config, printlevel: printlevel)
+        let placementReport = try await placementOptions.work(module: module, config: config, printlevel: printlevel)
         try analyzeOptions.work(module: module, placementReport: placementReport, printlevel: printlevel)
     }
 }

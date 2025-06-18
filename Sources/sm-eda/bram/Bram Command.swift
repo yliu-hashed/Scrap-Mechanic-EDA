@@ -46,6 +46,14 @@ private let multiplexityArgHelp = ArgumentHelp(
     valueName: "multiplex-bits"
 )
 
+private let maxLoopLengthDiscussion = "When specified, the program will increase multiplexity until the loop length is below this target. This value must be bigger or equal to 4."
+
+private let maxLoopLengthArgHelp = ArgumentHelp(
+    "The delay target in ticks for automatically choosing multiplexity of timer memory.",
+    discussion: maxLoopLengthDiscussion,
+    valueName: "ticks"
+)
+
 struct BRAMCMD: ParsableCommand {
     static var configuration: CommandConfiguration {
         CommandConfiguration(commandName: "bram", discussion: "Generate memory using timer or XOR DFFs.")
@@ -73,6 +81,9 @@ struct BRAMCMD: ParsableCommand {
             help: multiplexityArgHelp)
     var multiplexity: Int = 0
 
+    @Option(name: [.customLong("max-loop-delay")], help: maxLoopLengthArgHelp)
+    var maxLoopDelayTarget: Int? = nil
+
     @Option(name: [.customShort("n"), .customLong("name")],
             help: "Rename the output module")
     var name: String = "Untitled"
@@ -80,7 +91,7 @@ struct BRAMCMD: ParsableCommand {
     @OptionGroup(title: "Store Module")
     var storeModuleOptions: StoreModuleArgGroup
 
-    func run() throws {
+    mutating func run() throws {
         // guard against port misconfiguration
         guard ports.contains(where: { $0.hasRead }) else {
             throw CommandError.invalidInput(description: "No read ports configured")
@@ -114,6 +125,24 @@ struct BRAMCMD: ParsableCommand {
 
         guard multiplexity <= 7 else {
             throw CommandError.invalidInput(description: "Multiplexity cannot be bigger than 2^7")
+        }
+
+        if let maxLoopDelayTarget = maxLoopDelayTarget {
+            if type == .timer {
+                guard maxLoopDelayTarget >= 4 else {
+                    throw CommandError.invalidInput(description: "Maximum loop delay cannot be less than 4")
+                }
+                let maxLoopP2 = Int.bitWidth - (maxLoopDelayTarget - 1).leadingZeroBitCount
+                let targetMultiplexityP2 = abits - maxLoopP2
+                if targetMultiplexityP2 > 7 {
+                    print("WARNING: Maximum loop delay of \(maxLoopDelayTarget) cannot achieved as more than 2^7 of multiplexity is required.")
+                    multiplexity = 7
+                } else {
+                    multiplexity = max(multiplexity, targetMultiplexityP2)
+                }
+            } else if printlevel != .none {
+                print("WARNING: Maximum loop delay argument is only supported for timer memory.")
+            }
         }
 
         guard type == .dff || abits - multiplexity >= 2 else {

@@ -50,7 +50,7 @@ func genBRAMTimerWritePort(
         for b in 0..<config.multiplexityPow2 {
             let value = (i & (1 << b)) != 0
             let target = value ? posMatch : negMatch
-            builder.connect(addrBuffer[b], to: target)
+            builder.connect(addrBuffer[b + config.clockAddressSpacePow2], to: target)
         }
         builder.connect([posMatch, negMatch], to: bankMatch)
         if builder.module.gates[posMatch]!.srcs.isEmpty { builder.removeGate(posMatch) }

@@ -133,7 +133,15 @@ This repo contains the source code of the tools in SM-EDA only. SM-EDA is releas
 
 # Install
 
-## Install with Docker (Preferred)
+## Github Action (Preferred)
+
+You don't need to install anything to use SM-EDA. You can use [our template](https://github.com/yliu-hashed/SM-EDA-Project-Template) to create a GitHub repo, and use GitHub's servers to compile your blueprint. Everything is set up already, and it's hassle-free.
+
+After creating your repository from the template, you can compile your blueprint just by clicking on the **Run workflow** button under the provided **Compile and Generate** workflow. You can then download the blueprint as a Workflow Artifact when the workflow is done. The logs will also be saved along the way in a ZIP file, even if compilation fails.
+
+Learn more at [SM-EDA Project Template](https://github.com/yliu-hashed/SM-EDA-Project-Template).
+
+## Install with Docker
 
 First, [Install Docker](https://docs.docker.com/engine/install/). Then download the docker image by running the following command:
 

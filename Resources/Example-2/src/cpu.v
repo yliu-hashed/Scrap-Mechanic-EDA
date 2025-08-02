@@ -15,11 +15,11 @@
 // | 1000 ADD  | RA = RA + RB
 // | 1001 SUB  | RA = RA - RB
 // | 1010 NAND | RA = ~(RA & RB)
-// | 1010 OR   | RA = RA | RB
-// | 1011 XOR  | RA = RA ^ RB
-// | 1100 SHL  | RA = RA << RB
-// | 1101 SRL  | RA = RA >> RB (logical)
-// | 1110 SRA  | RA = RA >> RB (arithmetic)
+// | 1011 OR   | RA = RA | RB
+// | 1100 XOR  | RA = RA ^ RB
+// | 1101 SHL  | RA = RA << RB
+// | 1110 SRL  | RA = RA >> RB (logical)
+// | 1111 SRA  | RA = RA >> RB (arithmetic)
 
 module cpu(
   input        clk,         // universal clock port

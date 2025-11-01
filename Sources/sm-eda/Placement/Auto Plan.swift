@@ -39,7 +39,7 @@ func autoPlan(
         maxPortWidth = max(count, maxPortWidth)
     }
 
-    if let depth = depth, timerCount + logicCount > depth {
+    if let depth = depth, timerCount + logicCount < depth {
         print("WARNING: Depth argument is too large. The gate body will be detached from the ports.")
     }
 

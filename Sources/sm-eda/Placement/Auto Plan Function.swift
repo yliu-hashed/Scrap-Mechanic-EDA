@@ -7,6 +7,12 @@ import ArgumentParser
 import SMEDANetlist
 import SMEDABlueprint
 
+private let kBPSizesArgHelp = ArgumentHelp(
+    "The sizes of the blueprint to attempt",
+    discussion: "This specifies the sizes of the blueprint to try in the notation '<width>x<depth>x<height>' (like 10x10x20). This option is mutually exclusive with '--depth' and '--width'. You can specify multiple sizes by providing multiple arguments. The first one that fits the design will be chosen. If no sizes are given, automatic placement guided optionally by '--depth' and '--width' will be done.",
+    valueName: "sizes"
+)
+
 private let kBPWidthArgHelp = ArgumentHelp(
     "The width to wrap the ports of the blueprint",
     discussion: "This specifies the maximum width of the blueprint. If no value is given, the maximum width of any port clamped to 16 will be used as the width of the module.",
@@ -78,6 +84,9 @@ private enum PlaceInputDevice: EnumerableFlag {
 }
 
 struct AutoPlanArgGroup: ParsableArguments {
+    @Option(name: [.customShort("s"), .customLong("size")], help: kBPSizesArgHelp)
+    var sizes: [AutoPlanSize] = []
+
     @Option(name: [.customShort("d"), .customLong("depth")], help: kBPDepthArgHelp)
     var blueprintDepth: Int? = nil
 
@@ -100,6 +109,14 @@ struct AutoPlanArgGroup: ParsableArguments {
     var sinkPort: Bool = false
 
     func validate() throws {
+        if sizes.count > 0 {
+            guard blueprintDepth == nil else {
+                throw ValidationError.redundantDepth
+            }
+            guard blueprintWidth == nil else {
+                throw ValidationError.redundantWidth
+            }
+        }
         if let depth = blueprintDepth {
             guard depth >= 1 else {
                 throw ValidationError.nonPositiveDepth
@@ -115,6 +132,8 @@ struct AutoPlanArgGroup: ParsableArguments {
     enum ValidationError: Error, CustomStringConvertible {
         case nonPositiveDepth
         case nonPositiveWidth
+        case redundantDepth
+        case redundantWidth
 
         var description: String {
             switch self {
@@ -122,15 +141,24 @@ struct AutoPlanArgGroup: ParsableArguments {
                     return "Depth must be a positive integer."
                 case .nonPositiveWidth:
                     return "Width must be a positive integer."
+                case .redundantDepth:
+                    return "Depth must not be specified when volumes are used"
+                case .redundantWidth:
+                    return "Width must not be specified when volumes are used"
             }
         }
     }
 
     func work(module: borrowing SMModule) throws -> PlacementConfig {
+        let sizing: AutoPlanSizing = if sizes.isEmpty {
+            .automatic(width: blueprintWidth, depth: blueprintDepth)
+        } else {
+            .specific(sizes: sizes)
+        }
+
         return autoPlan(
             for: module,
-            depth: blueprintDepth,
-            width: blueprintWidth,
+            sizing: sizing,
             device: inputDeviceType.device,
             noFacade: noFacade,
             portDoubleSided: portDoubleSided,

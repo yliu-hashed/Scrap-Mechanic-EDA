@@ -6,10 +6,14 @@
 import SMEDANetlist
 import SMEDABlueprint
 
+enum AutoPlanSizing {
+    case automatic(width: Int?, depth: Int?)
+    case specific(sizes: [AutoPlanSize])
+}
+
 func autoPlan(
     for module: borrowing SMModule,
-    depth: Int? = nil,
-    width: Int? = nil,
+    sizing: AutoPlanSizing,
     device: SMInputDevice? = nil,
     noFacade: Bool,
     portDoubleSided: Bool,
@@ -38,14 +42,32 @@ func autoPlan(
         if !sinkPort { logicCount -= count }
         maxPortWidth = max(count, maxPortWidth)
     }
+    let volumeCount = logicCount + timerCount * 2
 
-    if let depth = depth, timerCount + logicCount < depth {
-        print("WARNING: Depth argument is too large. The gate body will be detached from the ports.")
+    // choose the right sizing
+    let forcedWidth: Int?
+    let forcedDepth: Int?
+    switch sizing {
+    case .automatic(let width, let depth):
+        forcedWidth = width
+        forcedDepth = depth
+    case .specific(let sizes):
+        let choice = sizes.first { size in
+            size.volume >= logicCount
+        }
+        if let size = choice {
+            forcedWidth = size.width
+            forcedDepth = size.depth
+        } else {
+            forcedWidth = nil
+            forcedDepth = nil
+            print("Warning: No specified sizing can contain the design of \(volumeCount) blocks. Falling back to fully automatic placement.")
+        }
     }
 
     // calculate width wrapping
     let planWidth: Int
-    if let width = width {
+    if let width = forcedWidth {
         planWidth = width
     } else {
         let maxSensableWidth = 16
@@ -72,12 +94,11 @@ func autoPlan(
 
     // calcualte dimensions
     let planDepth: Int
-    if let depth = depth {
+    if let depth = forcedDepth {
         planDepth = depth
     } else {
-        let counts = logicCount + timerCount * 2
         let planeSize = max(portHeight, 1) * planWidth
-        planDepth = min(max(counts / planeSize, 1), 32)
+        planDepth = min(max(volumeCount / planeSize, 1), 32)
     }
 
     // create config
@@ -106,6 +127,10 @@ func autoPlan(
             directionLeft: .posY,
             directionUp: .posZ
         ).flipped(width: planWidth))
+    }
+
+    if timerCount + logicCount < planDepth {
+        print("WARNING: Depth argument is too large. The gate body will be detached from the ports.")
     }
 
     return PlacementConfig(

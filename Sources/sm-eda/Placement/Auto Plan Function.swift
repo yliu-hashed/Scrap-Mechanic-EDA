@@ -96,7 +96,7 @@ struct AutoPlanArgGroup: ParsableArguments {
     @Flag(name: [.customLong("pack")], help: kPackPortArgHelp)
     var packPort: Bool = false
 
-    @Flag(name: [.customLong("sink")], help: kPackPortArgHelp)
+    @Flag(name: [.customLong("sink")], help: kSinkPortArgHelp)
     var sinkPort: Bool = false
 
     func validate() throws {

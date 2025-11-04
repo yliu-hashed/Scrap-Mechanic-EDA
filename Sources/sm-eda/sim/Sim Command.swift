@@ -35,6 +35,9 @@ struct SimCMD: ParsableCommand {
         CommandConfiguration(commandName: "sim", discussion: "This command perform simulation on a sm netlist file interactively.")
     }
 
+    @Flag(exclusivity: .exclusive, help: kPrintLevelArgHelp)
+    var printlevel: PrintLevel = .lite
+
     @OptionGroup(title: "Load Module")
     var loadModuleOptions: LoadModuleArgGroup
 
@@ -44,9 +47,6 @@ struct SimCMD: ParsableCommand {
     var inputScriptFile: String? = nil
 
     func run() throws {
-        // print welcome
-        print("Welcome to sm-net-sim!")
-
         // read file
         let netlist = try loadModuleOptions.work()
 
@@ -60,7 +60,9 @@ struct SimCMD: ParsableCommand {
             guard let script = String(data: scriptData, encoding: .utf8) else {
                 throw CommandError.invalidFormat(fileURL: url)
             }
-            print("Running script `\(inputScriptFile)`")
+            if printlevel != .none {
+                print("Running script `\(inputScriptFile)`")
+            }
             try runScript(controller: controller, script: script)
         } else {
             repl(controller: controller)
@@ -83,18 +85,21 @@ struct SimCMD: ParsableCommand {
             guard let command = SimStep(Substring(line)) else {
                 throw REPLError.invalidCommand
             }
-            controller.run(command: command)
+            controller.run(command: command, printlevel: printlevel)
         }
-        print("Done")
+        if printlevel != .none {
+            print("Done")
+        }
     }
 
     func repl(controller: Controller) {
+        print("Welcome to sm-eda sim!")
         print("Use `help` to explore possible commands")
         while true {
             guard let line = readLine() else { return }
             guard let command = SimStep(Substring(line)) else { continue }
             if command == .quit { return }
-            controller.run(command: command)
+            controller.run(command: command, printlevel: .lite)
         }
     }
 }

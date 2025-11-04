@@ -12,7 +12,7 @@ class Controller {
         self.isRepl = isRepl
     }
 
-    func run(command: SimStep) {
+    func run(command: SimStep, printlevel: PrintLevel) {
         switch (command) {
             case .quit:
                 return

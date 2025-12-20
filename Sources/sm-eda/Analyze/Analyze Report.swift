@@ -18,46 +18,6 @@ extension String {
     }
 }
 
-private let deltaPercentFormatter: NumberFormatter = {
-    let formatter = NumberFormatter()
-    formatter.localizesFormat = false
-    formatter.numberStyle = .percent
-    formatter.positivePrefix = "+"
-    formatter.negativePrefix = "-"
-    formatter.maximumFractionDigits = 2
-    formatter.minimumFractionDigits = 2
-    return formatter
-}()
-
-private let deltaFloatFormatter: NumberFormatter = {
-    let formatter = NumberFormatter()
-    formatter.localizesFormat = false
-    formatter.numberStyle = .decimal
-    formatter.positivePrefix = "+"
-    formatter.negativePrefix = "-"
-    formatter.maximumFractionDigits = 2
-    formatter.minimumFractionDigits = 2
-    return formatter
-}()
-
-private let deltaIntFormatter: NumberFormatter = {
-    let formatter = NumberFormatter()
-    formatter.localizesFormat = false
-    formatter.numberStyle = .decimal
-    formatter.positivePrefix = "+"
-    formatter.negativePrefix = "-"
-    return formatter
-}()
-
-private let fractionFormatter: NumberFormatter = {
-    let formatter = NumberFormatter()
-    formatter.localizesFormat = false
-    formatter.numberStyle = .decimal
-    formatter.maximumFractionDigits = 3
-    formatter.minimumFractionDigits = 3
-    return formatter
-}()
-
 extension SMGateType: CustomStringConvertible {
     public var description: String {
         switch self {
@@ -141,7 +101,7 @@ extension ComplexityReport {
             " 5. sequential internal": sequentialGateCount.description,
             " 6. combinational internal": combinationalGateCount.description,
             " 7. total connection": connectionCount.description,
-            " 8. avg gate input": fractionFormatter.string(from: NSNumber(value: averageGateInputCount))!,
+            " 8. avg gate input": averageGateInputCount.formatted(.number.precision(.fractionLength(2))),
         ]
     }
 }
@@ -165,16 +125,18 @@ func printDifference(old: FullSynthesisReport, new: FullSynthesisReport) {
     let newUtil = new.placementReport.utilization
     if !oldUtil.isNaN, !newUtil.isNaN, oldUtil > 0, abs(newUtil - oldUtil) > 0.005 {
         let improvement = (newUtil - oldUtil) / oldUtil
-        print("Utilization changed by \(deltaPercentFormatter.string(from: NSNumber(value: improvement))!)")
+        let improvementStr = improvement.formatted(.percent.sign(strategy: .always()).precision(.fractionLength(2)))
+        print("Utilization changed by \(improvementStr)")
     }
     // check time difference
     let oldTime = old.timingReport.criticalDepth ?? 0
     let newTime = new.timingReport.criticalDepth ?? 0
     if oldTime != 0, newTime != 0, newTime != oldTime {
-        let improvement = (Float(newTime) - Float(oldTime)) / Float(oldTime)
-        let deltaString = deltaIntFormatter.string(from: NSNumber(value: newTime - oldTime))!
-        let deltaPercentString = deltaPercentFormatter.string(from: NSNumber(value: improvement))!
-        print("Critical depth changed by \(deltaString) (\(deltaPercentString))")
+        let change = newTime - oldTime
+        let improvement = Float(change) / Float(oldTime)
+        let changeStr = (newTime - oldTime).formatted(.number.sign(strategy: .always()))
+        let improvementStr = improvement.formatted(.percent.sign(strategy: .always()).precision(.fractionLength(2)))
+        print("Critical depth changed by \(changeStr) (\(improvementStr))")
     }
 }
 

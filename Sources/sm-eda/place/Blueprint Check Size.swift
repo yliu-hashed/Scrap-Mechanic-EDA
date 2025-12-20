@@ -13,14 +13,6 @@ import SMEDAResult
 @preconcurrency import SystemPackage
 #endif
 
-private let ratioFormatter: NumberFormatter = {
-    let formatter = NumberFormatter()
-    formatter.localizesFormat = false
-    formatter.numberStyle = .percent
-    formatter.maximumFractionDigits = 2
-    return formatter
-}()
-
 private func estimatePacketSize(dataSize: Int, facade: Bool) -> Float {
     let value = Float(dataSize)
     return value * (facade ? 0.15 : 0.125)
@@ -52,8 +44,10 @@ func checkSize(data: Data, facade: Bool, report: inout PlacementReport, verbose:
     report.utilization = curRatio
     report.conservativeUtilization = maxRatio
 
-    let curString = ratioFormatter.string(from: NSNumber(value: curRatio))!
-    let maxString = ratioFormatter.string(from: NSNumber(value: maxRatio))!
+    let ratioFormat: any FormatStyle<Float, String> = .percent.precision(.fractionLength(2))
+
+    let curString = curRatio.formatted(ratioFormat)
+    let maxString = maxRatio.formatted(ratioFormat)
 
     if verbose {
         print("Blueprint    Utilization: \(curString)")
@@ -62,7 +56,7 @@ func checkSize(data: Data, facade: Bool, report: inout PlacementReport, verbose:
 
     if curRatio > 1.0 {
         let overSizeRatio = curRatio - 1.0
-        let string = ratioFormatter.string(from: NSNumber(value: overSizeRatio))!
+        let string = overSizeRatio.formatted(ratioFormat)
         print("Warning: Blueprint is above the limit by \(string). It will likely fail to import.")
     } else if curRatio > (1.0 - tolarence) {
         print("Warning: Blueprint is very large (\(curString)). It will likely fail to import. Please proceed with caution.")

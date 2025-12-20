@@ -9,6 +9,12 @@ import SMEDANetlist
 import SMEDAResult
 import SMEDABlueprint
 
+private let kConnectionMinimizationEffortArgHelp = ArgumentHelp(
+    "Effort in minimizing connection distances (0...0.99)",
+    discussion: "Connection length minimization is used to minimize clutter when using the connection tool. This is enabled by default with effort 0.5. A higher value will result shorter connections on average, but will also take longer. You can disable minimization by specifying 0 as the effort.",
+    valueName: "effort"
+)
+
 private let kLZ4PathArgHelp = ArgumentHelp(
     "The path to the LZ4 executable",
     discussion: "Use this parameter to specify the path to LZ4 to accurately estimate blueprint size. If not specified, the path to the LZ4 executable is searched by asking the shell `which lz4`.",
@@ -21,6 +27,10 @@ private let kOutBPFileArgHelp = ArgumentHelp(
 )
 
 struct PlacementArgGroup: ParsableArguments {
+
+    @Option(name: [.customLong("conn-opt-effort")],
+            help: kConnectionMinimizationEffortArgHelp)
+    var connectionMinimizationEffort: Float = 0.5
 
     @Option(name: [.customLong("lz4-path")],
             help: kLZ4PathArgHelp,
@@ -43,9 +53,14 @@ struct PlacementArgGroup: ParsableArguments {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [ .sortedKeys ]
         // place blueprint
-        if printlevel == .verbose { print("Placing Blueprint") }
         var placementReport = PlacementReport()
-        let blueprint = try place(module, config: config, report: &placementReport)
+        let blueprint = try place(
+            module,
+            config: config,
+            report: &placementReport,
+            connectionMinimizationEffort: connectionMinimizationEffort,
+            verbose: printlevel == .verbose
+        )
         if printlevel == .verbose { print("Blueprint Generation Successfully") }
 
         // check size & write blueprint

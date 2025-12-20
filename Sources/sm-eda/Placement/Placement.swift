@@ -10,9 +10,17 @@ import SMEDAResult
 func place(
     _ module: borrowing SMModule,
     config: borrowing PlacementConfig,
-    report: inout PlacementReport
+    report: inout PlacementReport,
+    connectionMinimizationEffort: Float,
+    verbose: Bool
 ) throws -> SMBlueprint {
+    if verbose { print("Placing Blueprint") }
+
     let builder = SMBlueprintBuilder()
+
+    // mapping for objects
+    var mapping: [UInt64: SMVector] = [:]
+
     // place all ports
     var controllerTable: [UInt64: UInt64] = [:]
     var occupied: Set<SMVector> = []
@@ -23,7 +31,8 @@ func place(
         into: builder,
         config: config,
         controllerTable: &controllerTable,
-        occupied: &occupied
+        occupied: &occupied,
+        updating: &mapping
     )
 
     // enumerate out all the spaces that would be used by ordinary gates and timers
@@ -59,13 +68,35 @@ func place(
             color: .defaultBodyGates
         )
         controllerTable[gateId] = controllerId
+        mapping[gateId] = pos
     }
 
     // place all ordinary gates
+    var placedGates: Set<UInt64> = []
     for (gateId, gate) in module.gates {
+        guard !mapping.keys.contains(gateId) else { continue }
+        guard case .logic(_) = gate.type else { continue }
+        let pos = space.popFirst()!
+        mapping[gateId] = pos
+        placedGates.insert(gateId)
+    }
+
+    if connectionMinimizationEffort > 0 {
+        optimizeConnections(
+            of: &mapping,
+            for: module,
+            logicGates: placedGates,
+            effort: min(max(connectionMinimizationEffort, 0), 0.999),
+            verbose: verbose
+        )
+    } else {
+        print("   Connection minimization effort is 0, not optimizing connections.")
+    }
+
+    for (gateId, pos) in mapping {
+        let gate = module.gates[gateId]!
         guard !portGateIds.contains(gateId) else { continue }
         guard case .logic(let type) = gate.type else { continue }
-        let pos = space.removeFirst()
         // enable facade if all adjacent positions are covered (or explicitly disabled)
         let noFacade = !config.facade || SMDirection.allCases.allSatisfy {
             occupied.contains(pos + $0.vector)
@@ -122,6 +153,14 @@ func place(
     report.depth  = maxX - minX + 1
     report.width  = maxY - minY + 1
     report.height = maxZ - minZ + 1
+
+    if verbose {
+        print("Blueprint placed")
+        print("   Depth  (X): \(report.depth)")
+        print("   Width  (Y): \(report.depth)")
+        print("   Height (Z): \(report.depth)")
+        print()
+    }
 
     return SMBlueprint(bodies: [builder.blueprintBody])
 }

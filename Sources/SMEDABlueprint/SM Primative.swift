@@ -15,12 +15,20 @@ public struct SMVector: Codable, Equatable, Hashable, Sendable {
         return sqrt(Double(x*x + y*y + z*z))
     }
 
+    public var distanceSquared: Int {
+        return x*x + y*y + z*z
+    }
+
     public var volume: Int {
         return x * y * z
     }
 
     public static func +(lhs: Self, rhs: Self) -> Self {
         return Self(x: lhs.x + rhs.x, y: lhs.y + rhs.y, z: lhs.z + rhs.z)
+    }
+
+    public static func +=(lhs: inout Self, rhs: Self) {
+        lhs = lhs + rhs
     }
 
     public static func -(lhs: Self, rhs: Self) -> Self {

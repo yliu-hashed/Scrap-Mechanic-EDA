@@ -11,7 +11,8 @@ func placementPorts(
     into builder: SMBlueprintBuilder,
     config: borrowing PlacementConfig,
     controllerTable: inout [UInt64: UInt64],
-    occupied: inout Set<SMVector>
+    occupied: inout Set<SMVector>,
+    updating mapping: inout [UInt64: SMVector]
 ) throws -> Set<UInt64> {
     var portGateIds: Set<UInt64> = []
     var portLocationTable: [SMVector: PortBit] = [:]
@@ -84,6 +85,7 @@ func placementPorts(
             portGateIds.insert(gateId)
             occupied.insert(position)
             portLocationTable[position] = bit
+            mapping[gateId] = position
 
             // add input device
             if let device = device {

@@ -1,7 +1,7 @@
 name: Build
 on:
   release:
-    types: [created]
+    types: [prereleased, published]
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/sm-eda-bundle

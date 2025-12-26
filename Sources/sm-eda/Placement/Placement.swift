@@ -157,8 +157,8 @@ func place(
     if verbose {
         print("Blueprint placed")
         print("   Depth  (X): \(report.depth)")
-        print("   Width  (Y): \(report.depth)")
-        print("   Height (Z): \(report.depth)")
+        print("   Width  (Y): \(report.width)")
+        print("   Height (Z): \(report.height)")
         print()
     }
 

@@ -53,7 +53,7 @@ func autoPlan(
         forcedDepth = depth
     case .specific(let sizes):
         let choice = sizes.first { size in
-            size.volume >= logicCount
+            size.volume >= volumeCount
         }
         if let size = choice {
             forcedWidth = size.width

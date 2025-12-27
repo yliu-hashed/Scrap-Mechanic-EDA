@@ -3,8 +3,6 @@
 //  Scrap Mechanic EDA
 //
 
-import Foundation
-
 enum REPLError: Error, CustomStringConvertible {
     case invalidCommand
 

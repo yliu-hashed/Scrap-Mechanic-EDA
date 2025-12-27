@@ -3,8 +3,6 @@
 //  Scrap Mechanic EDA
 //
 
-import Foundation
-
 enum NetlistError: Error, CustomStringConvertible {
     case danglingGate(gateId: UInt64)
     case asymDst(gateId: UInt64, dstId: UInt64)

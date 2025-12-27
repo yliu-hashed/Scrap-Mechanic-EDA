@@ -3,8 +3,6 @@
 //  Scrap Mechenic EDA
 //
 
-import Foundation
-
 public struct FullSynthesisReport: Codable {
     public var complexityReport: ComplexityReport = ComplexityReport()
     public var timingReport: TimingReport = TimingReport()

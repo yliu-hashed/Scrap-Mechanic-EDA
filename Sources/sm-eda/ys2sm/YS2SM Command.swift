@@ -3,9 +3,7 @@
 //  Scrap Mechanic EDA
 //
 
-import Foundation
 import ArgumentParser
-
 import SMEDANetlist
 import SMEDABlueprint
 import SMEDAResult

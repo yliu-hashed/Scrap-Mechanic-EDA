@@ -3,8 +3,6 @@
 //  Scrap Mechanic EDA
 //
 
-import Foundation
-
 public struct SMVector: Codable, Equatable, Hashable, Sendable {
 
     public var x: Int
@@ -12,7 +10,7 @@ public struct SMVector: Codable, Equatable, Hashable, Sendable {
     public var z: Int
 
     public var distance: Double {
-        return sqrt(Double(x*x + y*y + z*z))
+        return Double(x*x + y*y + z*z).squareRoot()
     }
 
     public var distanceSquared: Int {

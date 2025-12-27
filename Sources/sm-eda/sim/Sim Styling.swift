@@ -3,8 +3,6 @@
 //  Scrap Mechanic EDA
 //
 
-import Foundation
-
 enum ANSIColor: String {
     case black = "\u{001B}[0;30m"
     case red = "\u{001B}[0;31m"

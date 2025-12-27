@@ -3,6 +3,8 @@
 //  Scrap Mechanic EDA
 //
 
+import Foundation
+
 class Controller {
     let model: SimulationModel
     let isRepl: Bool
@@ -47,7 +49,8 @@ class Controller {
                 model.stopRecording()
                 if isRepl { print("Recording Stopped") }
                 return
-            case .saveRecord(let url):
+            case .saveRecord(let path):
+                let url = URL(filePath: path, directoryHint: .notDirectory)
                 let string = vcdGen(module: model.module, duration: model.recordingTime, history: model.history)
                 let data = string.data(using: .utf8)!
                 do {

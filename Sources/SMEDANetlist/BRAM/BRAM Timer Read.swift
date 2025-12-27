@@ -3,8 +3,6 @@
 //  Scrap Mechanic EDA
 //
 
-import Foundation
-
 func genReadPort(
     config: borrowing BRAMTimerConfig, builder: SMNetBuilder,
     portInfo: borrowing BRAMTimerPortInfo, clock: borrowing [UInt64],

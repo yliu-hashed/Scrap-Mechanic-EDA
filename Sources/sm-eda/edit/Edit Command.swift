@@ -95,7 +95,7 @@ struct EditCMD: ParsableCommand {
             // read data
             let data = try Data(contentsOf: url)
             guard let script = String(data: data, encoding: .utf8) else {
-                throw CommandError.invalidFormat(fileURL: url)
+                throw CommandError.invalidFormat(path: scriptFile)
             }
 
             // warn inhibit other operands

@@ -3,17 +3,15 @@
 //  Scrap Mechanic EDA
 //
 
-import Foundation
-
 enum CommandError: Error, CustomStringConvertible {
-    case invalidFormat(fileURL: URL)
+    case invalidFormat(path: String)
     case invalidInput(description: String)
     case lz4CannotBeAccessed(path: String)
 
     var description: String {
         switch self {
-            case .invalidFormat(let fileURL):
-                return "File \"\(fileURL)\" is not in the correct format"
+            case .invalidFormat(let path):
+                return "File \"\(path)\" is not in the correct format"
             case .invalidInput(let description):
                 return "Invalid Input: \(description)"
             case .lz4CannotBeAccessed(let path):

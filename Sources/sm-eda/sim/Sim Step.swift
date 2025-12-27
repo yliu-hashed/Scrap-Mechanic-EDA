@@ -3,8 +3,6 @@
 //  Scrap Mechanic EDA
 //
 
-import Foundation
-
 enum SimStep: Equatable {
     case quit
     case tick(tickCount: UInt32)
@@ -14,7 +12,7 @@ enum SimStep: Equatable {
     case assert(constant: UInt64, port: Port)
     case record
     case stopRecord
-    case saveRecord(url: URL)
+    case saveRecord(path: String)
     case help
 
     init?(_ string: Substring) {
@@ -81,9 +79,8 @@ enum SimStep: Equatable {
             case "save-record", "save":
                 let linkString = string
                     .trimmingPrefix(tokens.first!)
-                    .trimmingCharacters(in: [" "])
-                let url = URL(fileURLWithPath: linkString, isDirectory: false)
-                self = .saveRecord(url: url)
+                    .trimmingCharacters(in: .whitespaces)
+            self = .saveRecord(path: linkString)
             case "help", "h":
                 self = .help
             default:

@@ -58,7 +58,7 @@ struct SimCMD: ParsableCommand {
             let url = URL(fileURLWithPath: inputScriptFile, isDirectory: false)
             let scriptData = try Data(contentsOf: url)
             guard let script = String(data: scriptData, encoding: .utf8) else {
-                throw CommandError.invalidFormat(fileURL: url)
+                throw CommandError.invalidFormat(path: inputScriptFile)
             }
             if printlevel != .none {
                 print("Running script `\(inputScriptFile)`")

@@ -3,7 +3,6 @@
 //  Scrap Mechanic EDA
 //
 
-import Foundation
 import ArgumentParser
 
 private let discussion = "This is the Scrap Mechanic EDA command line toolset."

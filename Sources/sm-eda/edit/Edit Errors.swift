@@ -3,8 +3,6 @@
 //  Scrap Mechanic EDA
 //
 
-import Foundation
-
 public enum EditScriptError: Error, CustomStringConvertible {
     case cannotParseScript(line: Int, content: String)
 

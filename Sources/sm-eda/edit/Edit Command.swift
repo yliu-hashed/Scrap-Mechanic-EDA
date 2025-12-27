@@ -99,8 +99,8 @@ struct EditCMD: ParsableCommand {
             }
 
             // warn inhibit other operands
-            let isNop = !mergeNetlistFiles.isEmpty || !portConnect.isEmpty || !portShare.isEmpty || !portDrive.isEmpty || !portRemove.isEmpty
-            if printlevel != .none, isNop {
+            let hasArgOps = !mergeNetlistFiles.isEmpty || !portConnect.isEmpty || !portShare.isEmpty || !portDrive.isEmpty || !portRemove.isEmpty
+            if printlevel != .none, hasArgOps {
                 print("Warning: Edit arguments will be ignored when script file is specified")
             }
 

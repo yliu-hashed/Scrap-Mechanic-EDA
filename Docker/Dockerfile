@@ -8,7 +8,7 @@ ARG build_mode
 ADD . /repo
 
 # build sm-eda using swift
-RUN cd repo && swift build -c $build_mode --static-swift-stdlib
+RUN cd repo && swift build -c $build_mode --static-swift-stdlib -Xlinker -s
 # copy license
 RUN mkdir /sm-eda && mkdir /sm-eda/bin && mkdir /sm-eda/bash
 RUN cp /repo/LICENSE /sm-eda/LICENSE

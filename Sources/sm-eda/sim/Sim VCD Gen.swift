@@ -11,17 +11,10 @@ struct LevelChangeRecord {
     var levelChanges: [UInt64: Bool]
 }
 
-private let dateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.locale = .init(identifier: "en_US_POSIX")
-    formatter.dateFormat = "EEE MMM d ss:mm:HH YYYY"
-    return formatter
-}()
-
 func vcdGen(module: borrowing SMModule, duration: UInt64, history: borrowing [LevelChangeRecord]) -> String {
     // obtain date information
     let date = Date()
-    let dateString = dateFormatter.string(from: date)
+    let dateString = date.formatted()
     // header - metadata
     var string: String = ""
     string += "$version\n  sm-net-sim\n$end\n"

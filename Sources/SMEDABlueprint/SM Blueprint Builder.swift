@@ -99,10 +99,10 @@ public class SMBlueprintBuilder {
 
         let shapeId: String
         switch device {
-            case .button:
-                shapeId = kSMShapeID_button
-            case .switch:
-                shapeId = kSMShapeID_switch
+        case .button:
+            shapeId = kSMShapeID_button
+        case .switch:
+            shapeId = kSMShapeID_switch
         }
 
         let newChild = SMBlueprintItem(
@@ -155,12 +155,12 @@ public enum SMBlockType: String {
 
     var shapeID: String {
         switch self {
-            case .cardboard:
-                return kSMShapeID_cardboard
-            case .spaceship:
-                return kSMShapeID_spaceship
-            case .caution:
-                return kSMShapeId_caution
+        case .cardboard:
+            return kSMShapeID_cardboard
+        case .spaceship:
+            return kSMShapeID_spaceship
+        case .caution:
+            return kSMShapeId_caution
         }
     }
 }

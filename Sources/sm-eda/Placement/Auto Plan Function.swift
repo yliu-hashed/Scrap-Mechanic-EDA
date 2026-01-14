@@ -62,23 +62,23 @@ private enum PlaceInputDevice: EnumerableFlag {
 
     static func name(for value: PlaceInputDevice) -> NameSpecification {
         switch value {
-            case .button:
-                return [.customLong("in-button"), .customLong("btn")]
-            case .switch:
-                return [.customLong("in-switch"), .customLong("sw")]
-            case .none:
-                return [.customLong("in-none"), .customLong("inn")]
+        case .button:
+            return [.customLong("in-button"), .customLong("btn")]
+        case .switch:
+            return [.customLong("in-switch"), .customLong("sw")]
+        case .none:
+            return [.customLong("in-none"), .customLong("inn")]
         }
     }
 
     var device: SMInputDevice? {
         switch self {
-            case .button:
-                return .button
-            case .switch:
-                return .switch
-            case .none:
-                return nil
+        case .button:
+            return .button
+        case .switch:
+            return .switch
+        case .none:
+            return nil
         }
     }
 }
@@ -128,7 +128,7 @@ struct AutoPlanArgGroup: ParsableArguments {
             }
         }
     }
-
+    
     enum ValidationError: Error, CustomStringConvertible {
         case nonPositiveDepth
         case nonPositiveWidth
@@ -137,14 +137,14 @@ struct AutoPlanArgGroup: ParsableArguments {
 
         var description: String {
             switch self {
-                case .nonPositiveDepth:
-                    return "Depth must be a positive integer."
-                case .nonPositiveWidth:
-                    return "Width must be a positive integer."
-                case .redundantDepth:
-                    return "Depth must not be specified when volumes are used"
-                case .redundantWidth:
-                    return "Width must not be specified when volumes are used"
+            case .nonPositiveDepth:
+                return "Depth must be a positive integer."
+            case .nonPositiveWidth:
+                return "Width must be a positive integer."
+            case .redundantDepth:
+                return "Depth must not be specified when volumes are used"
+            case .redundantWidth:
+                return "Width must not be specified when volumes are used"
             }
         }
     }

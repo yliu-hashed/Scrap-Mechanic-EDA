@@ -44,50 +44,50 @@ func transform(ysModule: YSModule, moduleName: String, clockDomainNames: [String
         cellTypeLUTs.updateValue(cellType, forKey: cellName)
 
         switch cellType {
-            case .basicGate(_, let size):
-                if let sureSize = size {
-                    // a basic gate with known size
-                    guard cell.conns.count == sureSize + 1,
-                          cell.conns.allSatisfy({ $0.value.count == 1 }),
-                          let outputBits = cell.conns.first(where: { $0.key == "Y" })?.value,
-                          outputBits.count == 1,
-                          case .shared(let id) = outputBits[0] else {
+        case .basicGate(_, let size):
+            if let sureSize = size {
+                // a basic gate with known size
+                guard cell.conns.count == sureSize + 1,
+                      cell.conns.allSatisfy({ $0.value.count == 1 }),
+                      let outputBits = cell.conns.first(where: { $0.key == "Y" })?.value,
+                      outputBits.count == 1,
+                      case .shared(let id) = outputBits[0] else {
 
-                        throw TransformError.malformedCellPorts(cellName: cellName)
-                    }
-                    guard !outputLUTs.keys.contains(id) else {
-                        throw TransformError.duplicateOutput(
-                            connId: id, cellName1: cellName,
-                            cellName2: outputLUTs[id]!.nodeName
-                        )
-                    }
-                    let outputStore = TransformOutputStore(nodeName: cellName, connName: "Y", bitIndex: 0)
-                    outputLUTs.updateValue(outputStore, forKey: id)
-                } else {
-                    // a basic gate with variable size
-                    guard cell.conns.count == 2,
-                          let inputBits = cell.conns["A"],
-                          inputBits.count >= 1,
-                          let outputBits = cell.conns["Y"],
-                          outputBits.count == 1,
-                          case .shared(let id) = outputBits[0] else {
-                        throw TransformError.malformedCellPorts(cellName: cellName)
-                    }
-                    guard !outputLUTs.keys.contains(id) else {
-                        throw TransformError.duplicateOutput(
-                            connId: id, cellName1: cellName,
-                            cellName2: outputLUTs[id]!.nodeName
-                        )
-                    }
-                    let outputStore = TransformOutputStore(nodeName: cellName, connName: "Y", bitIndex: 0)
-                    outputLUTs.updateValue(outputStore, forKey: id)
+                    throw TransformError.malformedCellPorts(cellName: cellName)
                 }
-            case .psudoDFF(hasAsyncReset: false):
-                try checkDFF(name: cellName, cell: cell, updating: &outputLUTs)
-            case .psudoDFF(hasAsyncReset: true):
-                try checkDFFWithAsyncReset(name: cellName, cell: cell, updating: &outputLUTs)
-            case .psudoBRAMTimer(let length):
-                try checkBRAMTimer(name: cellName, cell: cell, length: length, updating: &outputLUTs)
+                guard !outputLUTs.keys.contains(id) else {
+                    throw TransformError.duplicateOutput(
+                        connId: id, cellName1: cellName,
+                        cellName2: outputLUTs[id]!.nodeName
+                    )
+                }
+                let outputStore = TransformOutputStore(nodeName: cellName, connName: "Y", bitIndex: 0)
+                outputLUTs.updateValue(outputStore, forKey: id)
+            } else {
+                // a basic gate with variable size
+                guard cell.conns.count == 2,
+                      let inputBits = cell.conns["A"],
+                      inputBits.count >= 1,
+                      let outputBits = cell.conns["Y"],
+                      outputBits.count == 1,
+                      case .shared(let id) = outputBits[0] else {
+                    throw TransformError.malformedCellPorts(cellName: cellName)
+                }
+                guard !outputLUTs.keys.contains(id) else {
+                    throw TransformError.duplicateOutput(
+                        connId: id, cellName1: cellName,
+                        cellName2: outputLUTs[id]!.nodeName
+                    )
+                }
+                let outputStore = TransformOutputStore(nodeName: cellName, connName: "Y", bitIndex: 0)
+                outputLUTs.updateValue(outputStore, forKey: id)
+            }
+        case .psudoDFF(hasAsyncReset: false):
+            try checkDFF(name: cellName, cell: cell, updating: &outputLUTs)
+        case .psudoDFF(hasAsyncReset: true):
+            try checkDFFWithAsyncReset(name: cellName, cell: cell, updating: &outputLUTs)
+        case .psudoBRAMTimer(let length):
+            try checkBRAMTimer(name: cellName, cell: cell, length: length, updating: &outputLUTs)
         }
     }
 
@@ -147,10 +147,10 @@ func transform(ysModule: YSModule, moduleName: String, clockDomainNames: [String
         // register
         let direction = port.direction
         switch direction {
-            case .input:
-                builder.registerInputGates(port: portName, gates: bitsTarget)
-            case .output:
-                builder.registerOutputGates(port: portName, gates: bitsTarget)
+        case .input:
+            builder.registerInputGates(port: portName, gates: bitsTarget)
+        case .output:
+            builder.registerOutputGates(port: portName, gates: bitsTarget)
         }
     }
 
@@ -287,18 +287,18 @@ class LoweringCache {
 
 private func lowerCell(cellType: YSSMCellType, builder: SMNetBuilder, context: borrowing YSCell, cache: LoweringCache) -> any CellLowerTarget {
     switch cellType {
-        case .basicGate(let type, _):
-            let mainGate = builder.addLogic(type: type)
-            return LogicLowerTarget(gateId: mainGate)
+    case .basicGate(let type, _):
+        let mainGate = builder.addLogic(type: type)
+        return LogicLowerTarget(gateId: mainGate)
 
-        case .psudoDFF(hasAsyncReset: false):
-            return emitDFF(builder: builder)
+    case .psudoDFF(hasAsyncReset: false):
+        return emitDFF(builder: builder)
 
-        case .psudoDFF(hasAsyncReset: true):
-            return emitDFFWithAsyncReset(builder: builder)
+    case .psudoDFF(hasAsyncReset: true):
+        return emitDFFWithAsyncReset(builder: builder)
 
-        case .psudoBRAMTimer(let length):
-            return emitBRAMTimer(builder: builder, length: length, context: context, cache: cache.timerCache)
+    case .psudoBRAMTimer(let length):
+        return emitBRAMTimer(builder: builder, length: length, context: context, cache: cache.timerCache)
     }
 }
 
@@ -360,25 +360,25 @@ func extractType(typeName: String) -> YSSMCellType? {
 extension SMLogicType: CustomStringConvertible {
     init?(name: Substring) {
         switch name {
-            case "OR":   self = .or
-            case "AND":  self = .and
-            case "NOR":  self = .nor
-            case "NAND": self = .nand
-            case "XOR":  self = .xor
-            case "XNOR": self = .xnor
-            default:
-                return nil
+        case "OR":   self = .or
+        case "AND":  self = .and
+        case "NOR":  self = .nor
+        case "NAND": self = .nand
+        case "XOR":  self = .xor
+        case "XNOR": self = .xnor
+        default:
+            return nil
         }
     }
-    
+
     var name: String {
         switch self {
-            case .or:   return "OR"
-            case .and:  return "AND"
-            case .nor:  return "NOR"
-            case .nand: return "NAND"
-            case .xor:  return "XOR"
-            case .xnor: return "XNOR"
+        case .or:   return "OR"
+        case .and:  return "AND"
+        case .nor:  return "NOR"
+        case .nand: return "NAND"
+        case .xor:  return "XOR"
+        case .xnor: return "XNOR"
         }
     }
 

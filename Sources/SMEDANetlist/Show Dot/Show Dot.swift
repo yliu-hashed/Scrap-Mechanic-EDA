@@ -6,17 +6,17 @@
 private extension SMGateType {
     func getDotName() -> String {
         switch self {
-            case .logic(let type):
-                switch type {
-                    case .and:  return "AND"
-                    case .or:   return "OR"
-                    case .xor:  return "XOR"
-                    case .nand: return "NAND"
-                    case .nor:  return "NOR"
-                    case .xnor: return "XNOR"
-                }
-            case .timer(let delay):
-                return "TIMER(\(delay))"
+        case .logic(let type):
+            switch type {
+            case .and:  return "AND"
+            case .or:   return "OR"
+            case .xor:  return "XOR"
+            case .nand: return "NAND"
+            case .nor:  return "NOR"
+            case .xnor: return "XNOR"
+            }
+        case .timer(let delay):
+            return "TIMER(\(delay))"
         }
     }
 }

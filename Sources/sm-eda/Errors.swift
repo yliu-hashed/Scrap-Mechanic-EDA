@@ -10,12 +10,12 @@ enum CommandError: Error, CustomStringConvertible {
 
     var description: String {
         switch self {
-            case .invalidFormat(let path):
-                return "File \"\(path)\" is not in the correct format"
-            case .invalidInput(let description):
-                return "Invalid Input: \(description)"
-            case .lz4CannotBeAccessed(let path):
-                return "The specified path to LZ4 \(path) cannot be read"
+        case .invalidFormat(let path):
+            return "File \"\(path)\" is not in the correct format"
+        case .invalidInput(let description):
+            return "Invalid Input: \(description)"
+        case .lz4CannotBeAccessed(let path):
+            return "The specified path to LZ4 \(path) cannot be read"
         }
     }
 }

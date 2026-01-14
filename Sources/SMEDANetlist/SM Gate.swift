@@ -64,13 +64,13 @@ public enum SMGateGroup: Int, Equatable, Hashable, CaseIterable, CustomStringCon
 
     public var description: String {
         switch self {
-            case .and:   return "AND"
-            case .or:    return "OR"
-            case .xor:   return "XOR"
-            case .nand:  return "NAND"
-            case .nor:   return "NOR"
-            case .xnor:  return "XNOR"
-            case .timer: return "TIMER"
+        case .and:   return "AND"
+        case .or:    return "OR"
+        case .xor:   return "XOR"
+        case .nand:  return "NAND"
+        case .nor:   return "NOR"
+        case .xnor:  return "XNOR"
+        case .timer: return "TIMER"
         }
     }
 }
@@ -81,10 +81,10 @@ public enum SMGateType: Codable, Equatable, Hashable {
 
     public var group: SMGateGroup {
         switch self {
-            case .logic(let type):
-                return SMGateGroup(rawValue: type.rawValue)!
-            case .timer(_):
-                return .timer
+        case .logic(let type):
+            return SMGateGroup(rawValue: type.rawValue)!
+        case .timer(_):
+            return .timer
         }
     }
 }

@@ -73,10 +73,10 @@ struct YSPort: Decodable {
 
         static func convert(from string: String) -> Direction? {
             switch string {
-                case "input": return .input
-                case "output": return .output
-                default:
-                    return nil
+            case "input": return .input
+            case "output": return .output
+            default:
+                return nil
             }
         }
     }
@@ -120,24 +120,24 @@ enum YSSMCellType {
 
     func isInput(name: borrowing String) -> Bool {
         switch self {
-            case .basicGate(_, _):
-                return name != "Y"
-            case .psudoDFF(_):
-                return name != "Q"
-            case .psudoBRAMTimer(_):
-                let regex = #/B[0-9]+DATA/#
-                return name.wholeMatch(of: regex) == nil
+        case .basicGate(_, _):
+            return name != "Y"
+        case .psudoDFF(_):
+            return name != "Q"
+        case .psudoBRAMTimer(_):
+            let regex = #/B[0-9]+DATA/#
+            return name.wholeMatch(of: regex) == nil
         }
     }
 
     var name: String {
         switch self {
-            case .basicGate(_, _):
-                return "Basic Gate"
-            case .psudoDFF(let hasAsyncReset):
-                return hasAsyncReset ? "DFFER" : "DFFE"
-            case .psudoBRAMTimer(let length):
-                return "BRAM TIMER (\(length))"
+        case .basicGate(_, _):
+            return "Basic Gate"
+        case .psudoDFF(let hasAsyncReset):
+            return hasAsyncReset ? "DFFER" : "DFFE"
+        case .psudoBRAMTimer(let length):
+            return "BRAM TIMER (\(length))"
         }
     }
 }

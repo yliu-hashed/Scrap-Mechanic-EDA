@@ -83,16 +83,16 @@ struct DFFTarget: CellLowerTarget {
 
     func gateFor(port: String, bit: Int) -> [UInt64] {
         switch port {
-            case "D":
-                return [diff]
-            case "C":
-                return [cInv, filt]
-            case "Q":
-                return [xlp0]
-            case "E":
-                return [filt]
-            default:
-                fatalError()
+        case "D":
+            return [diff]
+        case "C":
+            return [cInv, filt]
+        case "Q":
+            return [xlp0]
+        case "E":
+            return [filt]
+        default:
+            fatalError()
         }
     }
 }
@@ -188,18 +188,18 @@ struct DFFWithAsyncResetTarget: CellLowerTarget {
 
     func gateFor(port: String, bit: Int) -> [UInt64] {
         switch port {
-            case "D":
-                return [diff]
-            case "C":
-                return [cInv, filt]
-            case "Q":
-                return [xlp0]
-            case "R":
-                return [rInv, rFlt]
-            case "E":
-                return [rFlt]
-            default:
-                fatalError()
+        case "D":
+            return [diff]
+        case "C":
+            return [cInv, filt]
+        case "Q":
+            return [xlp0]
+        case "R":
+            return [rInv, rFlt]
+        case "E":
+            return [rFlt]
+        default:
+            fatalError()
         }
     }
 }

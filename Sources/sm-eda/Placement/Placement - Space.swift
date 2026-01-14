@@ -74,11 +74,11 @@ func placementEnumerateSpace(
     for (gateId, gate) in module.gates {
         guard !portGateIds.contains(gateId) else { continue }
         switch gate.type {
-            case .logic(_):
-                try reserveSpace()
-            case .timer(_):
-                try reserveSpace()
-                try reserveSpace()
+        case .logic(_):
+            try reserveSpace()
+        case .timer(_):
+            try reserveSpace()
+            try reserveSpace()
         }
     }
     return space

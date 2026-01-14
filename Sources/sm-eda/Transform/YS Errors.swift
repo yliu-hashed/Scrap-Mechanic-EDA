@@ -11,14 +11,14 @@ enum TransformError: Error, CustomStringConvertible {
 
     var description: String {
         switch self {
-            case .malformedCellPorts(let cellName, let description):
-                return "[Transform Error] The connections of cell \(cellName) is malformed. \(description)"
-            case .duplicateOutput(let connId, let cellName1, let cellName2):
-                return "[Transform Error] Connection \(connId) is the target of cell \(cellName1) and \(cellName2)"
-            case .connectionDoesNotExist(let connId):
-                return "[Transform Error] Connection \(connId) does not exist"
-            case .invalidCellType(let cellName, let cellTypeName):
-                return "[Transform Error] Cell \(cellName) with type \(cellTypeName) is unsupported"
+        case .malformedCellPorts(let cellName, let description):
+            return "[Transform Error] The connections of cell \(cellName) is malformed. \(description)"
+        case .duplicateOutput(let connId, let cellName1, let cellName2):
+            return "[Transform Error] Connection \(connId) is the target of cell \(cellName1) and \(cellName2)"
+        case .connectionDoesNotExist(let connId):
+            return "[Transform Error] Connection \(connId) does not exist"
+        case .invalidCellType(let cellName, let cellTypeName):
+            return "[Transform Error] Cell \(cellName) with type \(cellTypeName) is unsupported"
         }
     }
 }
@@ -30,12 +30,12 @@ enum ModuleSelectionError: Error, CustomStringConvertible {
 
     var description: String {
         switch self {
-            case .noTopLevelModule:
-                return "Unable to find top level module"
-            case .missingClockDomain(let name):
-                return "Clock domain \(name) does not exist"
-            case .malformedClockDomain(let name):
-                return "Clock domain \(name) is malformed"
+        case .noTopLevelModule:
+            return "Unable to find top level module"
+        case .missingClockDomain(let name):
+            return "Clock domain \(name) does not exist"
+        case .malformedClockDomain(let name):
+            return "Clock domain \(name) is malformed"
         }
     }
 }

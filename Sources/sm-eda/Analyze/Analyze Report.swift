@@ -20,10 +20,10 @@ extension String {
 extension SMGateType: CustomStringConvertible {
     public var description: String {
         switch self {
-            case .logic(let type):
-                return type.description
-            case .timer(let delay):
-                return "TIMER[\(delay)]"
+        case .logic(let type):
+            return type.description
+        case .timer(let delay):
+            return "TIMER[\(delay)]"
         }
     }
 }

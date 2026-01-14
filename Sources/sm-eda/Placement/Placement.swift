@@ -177,22 +177,22 @@ enum PlacementError: Error, CustomStringConvertible {
 
     var description: String {
         switch self {
-            case .portNotFound(let name):
-                return "Port \"\(name)\" does not exist"
-            case .portOutOfRange(let portBit, let min, let max):
-                return "Port \"\(portBit)\" is out of the valid range of [\(min):\(max)]"
-            case .invalidDevice(let name):
-                return "Cannot recognize specified device \"\(name)\""
-            case .portNotLogic(let portBit):
-                return "Port \"\(portBit)\" is not a logic gate"
-            case .portCollide(let portBit, let other, let position):
-                return "Port \"\(portBit)\" collides with port \"\(other)\" at position \(position)"
-            case .portRepeated(let portBit):
-                return "Port \"\(portBit)\" is repeated during placement"
-            case .inputIgnored(let portBit):
-                return "Input port \"\(portBit)\" never used in placement"
-            case .spaceNotEnouph(let current):
-                return "The give volumes (\(current) blocks) are not enouph to fit the design"
+        case .portNotFound(let name):
+            return "Port \"\(name)\" does not exist"
+        case .portOutOfRange(let portBit, let min, let max):
+            return "Port \"\(portBit)\" is out of the valid range of [\(min):\(max)]"
+        case .invalidDevice(let name):
+            return "Cannot recognize specified device \"\(name)\""
+        case .portNotLogic(let portBit):
+            return "Port \"\(portBit)\" is not a logic gate"
+        case .portCollide(let portBit, let other, let position):
+            return "Port \"\(portBit)\" collides with port \"\(other)\" at position \(position)"
+        case .portRepeated(let portBit):
+            return "Port \"\(portBit)\" is repeated during placement"
+        case .inputIgnored(let portBit):
+            return "Input port \"\(portBit)\" never used in placement"
+        case .spaceNotEnouph(let current):
+            return "The give volumes (\(current) blocks) are not enouph to fit the design"
         }
     }
 }

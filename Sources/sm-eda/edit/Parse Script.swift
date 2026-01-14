@@ -21,31 +21,31 @@ func parseScript(_ script: String) throws -> EditFunction {
         let restOfLine = trimmedLine[firstSeperator...]
             .trimmingCharacters(in: .whitespacesAndNewlines)
         switch firstToken {
-            case "m", "merge":
-                let module = try fetchModule(file: restOfLine)
-                list.append(.merge(target: module))
-            case "c", "connect":
-                guard let arg = EditPortRoute(argument: restOfLine) else {
-                    throw EditScriptError.cannotParseScript(line: index, content: trimmedLine)
-                }
-                list.append(.connect(route: arg))
-            case "s", "share":
-                guard let arg = EditPortRoute(argument: restOfLine) else {
-                    throw EditScriptError.cannotParseScript(line: index, content: trimmedLine)
-                }
-                list.append(.share(route: arg))
-            case "d", "drive":
-                guard let arg = EditPortDrive(argument: restOfLine) else {
-                    throw EditScriptError.cannotParseScript(line: index, content: trimmedLine)
-                }
-                list.append(.drive(drive: arg))
-            case "r", "remove":
-                guard let arg = EditPort(argument: restOfLine) else {
-                    throw EditScriptError.cannotParseScript(line: index, content: trimmedLine)
-                }
-                list.append(.remove(port: arg))
-            default:
+        case "m", "merge":
+            let module = try fetchModule(file: restOfLine)
+            list.append(.merge(target: module))
+        case "c", "connect":
+            guard let arg = EditPortRoute(argument: restOfLine) else {
                 throw EditScriptError.cannotParseScript(line: index, content: trimmedLine)
+            }
+            list.append(.connect(route: arg))
+        case "s", "share":
+            guard let arg = EditPortRoute(argument: restOfLine) else {
+                throw EditScriptError.cannotParseScript(line: index, content: trimmedLine)
+            }
+            list.append(.share(route: arg))
+        case "d", "drive":
+            guard let arg = EditPortDrive(argument: restOfLine) else {
+                throw EditScriptError.cannotParseScript(line: index, content: trimmedLine)
+            }
+            list.append(.drive(drive: arg))
+        case "r", "remove":
+            guard let arg = EditPort(argument: restOfLine) else {
+                throw EditScriptError.cannotParseScript(line: index, content: trimmedLine)
+            }
+            list.append(.remove(port: arg))
+        default:
+            throw EditScriptError.cannotParseScript(line: index, content: trimmedLine)
         }
     }
 

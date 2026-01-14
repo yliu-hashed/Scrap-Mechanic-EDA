@@ -114,29 +114,29 @@ extension SMLogicType {
     /// Whether the gate is a inverter if only one input is given
     public var isInverter: Bool {
         switch self {
-            case .or,  .and,  .xor:  return false
-            case .nor, .nand, .xnor: return true
+        case .or,  .and,  .xor:  return false
+        case .nor, .nand, .xnor: return true
         }
     }
 
     /// The behavior of the gate when treating multiple input sources
     public var sourceAggrigationType: SourceAggrigationType {
         switch self {
-            case .or,  .nor:  return .logicalOr
-            case .and, .nand: return .logicalAnd
-            case .xor, .xnor: return .logicalChain
+        case .or,  .nor:  return .logicalOr
+        case .and, .nand: return .logicalAnd
+        case .xor, .xnor: return .logicalChain
         }
     }
 
     /// The negated gate type to the current gate
     public var negatedGate: SMLogicType {
         switch self {
-            case .or:   return .nor
-            case .and:  return .nand
-            case .nor:  return .or
-            case .nand: return .and
-            case .xor:  return .xnor
-            case .xnor: return .xor
+        case .or:   return .nor
+        case .and:  return .nand
+        case .nor:  return .or
+        case .nand: return .and
+        case .xor:  return .xnor
+        case .xnor: return .xor
         }
     }
 
@@ -178,9 +178,9 @@ public enum SourceAggrigationType: Int {
     /// the equivalent front part of the gate
     public var equivGate: SMLogicType {
         switch self {
-            case .logicalAnd:   return .and
-            case .logicalOr:    return .or
-            case .logicalChain: return .xor
+        case .logicalAnd:   return .and
+        case .logicalOr:    return .or
+        case .logicalChain: return .xor
         }
     }
 }

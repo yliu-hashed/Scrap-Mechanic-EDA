@@ -35,10 +35,10 @@ class SimulationModel {
     func buildState() {
         states = Dictionary(uniqueKeysWithValues: module.gates.map { (gateId, gate) in
             switch gate.type {
-                case .logic(_):
-                    return (gateId, .basic(false))
-                case .timer(_):
-                    return (gateId, .timer([]))
+            case .logic(_):
+                return (gateId, .basic(false))
+            case .timer(_):
+                return (gateId, .timer([]))
             }
         })
         instableCount = 0
@@ -73,13 +73,13 @@ class SimulationModel {
             return overrideState
         }
         switch states[id] {
-            case .basic(let basicState):
-                return basicState
-            case .timer(let timerState):
-                guard case .timer(let delay) = module.gates[id]?.type else { fatalError() }
-                return timerStateGetValue(state: timerState, delay: delay)
-            case .none:
-                fatalError()
+        case .basic(let basicState):
+            return basicState
+        case .timer(let timerState):
+            guard case .timer(let delay) = module.gates[id]?.type else { fatalError() }
+            return timerStateGetValue(state: timerState, delay: delay)
+        case .none:
+            fatalError()
         }
     }
 
@@ -142,72 +142,72 @@ class SimulationModel {
         // update
         for (gateId, gate) in module.gates {
             switch gate.type {
-                case .logic(let logicType):
-                    let newState: Bool
+            case .logic(let logicType):
+                let newState: Bool
 
-                    if let overrideState = overrideList[gateId] {
-                        // use overriden if present
-                        newState = overrideState
-                    } else {
-                        // solve state
-                        func evalAsOR() -> Bool {
-                            for src in gate.srcs {
-                                // if one is true, out is true
-                                if outputOfGate(id: src) {
-                                    return true
-                                }
+                if let overrideState = overrideList[gateId] {
+                    // use overriden if present
+                    newState = overrideState
+                } else {
+                    // solve state
+                    func evalAsOR() -> Bool {
+                        for src in gate.srcs {
+                            // if one is true, out is true
+                            if outputOfGate(id: src) {
+                                return true
                             }
-                            return false
                         }
-
-                        func evalAsAND() -> Bool {
-                            for src in gate.srcs {
-                                // if one is false, out is false
-                                if !outputOfGate(id: src) {
-                                    return false
-                                }
-                            }
-                            return true
-                        }
-
-                        func evalAsXOR() -> Bool {
-                            var tmp = false
-                            for src in gate.srcs {
-                                if outputOfGate(id: src) {
-                                    tmp = !tmp
-                                }
-                            }
-                            return tmp
-                        }
-
-                        let notEmpty = !gate.srcs.isEmpty
-
-                        switch logicType {
-                            case .or:
-                                newState = notEmpty && evalAsOR()
-                            case .and:
-                                newState = notEmpty && evalAsAND()
-                            case .nor:
-                                newState = notEmpty && !evalAsOR()
-                            case .nand:
-                                newState = notEmpty && !evalAsAND()
-                            case .xor:
-                                newState = notEmpty && evalAsXOR()
-                            case .xnor:
-                                newState = notEmpty && !evalAsXOR()
-                        }
+                        return false
                     }
-                    newStates[gateId] = .basic(newState)
-                case .timer(let delay):
-                    guard case .timer(let timerState) = states[gateId] else { fatalError() }
-                    let value: Bool
-                    if let gateId = gate.srcs.first {
-                        value = outputOfGate(id: gateId)
-                    } else {
-                        value = false
+
+                    func evalAsAND() -> Bool {
+                        for src in gate.srcs {
+                            // if one is false, out is false
+                            if !outputOfGate(id: src) {
+                                return false
+                            }
+                        }
+                        return true
                     }
-                    let newState = timerStateTick(state: timerState, delay: delay, newValue: value)
-                    newStates[gateId] = .timer(newState)
+
+                    func evalAsXOR() -> Bool {
+                        var tmp = false
+                        for src in gate.srcs {
+                            if outputOfGate(id: src) {
+                                tmp = !tmp
+                            }
+                        }
+                        return tmp
+                    }
+
+                    let notEmpty = !gate.srcs.isEmpty
+
+                    switch logicType {
+                    case .or:
+                        newState = notEmpty && evalAsOR()
+                    case .and:
+                        newState = notEmpty && evalAsAND()
+                    case .nor:
+                        newState = notEmpty && !evalAsOR()
+                    case .nand:
+                        newState = notEmpty && !evalAsAND()
+                    case .xor:
+                        newState = notEmpty && evalAsXOR()
+                    case .xnor:
+                        newState = notEmpty && !evalAsXOR()
+                    }
+                }
+                newStates[gateId] = .basic(newState)
+            case .timer(let delay):
+                guard case .timer(let timerState) = states[gateId] else { fatalError() }
+                let value: Bool
+                if let gateId = gate.srcs.first {
+                    value = outputOfGate(id: gateId)
+                } else {
+                    value = false
+                }
+                let newState = timerStateTick(state: timerState, delay: delay, newValue: value)
+                newStates[gateId] = .timer(newState)
             }
         }
 
@@ -272,10 +272,10 @@ private func printState(state: [UInt64: LogicState]) {
     for (gate, state) in state {
         print("  \(gate): ", terminator: "")
         switch state {
-            case .basic(let basicState):
-                print(basicState)
-            case .timer(let timerState):
-                print(timerState)
+        case .basic(let basicState):
+            print(basicState)
+        case .timer(let timerState):
+            print(timerState)
         }
     }
 }

@@ -18,21 +18,21 @@ public enum SMColor: Sendable {
 
     public var hex: String {
         switch self {
-            case .custom(let hex):
-                return hex
-            case .paint(let shade, let hue):
-                return hue.getHex(withShade: shade)
-            case .defaultOrange:
-                return "DF7F01"
+        case .custom(let hex):
+            return hex
+        case .paint(let shade, let hue):
+            return hue.getHex(withShade: shade)
+        case .defaultOrange:
+            return "DF7F01"
         }
     }
 
     public func validate() -> Bool {
         switch self {
-            case .custom(let hex):
-                return hex.count == 6 && hex.allSatisfy { validHex.contains($0) }
-            default:
-                return true
+        case .custom(let hex):
+            return hex.count == 6 && hex.allSatisfy { validHex.contains($0) }
+        default:
+            return true
         }
     }
 }
@@ -52,10 +52,10 @@ public enum SMColorShade: Int, CaseIterable, Sendable {
 
     static func extractShade(shadeToken: String, hueToken: String) -> SMColorShade? {
         switch hueToken {
-            case "white": return .light
-            case "black": return .veryDark
-            case "brown": return .dark
-            default: break
+        case "white": return .light
+        case "black": return .veryDark
+        case "brown": return .dark
+        default: break
         }
         guard !shadeToken.isEmpty else { return .regular }
         return SMColorShade.shadeNameTable[shadeToken]

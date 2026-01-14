@@ -147,16 +147,16 @@ struct BRAMTimerTarget: CellLowerTarget {
     func gateFor(port: String, bit: Int) -> [UInt64] {
         // write ports and clock
         switch port {
-            case "CLK1":
-                return [clk]
-            case "A1ADDR":
-                return [addr[bit]]
-            case "A1DATA":
-                return [data]
-            case "A1EN":
-                return [writeEnable]
-            default:
-                break
+        case "CLK1":
+            return [clk]
+        case "A1ADDR":
+            return [addr[bit]]
+        case "A1DATA":
+            return [data]
+        case "A1EN":
+            return [writeEnable]
+        default:
+            break
         }
         // read ports
         let regex = #/B([0-9]+)([A-Z]+)/#

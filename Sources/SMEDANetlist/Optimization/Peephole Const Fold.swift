@@ -94,7 +94,7 @@ private func eliminateConstDrive(builder: SMNetBuilder,
         // if current gate has many inputs other than the constant drive (now removed)
         if !gate.srcs.isEmpty {
             guard let drive = currentFrame.drive,
-                  case .logic(let logicType) = gate.type 
+                  case .logic(let logicType) = gate.type
             else { fatalError() }
 
             // get what happens if the current gate is driven
@@ -154,14 +154,14 @@ private enum DriveResolution {
 /// Get what happens if you drive a multi-input logic gate
 private func driveGate(gateType: SMLogicType, drive: Bool) -> DriveResolution {
     switch gateType.sourceAggrigationType {
-        case .logicalAnd:
-            // if driven by false, AND produce false, output is whether it is inverter
-            return !drive ? .dominate(state: gateType.isInverter) : .convert(type: gateType)
-        case .logicalOr:
-            // if driven by true, OR produce true, output is whether it's not inverter
-            return drive ? .dominate(state: !gateType.isInverter) : .convert(type: gateType)
-        case .logicalChain:
-            // if driven by true, XOR or XNOR is negated
-            return .convert(type: drive ? gateType.negatedGate : gateType)
+    case .logicalAnd:
+        // if driven by false, AND produce false, output is whether it is inverter
+        return !drive ? .dominate(state: gateType.isInverter) : .convert(type: gateType)
+    case .logicalOr:
+        // if driven by true, OR produce true, output is whether it's not inverter
+        return drive ? .dominate(state: !gateType.isInverter) : .convert(type: gateType)
+    case .logicalChain:
+        // if driven by true, XOR or XNOR is negated
+        return .convert(type: drive ? gateType.negatedGate : gateType)
     }
 }

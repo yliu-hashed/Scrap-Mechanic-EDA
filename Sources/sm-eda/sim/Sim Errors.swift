@@ -8,8 +8,8 @@ enum REPLError: Error, CustomStringConvertible {
 
     var description: String {
         switch self {
-            case .invalidCommand:
-                return "Invalid Command"
+        case .invalidCommand:
+            return "Invalid Command"
         }
     }
 }

@@ -100,18 +100,18 @@ public struct EditFunction {
 
         for command in commands {
             switch command {
-                case .merge(let target):
-                    try editMerge(&module, with: target)
-                case .connect(let route):
-                    try editPortConnect(&module, route: route, invalidInputGates: &invalidInputGates)
-                case .share(let route):
-                    try editPortShare(&module, route: route, invalidInputGates: &invalidInputGates)
-                case .drive(let drive):
-                    try editPortDrive(&module, drive: drive, invalidInputGates: &invalidInputGates)
-                case .remove(let port):
-                    try editPortIgnore(&module, port: port, invalidOutputGates: &invalidOutputGates)
-                case .solidify:
-                    solidifyPorts()
+            case .merge(let target):
+                try editMerge(&module, with: target)
+            case .connect(let route):
+                try editPortConnect(&module, route: route, invalidInputGates: &invalidInputGates)
+            case .share(let route):
+                try editPortShare(&module, route: route, invalidInputGates: &invalidInputGates)
+            case .drive(let drive):
+                try editPortDrive(&module, drive: drive, invalidInputGates: &invalidInputGates)
+            case .remove(let port):
+                try editPortIgnore(&module, port: port, invalidOutputGates: &invalidOutputGates)
+            case .solidify:
+                solidifyPorts()
             }
         }
 

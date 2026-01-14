@@ -51,11 +51,11 @@ func parseConstant(argument: Substring) -> UInt64? {
 
     let constDecode: UInt64?
     switch matchConst.1 {
-        case "", "0d": constDecode = UInt64(matchConst.2)
-        case     "0x": constDecode = UInt64(matchConst.2, radix: 16)
-        case     "0o": constDecode = UInt64(matchConst.2, radix: 8)
-        case     "0b": constDecode = UInt64(matchConst.2, radix: 2)
-        default: return nil
+    case "", "0d": constDecode = UInt64(matchConst.2)
+    case     "0x": constDecode = UInt64(matchConst.2, radix: 16)
+    case     "0o": constDecode = UInt64(matchConst.2, radix: 8)
+    case     "0b": constDecode = UInt64(matchConst.2, radix: 2)
+    default: return nil
     }
     return constDecode
 }

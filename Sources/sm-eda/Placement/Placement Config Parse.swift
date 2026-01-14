@@ -37,10 +37,10 @@ extension PlacementConfig.Volume: Codable {
 
         var description: String {
             switch self {
-                case .notPerp(let axis):
-                    return "The specified axis \(axis) does not cover all cardinal directions."
-                case .containsDuplicate(let axis):
-                    return "The specified axis \(axis) contains duplicate cardinal directions."
+            case .notPerp(let axis):
+                return "The specified axis \(axis) does not cover all cardinal directions."
+            case .containsDuplicate(let axis):
+                return "The specified axis \(axis) contains duplicate cardinal directions."
             }
         }
     }
@@ -221,10 +221,10 @@ private enum PortConfigParseError: Error, CustomStringConvertible {
 
     var description: String {
         switch self {
-            case .cannotParsePort(let port):
-                return "Cannot parse port description \"\(port)\""
-            case .repeatedPort(let portBit):
-                return "Port \(portBit) is repeated"
+        case .cannotParsePort(let port):
+            return "Cannot parse port description \"\(port)\""
+        case .repeatedPort(let portBit):
+            return "Port \(portBit) is repeated"
         }
     }
 }

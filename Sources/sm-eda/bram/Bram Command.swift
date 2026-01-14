@@ -156,24 +156,24 @@ struct BRAMCMD: ParsableCommand {
         // generate
         var module: SMModule
         switch type {
-            case .dff:
-                let config = BRAMDFFConfig(
-                    addressability: dbits,
-                    addressSpacePow2: abits,
-                    ports: ports
-                )
-                module = genBRAMDFF(config: config)
-            case .timer:
-                let config = BRAMTimerConfig(
-                    addressability: dbits,
-                    addressSpacePow2: abits,
-                    multiplexityPow2: multiplexity,
-                    ports: ports
-                )
-                module = genBRAMTimer(config: config)
-                if printlevel != .none {
-                    print("timer cycle: \(config.timerCycleLength)(\(config.timerCycleLengthS)s)")
-                }
+        case .dff:
+            let config = BRAMDFFConfig(
+                addressability: dbits,
+                addressSpacePow2: abits,
+                ports: ports
+            )
+            module = genBRAMDFF(config: config)
+        case .timer:
+            let config = BRAMTimerConfig(
+                addressability: dbits,
+                addressSpacePow2: abits,
+                multiplexityPow2: multiplexity,
+                ports: ports
+            )
+            module = genBRAMTimer(config: config)
+            if printlevel != .none {
+                print("timer cycle: \(config.timerCycleLength)(\(config.timerCycleLengthS)s)")
+            }
         }
 
         try module.check()
@@ -193,19 +193,19 @@ struct BRAMCMD: ParsableCommand {
 
         static func name(for value: MemoryType) -> NameSpecification {
             switch value {
-                case .dff:
-                    return [.customLong("dff")]
-                case .timer:
-                    return [.customLong("timer")]
+            case .dff:
+                return [.customLong("dff")]
+            case .timer:
+                return [.customLong("timer")]
             }
         }
 
         var description: String {
             switch self {
-                case .dff:
-                    return "DFF"
-                case .timer:
-                    return "TIMER"
+            case .dff:
+                return "DFF"
+            case .timer:
+                return "TIMER"
             }
         }
     }

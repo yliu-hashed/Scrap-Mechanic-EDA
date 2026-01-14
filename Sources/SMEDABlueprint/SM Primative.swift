@@ -78,25 +78,25 @@ public enum SMDirection: Int, Codable, CaseIterable, Sendable {
         guard vector != .zero else { return nil }
 
         switch (vector.x, vector.y, vector.z) {
-            case (let x, 0, 0):
-                self = x > 0 ? .posX : .negX
-            case (0, let y, 0):
-                self = y > 0 ? .posY : .negY
-            case (0, 0, let z):
-                self = z > 0 ? .posZ : .negZ
-            default:
-                return nil
+        case (let x, 0, 0):
+            self = x > 0 ? .posX : .negX
+        case (0, let y, 0):
+            self = y > 0 ? .posY : .negY
+        case (0, 0, let z):
+            self = z > 0 ? .posZ : .negZ
+        default:
+            return nil
         }
     }
 
     public var vector: SMVector {
         switch self {
-            case .posX: return SMVector(x:  1, y:  0, z:  0)
-            case .posY: return SMVector(x:  0, y:  1, z:  0)
-            case .posZ: return SMVector(x:  0, y:  0, z:  1)
-            case .negX: return SMVector(x: -1, y:  0, z:  0)
-            case .negY: return SMVector(x:  0, y: -1, z:  0)
-            case .negZ: return SMVector(x:  0, y:  0, z: -1)
+        case .posX: return SMVector(x:  1, y:  0, z:  0)
+        case .posY: return SMVector(x:  0, y:  1, z:  0)
+        case .posZ: return SMVector(x:  0, y:  0, z:  1)
+        case .negX: return SMVector(x: -1, y:  0, z:  0)
+        case .negY: return SMVector(x:  0, y: -1, z:  0)
+        case .negZ: return SMVector(x:  0, y:  0, z: -1)
         }
     }
 
@@ -116,13 +116,13 @@ public enum SMDirection: Int, Codable, CaseIterable, Sendable {
         let c = vector.cross(with: direction.vector)
 
         switch (c.x, c.y, c.z) {
-            case ( 1,  0,  0): return .posX
-            case ( 0,  1,  0): return .posY
-            case ( 0,  0,  1): return .posZ
-            case (-1,  0,  0): return .negX
-            case ( 0, -1,  0): return .negY
-            case ( 0,  0, -1): return .negZ
-            default: fatalError()
+        case ( 1,  0,  0): return .posX
+        case ( 0,  1,  0): return .posY
+        case ( 0,  0,  1): return .posZ
+        case (-1,  0,  0): return .negX
+        case ( 0, -1,  0): return .negY
+        case ( 0,  0, -1): return .negZ
+        default: fatalError()
         }
     }
 
@@ -138,13 +138,13 @@ public enum SMDirection: Int, Codable, CaseIterable, Sendable {
     public static func random() -> SMDirection {
         let index = Int.random(in: 0..<6)
         switch index {
-            case 0: return .posX
-            case 1: return .posY
-            case 2: return .posZ
-            case 3: return .negX
-            case 4: return .negY
-            case 5: return .negZ
-            default: fatalError()
+        case 0: return .posX
+        case 1: return .posY
+        case 2: return .posZ
+        case 3: return .negX
+        case 4: return .negY
+        case 5: return .negZ
+        default: fatalError()
         }
     }
 }
@@ -200,62 +200,62 @@ public struct SMRotation: Equatable, Hashable, Sendable {
     /// Positional compensation for the rotation
     public var compensation: SMVector {
         switch (alignX.rawValue, alignZ.rawValue) {
-            case (-3, -2): return .init(x: 0, y: 1, z: 1)
-            case (-3, -1): return .init(x: 1, y: 1, z: 1)
-            case (-3,  1): return .init(x: 0, y: 0, z: 1)
-            case (-3,  2): return .init(x: 1, y: 0, z: 1)
-            case (-2, -3): return .init(x: 1, y: 1, z: 1)
-            case (-2, -1): return .init(x: 1, y: 1, z: 0)
-            case (-2,  1): return .init(x: 0, y: 1, z: 1)
-            case (-2,  3): return .init(x: 0, y: 1, z: 0)
-            case (-1, -3): return .init(x: 1, y: 0, z: 1)
-            case (-1, -2): return .init(x: 1, y: 1, z: 1)
-            case (-1,  2): return .init(x: 1, y: 0, z: 0)
-            case (-1,  3): return .init(x: 1, y: 1, z: 0)
-            case ( 1, -3): return .init(x: 0, y: 1, z: 1)
-            case ( 1, -2): return .init(x: 0, y: 1, z: 0)
-            case ( 1,  2): return .init(x: 0, y: 0, z: 1)
-            case ( 1,  3): return .init(x: 0, y: 0, z: 0)
-            case ( 2, -3): return .init(x: 0, y: 0, z: 1)
-            case ( 2, -1): return .init(x: 1, y: 0, z: 1)
-            case ( 2,  1): return .init(x: 0, y: 0, z: 0)
-            case ( 2,  3): return .init(x: 1, y: 0, z: 0)
-            case ( 3, -2): return .init(x: 1, y: 1, z: 0)
-            case ( 3, -1): return .init(x: 1, y: 0, z: 0)
-            case ( 3,  1): return .init(x: 0, y: 1, z: 0)
-            case ( 3,  2): return .init(x: 0, y: 0, z: 0)
-            default: fatalError()
+        case (-3, -2): return .init(x: 0, y: 1, z: 1)
+        case (-3, -1): return .init(x: 1, y: 1, z: 1)
+        case (-3,  1): return .init(x: 0, y: 0, z: 1)
+        case (-3,  2): return .init(x: 1, y: 0, z: 1)
+        case (-2, -3): return .init(x: 1, y: 1, z: 1)
+        case (-2, -1): return .init(x: 1, y: 1, z: 0)
+        case (-2,  1): return .init(x: 0, y: 1, z: 1)
+        case (-2,  3): return .init(x: 0, y: 1, z: 0)
+        case (-1, -3): return .init(x: 1, y: 0, z: 1)
+        case (-1, -2): return .init(x: 1, y: 1, z: 1)
+        case (-1,  2): return .init(x: 1, y: 0, z: 0)
+        case (-1,  3): return .init(x: 1, y: 1, z: 0)
+        case ( 1, -3): return .init(x: 0, y: 1, z: 1)
+        case ( 1, -2): return .init(x: 0, y: 1, z: 0)
+        case ( 1,  2): return .init(x: 0, y: 0, z: 1)
+        case ( 1,  3): return .init(x: 0, y: 0, z: 0)
+        case ( 2, -3): return .init(x: 0, y: 0, z: 1)
+        case ( 2, -1): return .init(x: 1, y: 0, z: 1)
+        case ( 2,  1): return .init(x: 0, y: 0, z: 0)
+        case ( 2,  3): return .init(x: 1, y: 0, z: 0)
+        case ( 3, -2): return .init(x: 1, y: 1, z: 0)
+        case ( 3, -1): return .init(x: 1, y: 0, z: 0)
+        case ( 3,  1): return .init(x: 0, y: 1, z: 0)
+        case ( 3,  2): return .init(x: 0, y: 0, z: 0)
+        default: fatalError()
         }
     }
 
     /// Angular rotation in (x, y, z) notated by the number of 90 degrees
     public var angularRotation: SMVector {
         switch (alignX.rawValue, alignZ.rawValue) {
-            case (-3, -2): return .init(x: 1, y: 0, z: 3)
-            case (-3, -1): return .init(x: 2, y: 3, z: 0)
-            case (-3,  1): return .init(x: 1, y: 1, z: 3)
-            case (-3,  2): return .init(x: 3, y: 0, z: 1)
-            case (-2, -3): return .init(x: 2, y: 0, z: 1)
-            case (-2, -1): return .init(x: 1, y: 3, z: 0)
-            case (-2,  1): return .init(x: 0, y: 1, z: 3)
-            case (-2,  3): return .init(x: 0, y: 0, z: 3)
-            case (-1, -3): return .init(x: 2, y: 0, z: 2)
-            case (-1, -2): return .init(x: 3, y: 2, z: 0)
-            case (-1,  2): return .init(x: 1, y: 2, z: 0)
-            case (-1,  3): return .init(x: 2, y: 2, z: 0)
-            case ( 1, -3): return .init(x: 2, y: 0, z: 0)
-            case ( 1, -2): return .init(x: 1, y: 0, z: 0)
-            case ( 1,  2): return .init(x: 3, y: 0, z: 0)
-            case ( 1,  3): return .init(x: 0, y: 0, z: 0)
-            case ( 2, -3): return .init(x: 0, y: 2, z: 1)
-            case ( 2, -1): return .init(x: 3, y: 3, z: 0)
-            case ( 2,  1): return .init(x: 1, y: 1, z: 0)
-            case ( 2,  3): return .init(x: 0, y: 0, z: 1)
-            case ( 3, -2): return .init(x: 1, y: 0, z: 1)
-            case ( 3, -1): return .init(x: 0, y: 3, z: 0)
-            case ( 3,  1): return .init(x: 2, y: 1, z: 0)
-            case ( 3,  2): return .init(x: 3, y: 0, z: 3)
-            default: fatalError()
+        case (-3, -2): return .init(x: 1, y: 0, z: 3)
+        case (-3, -1): return .init(x: 2, y: 3, z: 0)
+        case (-3,  1): return .init(x: 1, y: 1, z: 3)
+        case (-3,  2): return .init(x: 3, y: 0, z: 1)
+        case (-2, -3): return .init(x: 2, y: 0, z: 1)
+        case (-2, -1): return .init(x: 1, y: 3, z: 0)
+        case (-2,  1): return .init(x: 0, y: 1, z: 3)
+        case (-2,  3): return .init(x: 0, y: 0, z: 3)
+        case (-1, -3): return .init(x: 2, y: 0, z: 2)
+        case (-1, -2): return .init(x: 3, y: 2, z: 0)
+        case (-1,  2): return .init(x: 1, y: 2, z: 0)
+        case (-1,  3): return .init(x: 2, y: 2, z: 0)
+        case ( 1, -3): return .init(x: 2, y: 0, z: 0)
+        case ( 1, -2): return .init(x: 1, y: 0, z: 0)
+        case ( 1,  2): return .init(x: 3, y: 0, z: 0)
+        case ( 1,  3): return .init(x: 0, y: 0, z: 0)
+        case ( 2, -3): return .init(x: 0, y: 2, z: 1)
+        case ( 2, -1): return .init(x: 3, y: 3, z: 0)
+        case ( 2,  1): return .init(x: 1, y: 1, z: 0)
+        case ( 2,  3): return .init(x: 0, y: 0, z: 1)
+        case ( 3, -2): return .init(x: 1, y: 0, z: 1)
+        case ( 3, -1): return .init(x: 0, y: 3, z: 0)
+        case ( 3,  1): return .init(x: 2, y: 1, z: 0)
+        case ( 3,  2): return .init(x: 3, y: 0, z: 3)
+        default: fatalError()
         }
     }
 

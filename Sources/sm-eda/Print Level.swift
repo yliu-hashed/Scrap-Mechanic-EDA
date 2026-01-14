@@ -12,12 +12,12 @@ enum PrintLevel: EnumerableFlag {
 
     static func name(for value: PrintLevel) -> NameSpecification {
         switch value {
-            case .verbose:
-                return [.customLong("print-verbose"), .customShort("v")]
-            case .lite:
-                return [.customLong("print-lite")]
-            case .none:
-                return [.customLong("print-none"), .customLong("quiet"), .customShort("q")]
+        case .verbose:
+            return [.customLong("print-verbose"), .customShort("v")]
+        case .lite:
+            return [.customLong("print-lite")]
+        case .none:
+            return [.customLong("print-none"), .customLong("quiet"), .customShort("q")]
         }
     }
 }

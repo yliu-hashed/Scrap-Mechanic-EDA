@@ -1,4 +1,10 @@
 #!/bin/bash
+set -e
+if [ "$#" -ne 1 ]; then
+  echo "Usage: $0 <yosys-version>"
+  exit 1
+fi
+
 DEBIAN_FRONTEND=noninteractive
 export PREFIX=/yosys
 
@@ -13,10 +19,10 @@ apt-get -y autoremove
 update-ca-certificates
 rm -rf /var/lib/apt/lists
 
-git clone https://github.com/YosysHQ/yosys repo
+git clone https://github.com/YosysHQ/yosys.git repo
 
 cd repo
-git checkout v0.60
+git checkout $1
 git submodule update --init
 
 cp /Docker/yosys-make.conf Makefile.conf

@@ -38,10 +38,16 @@ struct TransformArgGroup: ParsableArguments {
         }
 
         // identify top level module
-        let topLevelModule = design.modules.first { Int($0.value.attributes["top"] ?? "0") == 1 } ?? design.modules.first
-        guard let (name, ysModule) = topLevelModule else {
+        let name: String
+        let ysModule: YSModule
+        if let marked = design.modules.first(where: { Int($0.value.attributes["top"] ?? "0") == 1 }) {
+            (name, ysModule) = marked
+        } else if design.modules.count == 1 {
+            (name, ysModule) = design.modules.first!
+        } else {
             throw ModuleSelectionError.noTopLevelModule
         }
+
         if printlevel == .verbose {
             print("Loaded top level module named \"\(name)\"")
         }

@@ -38,7 +38,7 @@ struct TransformArgGroup: ParsableArguments {
         }
 
         // identify top level module
-        let topLevelModule = design.modules.first { Int($0.value.attributes["top"] ?? "0") == 1 }
+        let topLevelModule = design.modules.first { Int($0.value.attributes["top"] ?? "0") == 1 } ?? design.modules.first
         guard let (name, ysModule) = topLevelModule else {
             throw ModuleSelectionError.noTopLevelModule
         }

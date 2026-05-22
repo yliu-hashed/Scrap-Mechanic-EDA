@@ -1,10 +1,9 @@
 //
-//  Analyze Report.swift
+//  Report Printing.swift
 //  Scrap Mechanic EDA
 //
 
 import SMEDANetlist
-import SMEDABlueprint
 import SMEDAResult
 
 extension String {
@@ -25,29 +24,6 @@ extension SMGateType: CustomStringConvertible {
         case .timer(let delay):
             return "TIMER[\(delay)]"
         }
-    }
-}
-
-private extension SMModule {
-    func dumpNet() {
-        print("Gate Network:")
-        print("  INPUTS: ")
-        for (name, gates) in inputs {
-            print("    \(name): \(gates)")
-        }
-        print("   OUTPUTS: ")
-        for (name, gates) in outputs {
-            print("    \(name): \(gates)")
-        }
-        print("   GATES: ")
-        for (gateId, gate) in gates {
-            let gateName = String(gateId)
-                .padding(toLength: 4, withPad: " ", startingAt: 0)
-            let gateTypeName = gate.type.description
-                .padding(toLength: 4, withPad: " ", startingAt: 0)
-            print("    \(gateName):\(gateTypeName) \(gate.srcs)")
-        }
-        print()
     }
 }
 
@@ -128,41 +104,5 @@ func printDifference(old: FullSynthesisReport, new: FullSynthesisReport) {
         let changeStr = (newTime - oldTime).formatted(.number.sign(strategy: .always()))
         let improvementStr = improvement.formatted(.percent.sign(strategy: .always()).precision(.fractionLength(2)))
         print("Critical depth changed by \(changeStr) (\(improvementStr))")
-    }
-}
-
-// MARK: Utility
-private func printItems(
-    title: String = "",
-    _ table: [(key: String, value: String)],
-    numbered: Bool,
-    minKeyWidth: Int = 25
-) {
-    print(title + ": ")
-    var maxKey: Int = max(minKeyWidth, 0)
-    for (key, _) in table {
-        maxKey = max(key.count, maxKey)
-    }
-    if numbered {
-        let digits = "\(table.count)".count
-        for (index, (key, value)) in table.enumerated() {
-            let prefix = (index + 1).description.padding(to: digits, left: true)
-            let key = (key + ":").padding(to: maxKey - digits)
-            print("   \(prefix). \(key) \(value)")
-        }
-    } else {
-        for (key, value) in table {
-            let key = (key + ":").padding(to: maxKey + 2)
-            print("   \(key) \(value)")
-        }
-    }
-}
-
-private func timeFromTicks(_ time: Int?, nilName: String = "--") -> String {
-    if let time = time {
-        let realTime = (Float(time) / Float(kSMFrameRate))
-        return "\(time.description) (\(realTime)s)"
-    } else {
-        return nilName
     }
 }

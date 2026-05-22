@@ -6,8 +6,10 @@
 import SMEDANetlist
 
 func checkBRAMTimer(
-    name: String, cell: borrowing YSCell, length: Int,
-    updating outputLUTs: inout [UInt64: TransformOutputStore]
+    name: String,
+    cell: borrowing YSCell,
+    length: Int,
+    updating outputLUTs: inout [UInt64: TransformTable.Output]
 ) throws {
     var names = Set(cell.conns.keys)
 
@@ -40,7 +42,7 @@ func checkBRAMTimer(
         }
         try checkAndRemove(portName)
         // add read data to output table
-        let outputStore = TransformOutputStore(nodeName: name, connName: portName, bitIndex: 0)
+        let outputStore = TransformTable.Output(cell: name, port: portName, bit: 0)
         guard case .shared(let id) = bits[0] else { fatalError() }
         outputLUTs.updateValue(outputStore, forKey: id)
     }
@@ -57,7 +59,12 @@ func checkBRAMTimer(
     }
 }
 
-func emitBRAMTimer(builder: SMNetBuilder, length: Int, context: borrowing YSCell, cache: BRAMTimerCache) -> BRAMTimerTarget {
+func emitBRAMTimer(
+    builder: SMNetBuilder,
+    length: Int,
+    context: borrowing YSCell,
+    cache: BRAMTimerCache
+) -> LoweredBRAMTimer {
     let writeAddr: [YSBit] = context.conns["A1ADDR"]!
 
     let regex = #/([A-Z]+)([0-9]+)([A-Z]+)/#
@@ -98,7 +105,7 @@ func emitBRAMTimer(builder: SMNetBuilder, length: Int, context: borrowing YSCell
     let bram = genBRAMTimer(config: config, into: builder)
 
     // map port
-    var readPorts: [BRAMTimerTarget.ReadPort?] = []
+    var readPorts: [LoweredBRAMTimer.ReadPort?] = []
     var used: Int = 1
     for i in 0..<readCount {
         // no read use this port, skip
@@ -116,14 +123,14 @@ func emitBRAMTimer(builder: SMNetBuilder, length: Int, context: borrowing YSCell
             used += 1
         }
 
-        let port = BRAMTimerTarget.ReadPort(
+        let port = LoweredBRAMTimer.ReadPort(
             data: bram.ports[mapIndex].readData[0],
             addr: bram.ports[mapIndex].address
         )
         readPorts.append(port)
     }
 
-    return BRAMTimerTarget(
+    return LoweredBRAMTimer(
         clk: bram.clk,
         writeEnable: bram.ports[0].writeEnable,
         data: bram.ports[0].writeData[0],
@@ -132,7 +139,7 @@ func emitBRAMTimer(builder: SMNetBuilder, length: Int, context: borrowing YSCell
     )
 }
 
-struct BRAMTimerTarget: CellLowerTarget {
+struct LoweredBRAMTimer: LoweredCell {
     var clk: UInt64
     var writeEnable: UInt64
     var data: UInt64
@@ -169,5 +176,9 @@ struct BRAMTimerTarget: CellLowerTarget {
         } else {
             return [port!.data]
         }
+    }
+
+    func isClock(port: String) -> Bool {
+        return port == "CLK1"
     }
 }

@@ -42,7 +42,7 @@ public struct ComplexityReport: Codable {
     public var clockTreeGateCount: Int = 0
 
     public var connectionCount: Int = 0
-    public var averageGateInputCount: Float = 0
+    public var averageFanin: Float = 0
 
     public init() {}
 
@@ -55,7 +55,7 @@ public struct ComplexityReport: Codable {
         case combinationalGateCount = "comb_gate_count"
         case clockTreeGateCount = "clock_tree_gate_count"
         case connectionCount = "conn_count"
-        case averageGateInputCount = "avg_gate_count"
+        case averageFanin = "avg_fanin"
     }
 
     public init(from decoder: any Decoder) throws {
@@ -68,7 +68,7 @@ public struct ComplexityReport: Codable {
         self.combinationalGateCount = try container.decode(Int.self, forKey: .combinationalGateCount)
         self.clockTreeGateCount = try container.decode(Int.self, forKey: .clockTreeGateCount)
         self.connectionCount = try container.decode(Int.self, forKey: .connectionCount)
-        self.averageGateInputCount = try container.decode(Float.self, forKey: .averageGateInputCount)
+        self.averageFanin = try container.decode(Float.self, forKey: .averageFanin)
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -81,7 +81,7 @@ public struct ComplexityReport: Codable {
         try container.encode(self.combinationalGateCount, forKey: .combinationalGateCount)
         try container.encode(self.clockTreeGateCount, forKey: .clockTreeGateCount)
         try container.encode(self.connectionCount, forKey: .connectionCount)
-        try container.encode(self.averageGateInputCount, forKey: .averageGateInputCount)
+        try container.encode(self.averageFanin, forKey: .averageFanin)
     }
 }
 

@@ -5,126 +5,106 @@
 
 import SMEDANetlist
 
-func transform(ysModule: YSModule, moduleName: String, clockDomainNames: [String], verbose: Bool) throws -> SMModule {
-
-    // Record keeping for statistics display
-    var transformRecord: [String: Int] = [:]
-    func recordTransform(for name: String) {
-        if let oldAmount = transformRecord[name] {
-            transformRecord[name] = oldAmount + 1
-        } else {
-            transformRecord[name] = 1
-        }
+struct TransformTable {
+    struct InputPort {
+        var name: String
+        var bit: Int
     }
 
-    // generate input port lut
-    var inputPortLUTs: [UInt64: InputPortStore] = [:]
-    for (portName, port) in ysModule.ports where port.direction == .input {
-        for (index, bit) in port.bits.enumerated() {
-            guard case .shared(let connId) = bit else {
-                fatalError("Input \"\(portName)\" contains fixed state.")
+    struct Output {
+        var cell: String
+        var port: String
+        var bit: Int
+    }
+
+    var inputPorts: [UInt64: InputPort] = [:]
+    var outputs: [UInt64: Output] = [:]
+    var cellTypes: [String: YSSMCellType] = [:]
+
+    init(byChecking ysModule: borrowing YSModule) throws {
+        // Generate input port lut
+        for (portName, port) in ysModule.ports where port.direction == .input {
+            for (index, bit) in port.bits.enumerated() {
+                guard case .shared(let connId) = bit else {
+                    fatalError("Input \"\(portName)\" contains fixed state.")
+                }
+                let store = TransformTable.InputPort(name: portName, bit: index)
+                inputPorts.updateValue(store, forKey: connId)
             }
-            let store = InputPortStore(portName: portName, bitIndex: index)
-            inputPortLUTs.updateValue(store, forKey: connId)
-        }
-    }
-
-    // make sure all cell types are supported
-    // check if connections are all valid
-    // generate lookup table of cell type and output
-    var outputLUTs: [UInt64: TransformOutputStore] = [:]
-    var cellTypeLUTs: [String: YSSMCellType] = [:]
-    cellTypeLUTs.reserveCapacity(ysModule.cells.count)
-
-    for (cellName, cell) in ysModule.cells {
-        guard let cellType = extractType(typeName: cell.type) else {
-            throw TransformError.invalidCellType(cellName: cellName, cellTypeName: cell.type)
         }
 
-        cellTypeLUTs.updateValue(cellType, forKey: cellName)
+        cellTypes.reserveCapacity(ysModule.cells.count)
 
-        switch cellType {
-        case .basicGate(_, let size):
-            if let sureSize = size {
-                // a basic gate with known size
-                guard cell.conns.count == sureSize + 1,
-                      cell.conns.allSatisfy({ $0.value.count == 1 }),
-                      let outputBits = cell.conns.first(where: { $0.key == "Y" })?.value,
-                      outputBits.count == 1,
-                      case .shared(let id) = outputBits[0] else {
-
-                    throw TransformError.malformedCellPorts(cellName: cellName)
-                }
-                guard !outputLUTs.keys.contains(id) else {
-                    throw TransformError.duplicateOutput(
-                        connId: id, cellName1: cellName,
-                        cellName2: outputLUTs[id]!.nodeName
-                    )
-                }
-                let outputStore = TransformOutputStore(nodeName: cellName, connName: "Y", bitIndex: 0)
-                outputLUTs.updateValue(outputStore, forKey: id)
-            } else {
-                // a basic gate with variable size
-                guard cell.conns.count == 2,
-                      let inputBits = cell.conns["A"],
-                      inputBits.count >= 1,
-                      let outputBits = cell.conns["Y"],
-                      outputBits.count == 1,
-                      case .shared(let id) = outputBits[0] else {
-                    throw TransformError.malformedCellPorts(cellName: cellName)
-                }
-                guard !outputLUTs.keys.contains(id) else {
-                    throw TransformError.duplicateOutput(
-                        connId: id, cellName1: cellName,
-                        cellName2: outputLUTs[id]!.nodeName
-                    )
-                }
-                let outputStore = TransformOutputStore(nodeName: cellName, connName: "Y", bitIndex: 0)
-                outputLUTs.updateValue(outputStore, forKey: id)
+        for (cellName, cell) in ysModule.cells {
+            guard let cellType = extractType(typeName: cell.type) else {
+                throw TransformError.invalidCellType(cellName: cellName, cellTypeName: cell.type)
             }
-        case .psudoDFF(hasAsyncReset: false):
-            try checkDFF(name: cellName, cell: cell, updating: &outputLUTs)
-        case .psudoDFF(hasAsyncReset: true):
-            try checkDFFWithAsyncReset(name: cellName, cell: cell, updating: &outputLUTs)
-        case .psudoBRAMTimer(let length):
-            try checkBRAMTimer(name: cellName, cell: cell, length: length, updating: &outputLUTs)
-        }
-    }
 
-    let builder = SMNetBuilder()
-    builder.setName(name: moduleName)
+            cellTypes.updateValue(cellType, forKey: cellName)
 
-    // const driver emit function
-    var constDangler: UInt64? = nil
-    var constHighDangler: UInt64? = nil
+            switch cellType {
+            case .basicGate(_, let size):
+                if let sureSize = size {
+                    // a basic gate with known size
+                    guard cell.conns.count == sureSize + 1,
+                          cell.conns.allSatisfy({ $0.value.count == 1 }),
+                          let outputBits = cell.conns.first(where: { $0.key == "Y" })?.value,
+                          outputBits.count == 1,
+                          case .shared(let id) = outputBits[0] else {
 
-    func getConstDriver(state: Bool) -> UInt64 {
-        recordTransform(for: "Constant Driver")
-        if state { // high
-            if constHighDangler == nil {
-                let lowDangler = getConstDriver(state: false)
-                constHighDangler = builder.addLogic(type: .nor)
-                builder.connect(lowDangler, to: constHighDangler!)
+                        throw TransformError.malformedCellPorts(cellName: cellName)
+                    }
+                    guard !outputs.keys.contains(id) else {
+                        throw TransformError.duplicateOutput(
+                            connId: id, cellName1: cellName,
+                            cellName2: outputs[id]!.cell
+                        )
+                    }
+                    let outputStore = TransformTable.Output(cell: cellName, port: "Y", bit: 0)
+                    outputs.updateValue(outputStore, forKey: id)
+                } else {
+                    // a basic gate with variable size
+                    guard cell.conns.count == 2,
+                          let inputBits = cell.conns["A"],
+                          inputBits.count >= 1,
+                          let outputBits = cell.conns["Y"],
+                          outputBits.count == 1,
+                          case .shared(let id) = outputBits[0] else {
+                        throw TransformError.malformedCellPorts(cellName: cellName)
+                    }
+                    guard !outputs.keys.contains(id) else {
+                        throw TransformError.duplicateOutput(
+                            connId: id, cellName1: cellName,
+                            cellName2: outputs[id]!.cell
+                        )
+                    }
+                    let outputStore = TransformTable.Output(cell: cellName, port: "Y", bit: 0)
+                    outputs.updateValue(outputStore, forKey: id)
+                }
+            case .psudoDFF(hasAsyncReset: false):
+                try checkDFF(name: cellName, cell: cell, updating: &outputs)
+            case .psudoDFF(hasAsyncReset: true):
+                try checkDFFWithAsyncReset(name: cellName, cell: cell, updating: &outputs)
+            case .psudoBRAMTimer(let length):
+                try checkBRAMTimer(name: cellName, cell: cell, length: length, updating: &outputs)
             }
-            return constHighDangler!
-        } else { // low
-            if constDangler == nil { constDangler = builder.addLogic(type: .or) }
-            return constDangler!
         }
     }
+}
 
-    // create all input & output gates
+/// Create all input and output gates.
+fileprivate func createPorts(
+    from ysModule: borrowing YSModule,
+    into builder: SMNetBuilder,
+    constHigh: UInt64,
+    using table: borrowing TransformTable
+) throws -> [String: [UInt64]] {
     var portTargets: [String: [UInt64]] = [:]
     for (portName, port) in ysModule.ports {
         var bitsTarget = [UInt64](repeating: 0, count: port.bits.count)
 
         if port.direction == .output,
-           port.bits.allSatisfy({ bit in
-               if case .fixed(false) = bit {
-                   return true
-               }
-               return false
-           }) {
+           port.bits.allSatisfy({ $0 == .fixed(state: false) }) {
             print("Output port \(portName) is stripped, it is constant zero")
             continue
         }
@@ -132,16 +112,14 @@ func transform(ysModule: YSModule, moduleName: String, clockDomainNames: [String
         for (index, bit) in port.bits.enumerated() {
             let gate: UInt64
             // const driver for output gate
-            if port.direction == .output, case .fixed(let state) = bit, state {
-                let constLow = getConstDriver(state: false)
+            if port.direction == .output, case .fixed(let state) = bit, state == true {
                 gate = builder.addLogic(type: .nor)
-                builder.connect(constLow, to: gate)
+                builder.connect(constHigh, to: gate)
             } else {
                 gate = builder.addLogic(type: .or)
             }
             // output gate
             bitsTarget[index] = gate
-            recordTransform(for: "Port")
         }
         portTargets.updateValue(bitsTarget, forKey: portName)
         // register
@@ -153,39 +131,57 @@ func transform(ysModule: YSModule, moduleName: String, clockDomainNames: [String
             builder.registerOutputGates(port: portName, gates: bitsTarget)
         }
     }
+    return portTargets
+}
 
-    // transform cells into gates and store them as lower target
+/// transform cells into gates and store them as lowered target
+fileprivate func lowerCells(
+    from ysModule: borrowing YSModule,
+    into builder: SMNetBuilder,
+    constLow: UInt64,
+    constHigh: UInt64,
+    using table: borrowing TransformTable
+) throws -> [String: any LoweredCell] {
     let cache = LoweringCache(builder: builder)
-    var lowerTargets: [String: any CellLowerTarget] = [:]
+    var targets: [String: any LoweredCell] = [:]
     for (cellName, cell) in ysModule.cells {
-        let cellType = cellTypeLUTs[cellName]!
+        let cellType = table.cellTypes[cellName]!
         // lower specific targets
-        let lowerTarget = lowerCell(cellType: cellType, builder: builder, context: cell, cache: cache)
-        recordTransform(for: cellType.name)
+        let loweredTarget = lowerCell(cellType: cellType, builder: builder, context: cell, cache: cache)
 
         // lower constant driver
         for (portName, bits) in cell.conns where cellType.isInput(name: portName) {
             for (index, bit) in bits.enumerated() {
                 guard case .fixed(let state) = bit else { continue }
-                let inputGates = lowerTarget.gateFor(port: portName, bit: index)
+                let inputGates = loweredTarget.gateFor(port: portName, bit: index)
                 if inputGates.isEmpty { continue }
-                let driver = getConstDriver(state: state)
+                let driver = state ? constHigh : constLow
                 builder.connect(driver, to: inputGates)
             }
         }
-
-        lowerTargets.updateValue(lowerTarget, forKey: cellName)
+        targets.updateValue(loweredTarget, forKey: cellName)
     }
+    return targets
+}
 
+fileprivate func connectCellsAndOutputs(
+    from ysModule: borrowing YSModule,
+    into builder: SMNetBuilder,
+    constLow: UInt64,
+    constHigh: UInt64,
+    cells: borrowing [String: any LoweredCell],
+    ports: borrowing [String: [UInt64]],
+    using table: borrowing TransformTable
+) throws {
     func getOutputGate(connId: UInt64) throws -> UInt64 {
-        if let source = outputLUTs[connId] { // if source is another cell
-            let lowerTarget = lowerTargets[source.nodeName]!
-            let out = lowerTarget.gateFor(port: source.connName, bit: source.bitIndex)
+        if let source = table.outputs[connId] { // if source is another cell
+            let lowered = cells[source.cell]!
+            let out = lowered.gateFor(port: source.port, bit: source.bit)
             assert(out.count == 1)
             return out[0]
-        } else if let source = inputPortLUTs[connId] { // if source is a input port
-            let portTarget = portTargets[source.portName]!
-            return portTarget[source.bitIndex]
+        } else if let source = table.inputPorts[connId] { // if source is a input port
+            let portTarget = ports[source.name]!
+            return portTarget[source.bit]
         }
 
         throw TransformError.connectionDoesNotExist(connId: connId)
@@ -193,16 +189,16 @@ func transform(ysModule: YSModule, moduleName: String, clockDomainNames: [String
 
     // connect all internal gates (between cells) by referencing output lut and target
     for (cellName, cell) in ysModule.cells {
-        let cellType = cellTypeLUTs[cellName]!
-        let lowerTarget = lowerTargets[cellName]!
+        let cellType = table.cellTypes[cellName]!
+        let lowered = cells[cellName]!
         for (port, bits) in cell.conns where cellType.isInput(name: port) {
             for (bitIndex, bit) in bits.enumerated() {
                 guard case .shared(let connId) = bit else { continue }
 
                 let srcNodeId = try getOutputGate(connId: connId)
-                let dstNodeId = lowerTarget.gateFor(port: port, bit: bitIndex)
+                let dstNodeIds = lowered.gateFor(port: port, bit: bitIndex)
 
-                builder.connect(srcNodeId, to: dstNodeId)
+                builder.connect(srcNodeId, to: dstNodeIds)
             }
         }
     }
@@ -210,7 +206,7 @@ func transform(ysModule: YSModule, moduleName: String, clockDomainNames: [String
     // connect output port
     for (portName, port) in ysModule.ports {
         guard port.direction == .output,
-              let portTarget = portTargets[portName]
+              let portTarget = ports[portName]
         else { continue }
 
         for (index, bit) in port.bits.enumerated() {
@@ -220,8 +216,10 @@ func transform(ysModule: YSModule, moduleName: String, clockDomainNames: [String
             builder.connect(source, to: portTarget[index])
         }
     }
+}
 
-    // strip input with no connections
+/// strip input with no connections
+fileprivate func stripUnusedInputs(_ builder: SMNetBuilder) {
     let inputNames: [String] = [String](builder.module.inputs.keys)
     for inputName in inputNames {
         let gates = builder.module.inputs[inputName]!.gates
@@ -233,26 +231,22 @@ func transform(ysModule: YSModule, moduleName: String, clockDomainNames: [String
             print("Input port \(inputName) is stripped, it has no connections")
         }
     }
+}
 
-    builder.legalize()
-
-    if verbose {
-        printTransformationStats(transformRecord)
-    }
-
-    var module = builder.module
-
-    transferAttributes(ysModule: ysModule, to: &module)
-
-    // identify & annotate clock domains
-    if !module.sequentialNodes.isEmpty {
-        var trueClockDomainNames: [String] = clockDomainNames
-        if clockDomainNames.isEmpty {
+fileprivate func inferAndMarkClockDomain(
+    in module: inout SMModule,
+    forceClockInputs: [String],
+    cells: borrowing [String: any LoweredCell]
+) throws {
+    let hasSequential = module.gates.contains { $0.value.isSequential }
+    if hasSequential {
+        var clocks: [String] = forceClockInputs
+        if clocks.isEmpty {
             print("Warning: Input contains sequential cells, but no clock domain is specified.")
             let commonNames: Set<String> = ["clock", "clk"]
             let makeshiftClock = module.inputs.keys.first { commonNames.contains($0.lowercased()) }
             if let makeshiftClock = makeshiftClock {
-                trueClockDomainNames = [makeshiftClock]
+                clocks = [makeshiftClock]
                 print("   Input \"\(makeshiftClock)\" will be considered a clock.")
             } else {
                 print("   Net will be generated without a clock.")
@@ -260,18 +254,82 @@ func transform(ysModule: YSModule, moduleName: String, clockDomainNames: [String
             print("   Indicate a clock domain using the '--clk <clock>' argument.\n")
         }
 
-        for clockDomainName in trueClockDomainNames {
-            guard let gates = module.inputs[clockDomainName]?.gates else {
-                print("Warning: specified clock domain \(clockDomainName) is either doesn't exist or optimizeed away.")
+        for clock in clocks {
+            guard let gates = module.inputs[clock]?.gates else {
+                print("Warning: specified clock domain \(clock) is either doesn't exist or optimizeed away.")
                 print("   Generation will continue without it.\n")
                 continue
             }
             guard gates.count == 1 else {
-                throw ModuleSelectionError.malformedClockDomain(name: clockDomainName)
+                throw ModuleSelectionError.clockIsBus(name: clock)
             }
-            module.inputs[clockDomainName]!.isClock = true
+            module.inputs[clock]!.isClock = true
+            // mark and check clock tree
+            var frontier: [UInt64] = [gates.first!]
+            while let gateId = frontier.popLast() {
+                let gate = module.gates[gateId]!
+                if gate.isSequential { continue }
+                guard gate.srcs.count <= 1 else {
+                    throw ModuleSelectionError.clockHasLogic(name: clock)
+                }
+                module.gates[gateId]!.domain = .clockTree
+                frontier.append(contentsOf: gate.dsts)
+            }
         }
     }
+}
+
+func transform(
+    ysModule: YSModule,
+    moduleName: String,
+    forceClockInputs: [String],
+    verbose: Bool
+) throws -> SMModule {
+
+    let table = try TransformTable(byChecking: ysModule)
+
+    let builder = SMNetBuilder()
+    builder.setName(name: moduleName)
+
+    // create const drivers
+    let constLow: UInt64 = builder.addLogic(type: .or)
+    let constHigh: UInt64 = builder.addLogic(type: .nor)
+    builder.connect(constLow, to: constHigh)
+
+    let loweredPorts = try createPorts(
+        from: ysModule, into: builder,
+        constHigh: constHigh,
+        using: table
+    )
+
+    let loweredCells = try lowerCells(
+        from: ysModule, into: builder,
+        constLow: constLow, constHigh: constHigh,
+        using: table
+    )
+
+    try connectCellsAndOutputs(
+        from: ysModule,
+        into: builder,
+        constLow: constLow, constHigh: constHigh,
+        cells: loweredCells,
+        ports: loweredPorts,
+        using: table
+    )
+
+    stripUnusedInputs(builder)
+
+    builder.legalize()
+
+    var module = builder.module
+
+    transferAttributes(ysModule: ysModule, to: &module)
+
+    try inferAndMarkClockDomain(
+        in: &module,
+        forceClockInputs: forceClockInputs,
+        cells: loweredCells
+    )
 
     return module
 }
@@ -285,11 +343,11 @@ class LoweringCache {
     }
 }
 
-private func lowerCell(cellType: YSSMCellType, builder: SMNetBuilder, context: borrowing YSCell, cache: LoweringCache) -> any CellLowerTarget {
+private func lowerCell(cellType: YSSMCellType, builder: SMNetBuilder, context: borrowing YSCell, cache: LoweringCache) -> any LoweredCell {
     switch cellType {
     case .basicGate(let type, _):
         let mainGate = builder.addLogic(type: type)
-        return LogicLowerTarget(gateId: mainGate)
+        return LoweredLogic(gateId: mainGate)
 
     case .psudoDFF(hasAsyncReset: false):
         return emitDFF(builder: builder)
@@ -303,26 +361,19 @@ private func lowerCell(cellType: YSSMCellType, builder: SMNetBuilder, context: b
 }
 
 // MARK: Internal Types
-protocol CellLowerTarget {
+protocol LoweredCell {
     func gateFor(port: String, bit: Int) -> [UInt64]
+    func isClock(port: String) -> Bool
 }
 
-struct LogicLowerTarget: CellLowerTarget {
+struct LoweredLogic: LoweredCell {
     var gateId: UInt64
     func gateFor(port: String, bit: Int) -> [UInt64] {
         return [gateId]
     }
-}
-
-struct TransformOutputStore {
-    var nodeName: String
-    var connName: String
-    var bitIndex: Int
-}
-
-private struct InputPortStore {
-    var portName: String
-    var bitIndex: Int
+    func isClock(port: String) -> Bool {
+        return false
+    }
 }
 
 // MARK: Utility

@@ -56,7 +56,7 @@ struct TransformArgGroup: ParsableArguments {
         let module = try transform(
             ysModule: ysModule,
             moduleName: name,
-            clockDomainNames: clockDomainNames,
+            forceClockInputs: clockDomainNames,
             verbose: printlevel == .verbose
         )
 

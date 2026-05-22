@@ -51,62 +51,54 @@ private extension SMModule {
     }
 }
 
-// MARK: Dump Transformation
-func printTransformationStats(_ transformRecord: [String: Int]) {
-    let reported = Dictionary(uniqueKeysWithValues: transformRecord.map { (key, value) in
-        return (key, String(value))
-    })
-    printItems(title: "Transformation Stats", reported)
-    print()
-}
-
 // MARK: Dump Timing
 extension TimingReport {
-    var symbols: [String: String] {
+    var symbols: [(key: String, value: String)] {
         return [
-            "1. critical depth": timeFromTicks(criticalDepth),
-            "2. timing type": timingType?.rawValue ?? "N/A",
+            ("critical depth", timeFromTicks(criticalDepth)),
+            ("timing type", timingType?.rawValue ?? "N/A"),
         ]
     }
 }
 
 func printTimingReport(_ timing: TimingReport) {
-    printItems(title: "Timing Report", timing.symbols)
+    printItems(title: "Timing Report", timing.symbols, numbered: true)
     print()
     printPortTimingReport(timing)
 }
 
 // MARK: Port Timing
 private func printPortTimingReport(_ timing: TimingReport) {
-    let inputs = Dictionary(uniqueKeysWithValues: timing.inputTiming.map { (key, value) in
+    let inputs = timing.inputTiming.map { (key, value) in
         return (key, timeFromTicks(value))
-    })
-    printItems(title: "Inputs Timing", inputs)
-    let outputs = Dictionary(uniqueKeysWithValues: timing.outputTiming.map { (key, value) in
+    }
+    printItems(title: "Inputs Timing", inputs, numbered: false)
+    let outputs = timing.outputTiming.map { (key, value) in
         return (key, timeFromTicks(value))
-    })
-    printItems(title: "Outputs Timing", outputs)
+    }
+    printItems(title: "Outputs Timing", outputs, numbered: false)
     print()
 }
 
 // MARK: Dump Complexity
 extension ComplexityReport {
-    var symbols: [String: String] {
+    var symbols: [(key: String, value: String)] {
         return [
-            " 1. total gate": gateCount.description,
-            " 2. input gate": inputGateCount.description,
-            " 3. output gate": outputGateCount.description,
-            " 4. internal gate": internalGateCount.description,
-            " 5. sequential internal": sequentialGateCount.description,
-            " 6. combinational internal": combinationalGateCount.description,
-            " 7. total connection": connectionCount.description,
-            " 8. avg gate input": averageGateInputCount.formatted(.number.precision(.fractionLength(2))),
+            ("total gate", gateCount.description),
+            ("input gate", inputGateCount.description),
+            ("output gate", outputGateCount.description),
+            ("internal gate", internalGateCount.description),
+            ("sequential internal", sequentialGateCount.description),
+            ("combinational internal", combinationalGateCount.description),
+            ("clock tree internal", clockTreeGateCount.description),
+            ("total connection", connectionCount.description),
+            ("avg fanin", averageFanin.formatted(.number.precision(.fractionLength(2)))),
         ]
     }
 }
 
 func printComplexityReport(_ report: ComplexityReport) {
-    printItems(title: "Design Statistics", report.symbols)
+    printItems(title: "Design Statistics", report.symbols, numbered: true)
     print()
 }
 
@@ -140,16 +132,29 @@ func printDifference(old: FullSynthesisReport, new: FullSynthesisReport) {
 }
 
 // MARK: Utility
-private func printItems(title: String = "", _ dict: [String: String], minKeyWidth: Int = 27) {
+private func printItems(
+    title: String = "",
+    _ table: [(key: String, value: String)],
+    numbered: Bool,
+    minKeyWidth: Int = 25
+) {
     print(title + ": ")
     var maxKey: Int = max(minKeyWidth, 0)
-    for key in dict.keys {
+    for (key, _) in table {
         maxKey = max(key.count, maxKey)
     }
-    for (key, value) in dict.sorted(by: { $0.key < $1.key }) {
-        print("   ", terminator: "")
-        print("\(key): ".padding(to: maxKey + 2), terminator: "")
-        print(value)
+    if numbered {
+        let digits = "\(table.count)".count
+        for (index, (key, value)) in table.enumerated() {
+            let prefix = (index + 1).description.padding(to: digits, left: true)
+            let key = (key + ":").padding(to: maxKey - digits)
+            print("   \(prefix). \(key) \(value)")
+        }
+    } else {
+        for (key, value) in table {
+            let key = (key + ":").padding(to: maxKey + 2)
+            print("   \(key) \(value)")
+        }
     }
 }
 

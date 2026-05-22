@@ -26,7 +26,8 @@ enum TransformError: Error, CustomStringConvertible {
 enum ModuleSelectionError: Error, CustomStringConvertible {
     case noTopLevelModule
     case missingClockDomain(name: String)
-    case malformedClockDomain(name: String)
+    case clockIsBus(name: String)
+    case clockHasLogic(name: String)
 
     var description: String {
         switch self {
@@ -34,8 +35,10 @@ enum ModuleSelectionError: Error, CustomStringConvertible {
             return "Unable to find top level module"
         case .missingClockDomain(let name):
             return "Clock domain \(name) does not exist"
-        case .malformedClockDomain(let name):
-            return "Clock domain \(name) is malformed"
+        case .clockIsBus(let name):
+            return "Clock input \(name) cannot be a bus"
+        case .clockHasLogic(let name):
+            return "Clock domain \(name) has suspicious combinational logic"
         }
     }
 }

@@ -5,7 +5,11 @@
 
 import SMEDANetlist
 
-func checkDFF(name: String, cell: borrowing YSCell, updating outputLUTs: inout [UInt64: TransformOutputStore]) throws {
+func checkDFF(
+    name: String,
+    cell: borrowing YSCell,
+    updating outputLUTs: inout [UInt64: TransformTable.Output]
+) throws {
     guard (3...4).contains(cell.conns.count),
           cell.conns.allSatisfy({ $0.value.count == 1 }),
           let outputBits = cell.conns.first(where: { $0.key == "Q" })?.value,
@@ -17,16 +21,16 @@ func checkDFF(name: String, cell: borrowing YSCell, updating outputLUTs: inout [
     guard !outputLUTs.keys.contains(id) else {
         throw TransformError.duplicateOutput(
             connId: id, cellName1: name,
-            cellName2: outputLUTs[id]!.nodeName
+            cellName2: outputLUTs[id]!.cell
         )
     }
-    let outputStore = TransformOutputStore(nodeName: name, connName: "Q", bitIndex: 0)
+    let outputStore = TransformTable.Output(cell: name, port: "Q", bit: 0)
     outputLUTs.updateValue(outputStore, forKey: id)
 }
 
 /// Build a edge triggered d-type flip flop. This design is edge triggered, and using 6 gates and 9
 /// internal connections.
-func emitDFF(builder: SMNetBuilder) -> DFFTarget {
+func emitDFF(builder: SMNetBuilder) -> LoweredDFFTarget {
     /*-----------------------------------------------------------*/
     /*               Edge Triggered D-Type Flip Flop             */
     /*----- Posedge Vairation -----X----------- NAMES -----------*/
@@ -49,14 +53,14 @@ func emitDFF(builder: SMNetBuilder) -> DFFTarget {
     /* xlp2: same                                                */
     /*-----------------------------------------------------------*/
 
-    let target = DFFTarget(
-        cInv: builder.addLogic(type: .nor, keepTiming: true),
-        filt: builder.addLogic(type: .and, keepTiming: true),
-        diff: builder.addLogic(type: .xor, keepTiming: false),
+    let target = LoweredDFFTarget(
+        cInv: builder.addLogic(type: .nor, into: .sequential),
+        filt: builder.addLogic(type: .and, into: .sequential),
+        diff: builder.addLogic(type: .xor, into: .combinational),
 
-        xlp0: builder.addLogic(type: .xor, keepTiming: true),
-        xlp1: builder.addLogic(type: .xor, keepTiming: true),
-        xlp2: builder.addLogic(type: .xor, keepTiming: true)
+        xlp0: builder.addLogic(type: .xor, into: .sequential),
+        xlp1: builder.addLogic(type: .xor, into: .sequential),
+        xlp2: builder.addLogic(type: .xor, into: .sequential)
     )
 
     // connect primary store loop
@@ -73,7 +77,7 @@ func emitDFF(builder: SMNetBuilder) -> DFFTarget {
     return target
 }
 
-struct DFFTarget: CellLowerTarget {
+struct LoweredDFFTarget: LoweredCell {
     var cInv: UInt64
     var filt: UInt64
     var diff: UInt64
@@ -95,9 +99,17 @@ struct DFFTarget: CellLowerTarget {
             fatalError()
         }
     }
+
+    func isClock(port: String) -> Bool {
+        return port == "C"
+    }
 }
 
-func checkDFFWithAsyncReset(name: String, cell: borrowing YSCell, updating outputLUTs: inout [UInt64: TransformOutputStore]) throws {
+func checkDFFWithAsyncReset(
+    name: String,
+    cell: borrowing YSCell,
+    updating outputLUTs: inout [UInt64: TransformTable.Output]
+) throws {
     guard (4...5).contains(cell.conns.count),
           cell.conns.allSatisfy({ $0.value.count == 1 }),
           let outputBits = cell.conns.first(where: { $0.key == "Q" })?.value,
@@ -109,14 +121,14 @@ func checkDFFWithAsyncReset(name: String, cell: borrowing YSCell, updating outpu
     guard !outputLUTs.keys.contains(id) else {
         throw TransformError.duplicateOutput(
             connId: id, cellName1: name,
-            cellName2: outputLUTs[id]!.nodeName
+            cellName2: outputLUTs[id]!.cell
         )
     }
-    let outputStore = TransformOutputStore(nodeName: name, connName: "Q", bitIndex: 0)
+    let outputStore = TransformTable.Output(cell: name, port: "Q", bit: 0)
     outputLUTs.updateValue(outputStore, forKey: id)
 }
 
-func emitDFFWithAsyncReset(builder: SMNetBuilder) -> DFFWithAsyncResetTarget {
+func emitDFFWithAsyncReset(builder: SMNetBuilder) -> LoweredDFFWithAsyncReset {
     /*---------------------------------------------------------------*/
     /*        Edge Triggered D-Type Flip Flop With Async Reset       */
     /*--------------- NAMES ---------------X---------- GATES --------*/
@@ -134,20 +146,20 @@ func emitDFFWithAsyncReset(builder: SMNetBuilder) -> DFFWithAsyncResetTarget {
     /*-------------------------------------X-------------------------*/
 
 
-    let target = DFFWithAsyncResetTarget(
-        rInv: builder.addLogic(type: .nor, keepTiming: true),
+    let target = LoweredDFFWithAsyncReset(
+        rInv: builder.addLogic(type: .nor, into: .sequential),
 
-        rFlt: builder.addLogic(type: .and, keepTiming: true),
-        sbuf: builder.addLogic(type: .or,  keepTiming: true),
+        rFlt: builder.addLogic(type: .and, into: .sequential),
+        sbuf: builder.addLogic(type: .or,  into: .sequential),
 
-        cInv: builder.addLogic(type: .nor, keepTiming: true),
+        cInv: builder.addLogic(type: .nor, into: .sequential),
 
-        filt: builder.addLogic(type: .and, keepTiming: true),
-        diff: builder.addLogic(type: .xor, keepTiming: false),
+        filt: builder.addLogic(type: .and, into: .sequential),
+        diff: builder.addLogic(type: .xor, into: .combinational),
 
-        xlp0: builder.addLogic(type: .xor, keepTiming: true),
-        xlp1: builder.addLogic(type: .xor, keepTiming: true),
-        xlp2: builder.addLogic(type: .xor, keepTiming: true)
+        xlp0: builder.addLogic(type: .xor, into: .sequential),
+        xlp1: builder.addLogic(type: .xor, into: .sequential),
+        xlp2: builder.addLogic(type: .xor, into: .sequential)
     )
 
     // connect primary store loop
@@ -174,7 +186,7 @@ func emitDFFWithAsyncReset(builder: SMNetBuilder) -> DFFWithAsyncResetTarget {
     return target
 }
 
-struct DFFWithAsyncResetTarget: CellLowerTarget {
+struct LoweredDFFWithAsyncReset: LoweredCell {
     var rInv: UInt64
     var rFlt: UInt64
     var sbuf: UInt64
@@ -201,5 +213,10 @@ struct DFFWithAsyncResetTarget: CellLowerTarget {
         default:
             fatalError()
         }
+    }
+
+    var clocks: [UInt64] { [cInv, filt] }
+    func isClock(port: String) -> Bool {
+        return port == "C"
     }
 }

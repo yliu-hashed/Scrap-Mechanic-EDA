@@ -183,7 +183,7 @@ public class SMNetBuilder {
             // create the temporary nodes, and connect from the sources to them
             var tmps = [UInt64](repeating: 0, count: tmpCount)
             for i in 0..<tmpCount {
-                tmps[i] = addLogic(type: .or, into: .combinational)
+                tmps[i] = addLogic(type: .or, into: gate.domain)
             }
             connect(gateId, to: tmps)
 

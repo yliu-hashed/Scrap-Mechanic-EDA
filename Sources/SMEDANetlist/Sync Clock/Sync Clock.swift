@@ -73,7 +73,7 @@ func calcLongestPath(_ module: SMModule, clockDomain: UInt64) -> Int {
         var newVisited: Set<UInt64> = []
         for gateId in lastNewVisited {
             for dstId in module.gates[gateId]!.dsts {
-                if module.gates[dstId]!.isSequential { continue }
+                if !module.gates[dstId]!.isClockTree { continue }
                 newVisited.insert(dstId)
             }
         }
@@ -97,7 +97,7 @@ func calcShortestPath(_ module: SMModule, clockDomain: UInt64) -> Int {
         var newVisited: Set<UInt64> = []
         for gateId in lastNewVisited {
             for dstId in module.gates[gateId]!.dsts {
-                if module.gates[dstId]!.isSequential { return iterations }
+                if !module.gates[dstId]!.isClockTree { return iterations }
             }
             newVisited.formUnion(module.gates[gateId]!.dsts)
         }

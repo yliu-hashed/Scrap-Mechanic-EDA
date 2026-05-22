@@ -20,10 +20,11 @@ func analyzeComplexity(_ module: borrowing SMModule) -> ComplexityReport {
         outputs.formUnion(port.gates)
     }
 
-    // internal gate count
+    // survey each node
     var combinationalGateCount = 0
     var sequentialGateCount = 0
     var clockTreeGateCount = 0
+
     for (gateId, gate) in module.gates {
         if inputs.contains(gateId) || outputs.contains(gateId) { continue }
         switch gate.domain {
@@ -39,8 +40,9 @@ func analyzeComplexity(_ module: borrowing SMModule) -> ComplexityReport {
     // connection count
     var connCount: Int = 0
     for (_, gate) in module.gates { connCount += gate.srcs.count }
-    // average gate input count
-    let avgGateInput: Float = Float(connCount) / Float(gateCount)
+
+    // average connection statistics
+    let avgFanin: Float = Float(connCount) / Float(gateCount)
 
     var report = ComplexityReport()
 
@@ -52,7 +54,7 @@ func analyzeComplexity(_ module: borrowing SMModule) -> ComplexityReport {
     report.combinationalGateCount = combinationalGateCount
     report.clockTreeGateCount = clockTreeGateCount
     report.connectionCount = connCount
-    report.averageGateInputCount = avgGateInput
+    report.averageFanin = avgFanin
 
     return report
 }

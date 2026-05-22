@@ -85,6 +85,8 @@ struct LoweredDFFTarget: LoweredCell {
     var xlp1: UInt64
     var xlp2: UInt64
 
+    var name: String { "DFF" }
+
     func gateFor(port: String, bit: Int) -> [UInt64] {
         switch port {
         case "D":
@@ -197,6 +199,8 @@ struct LoweredDFFWithAsyncReset: LoweredCell {
     var xlp0: UInt64
     var xlp1: UInt64
     var xlp2: UInt64
+
+    var name: String { "DFFAR" }
 
     func gateFor(port: String, bit: Int) -> [UInt64] {
         switch port {

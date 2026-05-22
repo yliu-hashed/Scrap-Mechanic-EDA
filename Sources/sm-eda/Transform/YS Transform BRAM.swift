@@ -151,6 +151,8 @@ struct LoweredBRAMTimer: LoweredCell {
         var addr: [UInt64]
     }
 
+    var name: String { "BRAMTimer" }
+
     func gateFor(port: String, bit: Int) -> [UInt64] {
         // write ports and clock
         switch port {

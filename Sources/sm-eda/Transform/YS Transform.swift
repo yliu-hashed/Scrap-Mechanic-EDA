@@ -279,6 +279,25 @@ fileprivate func inferAndMarkClockDomain(
     }
 }
 
+fileprivate func printLoweredCellStats(
+    cells: borrowing [String: any LoweredCell]
+) {
+    var table: [String: Int] = [:]
+    for cell in cells.lazy {
+        let name = cell.value.name
+        if table.keys.contains(name) {
+            table[name]! += 1
+        } else {
+            table[name] = 1
+        }
+    }
+
+    let flat = table
+        .sorted(by: { $0.value > $1.value })
+        .map ({ (key: $0, value: String($1)) })
+    printItems(title: "Transformed", flat, numbered: true)
+}
+
 func transform(
     ysModule: YSModule,
     moduleName: String,
@@ -307,6 +326,10 @@ func transform(
         constLow: constLow, constHigh: constHigh,
         using: table
     )
+
+    if verbose {
+        printLoweredCellStats(cells: loweredCells)
+    }
 
     try connectCellsAndOutputs(
         from: ysModule,
@@ -347,7 +370,7 @@ private func lowerCell(cellType: YSSMCellType, builder: SMNetBuilder, context: b
     switch cellType {
     case .basicGate(let type, _):
         let mainGate = builder.addLogic(type: type)
-        return LoweredLogic(gateId: mainGate)
+        return LoweredLogic(type: type, gateId: mainGate)
 
     case .psudoDFF(hasAsyncReset: false):
         return emitDFF(builder: builder)
@@ -362,12 +385,16 @@ private func lowerCell(cellType: YSSMCellType, builder: SMNetBuilder, context: b
 
 // MARK: Internal Types
 protocol LoweredCell {
+    var name: String { get }
     func gateFor(port: String, bit: Int) -> [UInt64]
     func isClock(port: String) -> Bool
 }
 
 struct LoweredLogic: LoweredCell {
+    var type: SMLogicType
     var gateId: UInt64
+
+    var name: String { type.name }
     func gateFor(port: String, bit: Int) -> [UInt64] {
         return [gateId]
     }

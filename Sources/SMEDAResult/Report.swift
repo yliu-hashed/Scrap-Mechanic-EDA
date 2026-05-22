@@ -39,6 +39,7 @@ public struct ComplexityReport: Codable {
 
     public var sequentialGateCount: Int = 0
     public var combinationalGateCount: Int = 0
+    public var clockTreeGateCount: Int = 0
 
     public var connectionCount: Int = 0
     public var averageGateInputCount: Float = 0
@@ -52,6 +53,7 @@ public struct ComplexityReport: Codable {
         case internalGateCount = "internal_gate_count"
         case sequentialGateCount = "seq_gate_count"
         case combinationalGateCount = "comb_gate_count"
+        case clockTreeGateCount = "clock_tree_gate_count"
         case connectionCount = "conn_count"
         case averageGateInputCount = "avg_gate_count"
     }
@@ -64,6 +66,7 @@ public struct ComplexityReport: Codable {
         self.internalGateCount = try container.decode(Int.self, forKey: .internalGateCount)
         self.sequentialGateCount = try container.decode(Int.self, forKey: .sequentialGateCount)
         self.combinationalGateCount = try container.decode(Int.self, forKey: .combinationalGateCount)
+        self.clockTreeGateCount = try container.decode(Int.self, forKey: .clockTreeGateCount)
         self.connectionCount = try container.decode(Int.self, forKey: .connectionCount)
         self.averageGateInputCount = try container.decode(Float.self, forKey: .averageGateInputCount)
     }
@@ -76,6 +79,7 @@ public struct ComplexityReport: Codable {
         try container.encode(self.internalGateCount, forKey: .internalGateCount)
         try container.encode(self.sequentialGateCount, forKey: .sequentialGateCount)
         try container.encode(self.combinationalGateCount, forKey: .combinationalGateCount)
+        try container.encode(self.clockTreeGateCount, forKey: .clockTreeGateCount)
         try container.encode(self.connectionCount, forKey: .connectionCount)
         try container.encode(self.averageGateInputCount, forKey: .averageGateInputCount)
     }

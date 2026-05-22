@@ -30,10 +30,9 @@ public func showDot(module: borrowing SMModule, showID: Bool) -> String {
 
     // dump gates
     for (gateId, gate) in module.gates {
-        let isSequential = module.sequentialNodes.contains(gateId)
         var name = gate.type.getDotName()
         if showID { name += "[\(gateId)]" }
-        let color = isSequential ? "royalblue" : "black"
+        let color = gate.isSequential ? "royalblue" : "black"
         string += "  n\(gateId) [ shape=record, fontcolor=\(color), label=\"\(name)\" ];\n"
     }
     // dump connections

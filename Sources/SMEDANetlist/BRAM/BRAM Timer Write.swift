@@ -13,7 +13,7 @@ func genBRAMTimerWritePort(
     var dataBuffer: [UInt64] = []
     dataBuffer.reserveCapacity(config.addressability)
     for i in 0..<config.addressability {
-        let buffer = genDFF(builder: builder, clkPulse: [clkPulse], data: portInfo.writeData[i], keepTiming: false)
+        let buffer = genDFF(builder: builder, clkPulse: [clkPulse], data: portInfo.writeData[i], domain: .combinational)
         let delayedBuffer = builder.addTimer(delay: 3)
         builder.connect(buffer, to: delayedBuffer)
         dataBuffer.append(delayedBuffer)
@@ -23,12 +23,12 @@ func genBRAMTimerWritePort(
     var addrBuffer: [UInt64] = []
     addrBuffer.reserveCapacity(config.addressSpacePow2)
     for i in 0..<config.addressSpacePow2 {
-        let buffer = genDFF(builder: builder, clkPulse: [clkPulse], data: portInfo.address[i], keepTiming: false)
+        let buffer = genDFF(builder: builder, clkPulse: [clkPulse], data: portInfo.address[i], domain: .combinational)
         addrBuffer.append(buffer)
     }
 
     // write enable buffer
-    let weBuffer = genDFF(builder: builder, clkPulse: [clkPulse], data: portInfo.writeEnable, keepTiming: false)
+    let weBuffer = genDFF(builder: builder, clkPulse: [clkPulse], data: portInfo.writeEnable, domain: .combinational)
 
     // generate clock match signal
     let match = builder.addLogic(type: .and)

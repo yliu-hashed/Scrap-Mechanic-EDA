@@ -33,8 +33,8 @@ public func genBRAMTimer(config: borrowing BRAMTimerConfig, into builder: SMNetB
     assert(config.clockAddressSpacePow2 >= 2)
     assert(config.addressability > 0)
 
-    let oldKeepTiming = builder.defaultKeepTiming
-    builder.defaultKeepTiming = true
+    let oldDomain = builder.defaultDomain
+    builder.defaultDomain = .sequential
 
     let clock = genClock(config: config, builder: builder)
     let loopBank = genBRAMTimerLoopBank(config: config, builder: builder)
@@ -55,7 +55,7 @@ public func genBRAMTimer(config: borrowing BRAMTimerConfig, into builder: SMNetB
         }
     }
 
-    builder.defaultKeepTiming = oldKeepTiming
+    builder.defaultDomain = oldDomain
     return portInfo
 }
 

@@ -28,7 +28,7 @@ func analyzeTiming(_ module: borrowing SMModule) -> TimingReport {
 
     var report = TimingReport()
 
-    let isPureComb = module.sequentialNodes.isEmpty
+    let isPureComb = module.gates.allSatisfy(\.value.isCombinational)
 
     report.criticalDepth = isPureComb ? totalDepth : totalDepth + 2
     report.timingType = isPureComb ? .combinational : .sequential
@@ -72,16 +72,14 @@ private func traverse(_ module: borrowing SMModule, isRev: Bool) -> [UInt64: Int
     // build initial set of timings
     var crossSection: Set<UInt64> = []
     for (gateId, gate) in module.gates {
-        let isSequential = module.sequentialNodes.contains(gateId)
-        guard gate.prevs(isRev: isRev).isEmpty || isSequential,
+        guard gate.prevs(isRev: isRev).isEmpty || gate.isSequential,
               gate.prevPortals(isRev: isRev).isEmpty else { continue }
-        table[gateId] = isSequential ? 0 : 1
+        table[gateId] = gate.isSequential ? 0 : 1
         addNext(gate, to: &crossSection)
     }
 
     func satisfied(_ gateId: UInt64) -> Int? {
         let gate = module.gates[gateId]!
-        let isSequential = module.sequentialNodes.contains(gateId)
         var depthMax: Int = 0
         for prevId in gate.prevs(isRev: isRev) {
             guard let depth = table[prevId] else { return nil }
@@ -91,7 +89,7 @@ private func traverse(_ module: borrowing SMModule, isRev: Bool) -> [UInt64: Int
             guard let depth = table[portalId] else { return nil }
             depthMax = max(depthMax, depth + additional)
         }
-        return depthMax + (isSequential ? -1 : 0)
+        return depthMax + (gate.isSequential ? -1 : 0)
     }
 
     while !crossSection.isEmpty {

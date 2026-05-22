@@ -10,20 +10,32 @@ func analyzeComplexity(_ module: borrowing SMModule) -> ComplexityReport {
     // all gate count
     let gateCount = module.gates.count
     // input gate count
-    var inputGateCount: Int = 0
+    var inputs: Set<UInt64> = []
     for (_, port) in module.inputs {
-        inputGateCount += port.gates.count
+        inputs.formUnion(port.gates)
     }
     // output gate count
-    var outputGateCount: Int = 0
+    var outputs: Set<UInt64> = []
     for (_, port) in module.outputs {
-        outputGateCount += port.gates.count
+        outputs.formUnion(port.gates)
     }
+
     // internal gate count
-    let internalGateCount = gateCount - inputGateCount - outputGateCount
-    // sequential gate count
-    let sequentialGateCount = module.sequentialNodes.count
-    let combinationalGateCount = internalGateCount - sequentialGateCount
+    var combinationalGateCount = 0
+    var sequentialGateCount = 0
+    var clockTreeGateCount = 0
+    for (gateId, gate) in module.gates {
+        if inputs.contains(gateId) || outputs.contains(gateId) { continue }
+        switch gate.domain {
+        case .combinational:
+            combinationalGateCount += 1
+        case .clockTree:
+            clockTreeGateCount += 1
+        case .sequential:
+            sequentialGateCount += 1
+        }
+    }
+
     // connection count
     var connCount: Int = 0
     for (_, gate) in module.gates { connCount += gate.srcs.count }
@@ -33,11 +45,12 @@ func analyzeComplexity(_ module: borrowing SMModule) -> ComplexityReport {
     var report = ComplexityReport()
 
     report.gateCount = gateCount
-    report.inputGateCount = inputGateCount
-    report.outputGateCount = outputGateCount
-    report.internalGateCount = internalGateCount
+    report.inputGateCount = inputs.count
+    report.outputGateCount = outputs.count
+    report.internalGateCount = gateCount - inputs.count - outputs.count
     report.sequentialGateCount = sequentialGateCount
     report.combinationalGateCount = combinationalGateCount
+    report.clockTreeGateCount = clockTreeGateCount
     report.connectionCount = connCount
     report.averageGateInputCount = avgGateInput
 

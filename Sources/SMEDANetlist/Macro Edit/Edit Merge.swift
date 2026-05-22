@@ -31,9 +31,6 @@ func editMerge(
         let newGateId = getNextFreeId()
         mainModule.gates.updateValue(gate, forKey: newGateId)
         lookup.updateValue(newGateId, forKey: gateId)
-        if module.sequentialNodes.contains(gateId) {
-            mainModule.sequentialNodes.insert(newGateId)
-        }
     }
 
     // update connection

@@ -36,7 +36,7 @@ public func peepoptReduceBuffers(builder: SMNetBuilder, keeping: Set<UInt64>) ->
               case .logic(let gateType) = gate.type,
               !gateType.isInverter,
               gate.srcs.count == 1,
-              !builder.module.sequentialNodes.contains(gateId)
+              gate.isCombinational
         else { continue }
 
         let transfer = gate.dsts
@@ -66,7 +66,7 @@ public func peepoptReduceInverters(builder: SMNetBuilder, keeping: Set<UInt64>) 
               case .logic(let gateType) = gate.type,
               gateType.isInverter,
               gate.srcs.count == 1,
-              !builder.module.sequentialNodes.contains(gateId)
+              gate.isCombinational
         else { continue }
 
         let srcId = gate.srcs.first!
@@ -76,7 +76,7 @@ public func peepoptReduceInverters(builder: SMNetBuilder, keeping: Set<UInt64>) 
               !keeping.contains(srcId),
               source.dsts.count == 1,
               !source.srcs.isEmpty, // cannot sink inverter into 0 input gate (it always outputs low)
-              !builder.module.sequentialNodes.contains(srcId)
+              gate.isCombinational
         else { continue }
 
         let transfer = gate.dsts

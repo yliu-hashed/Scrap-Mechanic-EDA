@@ -40,7 +40,7 @@ extension SMModule {
 
             // check that only sequential gate can have portal
             let hasPortal = !gate.portalDsts.isEmpty || !gate.portalSrcs.isEmpty
-            if hasPortal && !sequentialNodes.contains(gateId) {
+            if hasPortal && !gate.isSequential {
                 throw NetlistError.combPortal(gateId: gateId)
             }
 

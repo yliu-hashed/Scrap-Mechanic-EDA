@@ -3,13 +3,13 @@
 //  Scrap Mechanic EDA
 //
 
-func genDFF(builder: SMNetBuilder, clkPulse: [UInt64], data: UInt64, keepTiming: Bool? = nil) -> UInt64 {
+func genDFF(builder: SMNetBuilder, clkPulse: [UInt64], data: UInt64, domain: SMGate.Domain? = nil) -> UInt64 {
 
-    let xlp0 = builder.addLogic(type: .xor, keepTiming: true)
-    let xlp1 = builder.addLogic(type: .xor, keepTiming: true)
-    let xlp2 = builder.addLogic(type: .xor, keepTiming: true)
-    let diff = builder.addLogic(type: .xor, keepTiming: keepTiming)
-    let filt = builder.addLogic(type: .and, keepTiming: true)
+    let xlp0 = builder.addLogic(type: .xor, into: .sequential)
+    let xlp1 = builder.addLogic(type: .xor, into: .sequential)
+    let xlp2 = builder.addLogic(type: .xor, into: .sequential)
+    let diff = builder.addLogic(type: .xor, into: domain)
+    let filt = builder.addLogic(type: .and, into: .sequential)
 
     // connect inputs
     builder.connect(data, to: diff)

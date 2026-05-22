@@ -7,7 +7,7 @@ public class SMNetBuilder {
     private var nodeIdCounter: UInt64 = 0
     public private(set) var module: SMModule
 
-    public var defaultKeepTiming: Bool = false
+    public var defaultDomain: SMGate.Domain = .combinational
 
     public init(module: SMModule = SMModule()) {
         nodeIdCounter = module.nextId()
@@ -34,20 +34,19 @@ public class SMNetBuilder {
         module.outputs.removeValue(forKey: port)
     }
 
-    @discardableResult public func addLogic(type: SMLogicType, keepTiming: Bool? = nil) -> UInt64 {
-        return addGate(type: .logic(type: type), keepTiming: keepTiming)
+    @discardableResult public func addLogic(type: SMLogicType, into domain: SMGate.Domain? = nil) -> UInt64 {
+        return addGate(type: .logic(type: type), into: domain)
     }
 
-    @discardableResult public func addTimer(delay: Int) -> UInt64 {
-        return addGate(type: .timer(delay: delay), keepTiming: false)
+    @discardableResult public func addTimer(delay: Int, into domain: SMGate.Domain? = nil) -> UInt64 {
+        return addGate(type: .timer(delay: delay), into: domain)
     }
 
-    @discardableResult public func addGate(type: SMGateType, keepTiming: Bool? = nil) -> UInt64 {
+    @discardableResult public func addGate(type: SMGateType, into domain: SMGate.Domain? = nil) -> UInt64 {
         let thisId = nodeIdCounter
-        module.gates.updateValue(SMGate(type: type), forKey: thisId)
+        let domain = domain ?? defaultDomain
+        module.gates.updateValue(SMGate(type: type, domain: domain), forKey: thisId)
         nodeIdCounter += 1
-        let keepTiming = keepTiming ?? defaultKeepTiming
-        if keepTiming { module.sequentialNodes.insert(thisId) }
         return thisId
     }
 
@@ -59,7 +58,6 @@ public class SMNetBuilder {
     }
 
     public func removeGate(_ id: UInt64) {
-        module.sequentialNodes.remove(id)
         let gate = module.gates.removeValue(forKey: id)
         guard let gate = gate else { return }
 
@@ -171,8 +169,8 @@ public class SMNetBuilder {
             changed = true
             // disconnect the overused node from it's destinations
             let dsts: Set<UInt64>
-            if (module.sequentialNodes.contains(gateId)) {
-                dsts = gate.dsts.filter { !module.sequentialNodes.contains($0) }
+            if gate.isSequential {
+                dsts = gate.dsts.filter { !module.gates[$0]!.isSequential }
             } else {
                 dsts = gate.dsts
             }
@@ -185,7 +183,7 @@ public class SMNetBuilder {
             // create the temporary nodes, and connect from the sources to them
             var tmps = [UInt64](repeating: 0, count: tmpCount)
             for i in 0..<tmpCount {
-                tmps[i] = addLogic(type: .or, keepTiming: false)
+                tmps[i] = addLogic(type: .or, into: .combinational)
             }
             connect(gateId, to: tmps)
 

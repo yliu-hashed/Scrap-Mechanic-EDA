@@ -46,7 +46,8 @@ func ensureClockSync(builder: SMNetBuilder, clockComain: UInt64) {
         var newVisited: Set<UInt64> = []
         for gateId in lastNewVisited {
             for dstId in builder.module.gates[gateId]!.dsts {
-                if builder.module.sequentialNodes.contains(dstId) {
+                let dst = builder.module.gates[dstId]!
+                if dst.isSequential {
                     let buffer = builder.addLogic(type: .or)
                     builder.disconnect(gateId, to: dstId)
                     builder.connect(gateId, to: buffer)
@@ -71,7 +72,10 @@ func calcLongestPath(_ module: SMModule, clockDomain: UInt64) -> Int {
     while true {
         var newVisited: Set<UInt64> = []
         for gateId in lastNewVisited {
-            newVisited.formUnion(module.gates[gateId]!.dsts.lazy.filter({ !module.sequentialNodes.contains($0) }))
+            for dstId in module.gates[gateId]!.dsts {
+                if module.gates[dstId]!.isSequential { continue }
+                newVisited.insert(dstId)
+            }
         }
         if newVisited.isEmpty {
             break
@@ -92,8 +96,8 @@ func calcShortestPath(_ module: SMModule, clockDomain: UInt64) -> Int {
     while true {
         var newVisited: Set<UInt64> = []
         for gateId in lastNewVisited {
-            if module.gates[gateId]!.dsts.contains(where: { module.sequentialNodes.contains($0) }) {
-                return iterations
+            for dstId in module.gates[gateId]!.dsts {
+                if module.gates[dstId]!.isSequential { return iterations }
             }
             newVisited.formUnion(module.gates[gateId]!.dsts)
         }

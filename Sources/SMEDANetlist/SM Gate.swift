@@ -10,20 +10,37 @@ public struct SMGate: Codable, Equatable, Hashable {
     public var portalSrcs: [UInt64: Int]
     public var portalDsts: [UInt64: Int]
 
+    public enum Domain: Int, Codable, Hashable {
+        /// Acyclic portion of the logic where strict timing is not required.
+        case combinational = 0
+        /// A fanout tree of logic that distribute the clock signal evenly.
+        case clockTree = -1
+        /// Logics that emulate flipflops, latches, and other sequential elements.
+        case sequential = 1
+    }
+
+    public var domain: Domain
+
     public var hasPortals: Bool { !portalSrcs.isEmpty || !portalDsts.isEmpty }
+
+    public var isSequential: Bool { return domain == .sequential }
+    public var isClockTree: Bool { return domain == .clockTree }
+    public var isCombinational: Bool { return domain == .combinational }
 
     public init(
         type: SMGateType,
         srcs: Set<UInt64> = [],
         dsts: Set<UInt64> = [],
         portalSrcs: [UInt64: Int] = [:],
-        portalDsts: [UInt64: Int] = [:]
+        portalDsts: [UInt64: Int] = [:],
+        domain: Domain = .combinational
     ) {
         self.type = type
         self.srcs = srcs
         self.dsts = dsts
         self.portalSrcs = portalSrcs
         self.portalDsts = portalDsts
+        self.domain = domain
     }
 
     enum CodingKeys: CodingKey {
@@ -32,6 +49,7 @@ public struct SMGate: Codable, Equatable, Hashable {
         case dsts
         case portalSrcs
         case portalDsts
+        case domain
     }
 
     public func encode(to encoder: any Encoder) throws {
@@ -41,6 +59,7 @@ public struct SMGate: Codable, Equatable, Hashable {
         try container.encode(dsts, forKey: .dsts)
         if !portalSrcs.isEmpty { try container.encode(portalSrcs, forKey: .portalSrcs) }
         if !portalDsts.isEmpty { try container.encode(portalDsts, forKey: .portalDsts) }
+        if domain != .combinational { try container.encode(domain, forKey: .domain) }
     }
 
     public init(from decoder: any Decoder) throws {
@@ -50,6 +69,7 @@ public struct SMGate: Codable, Equatable, Hashable {
         self.dsts = try container.decode(Set<UInt64>.self, forKey: .dsts)
         self.portalSrcs = try container.decodeIfPresent([UInt64: Int].self, forKey: .portalSrcs) ?? [:]
         self.portalDsts = try container.decodeIfPresent([UInt64: Int].self, forKey: .portalDsts) ?? [:]
+        self.domain = try container.decodeIfPresent(Domain.self, forKey: .domain) ?? .combinational
     }
 }
 

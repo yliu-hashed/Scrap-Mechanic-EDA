@@ -35,7 +35,7 @@ extension SMNetBuilder {
     }
 
     // Build a delay-wise symmetric fanout starting from `src`.
-    public func buildDriveTree(srcId: UInt64, fanout: Int, keepTiming: Bool? = nil) -> TreeHandle {
+    public func buildDriveTree(srcId: UInt64, fanout: Int, into domain: SMGate.Domain? = nil) -> TreeHandle {
         guard let srcGate = module.gates[srcId] else {
             fatalError("Gate \(srcId) doesn't exist")
         }
@@ -48,7 +48,7 @@ extension SMNetBuilder {
         }
 
         let limit = SMModule.gateOutputLimit
-        let sequential = keepTiming ?? module.sequentialNodes.contains(srcId)
+        let domain = domain ?? srcGate.domain
 
         var widths: [Int] = []
 
@@ -68,7 +68,7 @@ extension SMNetBuilder {
             for i in 0..<width {
                 let index = i / limit
                 let srcId = handles[index]
-                let dstId = addGate(type: .logic(type: .or), keepTiming: sequential)
+                let dstId = addGate(type: .logic(type: .or), into: domain)
                 connect(srcId, to: dstId)
                 newHandles.append(dstId)
             }

@@ -41,7 +41,7 @@ func genBRAMTimerPort(config: borrowing BRAMTimerConfig, builder: SMNetBuilder, 
 
     var address = [UInt64](repeating: 0, count: config.addressSpacePow2)
     for i in 0..<config.addressSpacePow2 {
-        address[i] = builder.addLogic(type: .and, keepTiming: false)
+        address[i] = builder.addLogic(type: .and, into: .combinational)
     }
     if global {
         builder.registerInputGates(port: "\(index)ADDR", gates: address)
@@ -52,7 +52,7 @@ func genBRAMTimerPort(config: borrowing BRAMTimerConfig, builder: SMNetBuilder, 
     if (config.ports[index].hasRead) {
         var data = [UInt64](repeating: 0, count: config.addressability)
         for i in 0..<config.addressability {
-            data[i] = builder.addLogic(type: .or, keepTiming: false)
+            data[i] = builder.addLogic(type: .or, into: .combinational)
         }
         info.readData = data
         if global {
@@ -63,14 +63,14 @@ func genBRAMTimerPort(config: borrowing BRAMTimerConfig, builder: SMNetBuilder, 
     if (config.ports[index].hasWrite) {
         var data = [UInt64](repeating: 0, count: config.addressability)
         for i in 0..<config.addressability {
-            data[i] = builder.addLogic(type: .and, keepTiming: false)
+            data[i] = builder.addLogic(type: .and, into: .combinational)
         }
         info.writeData = data
         if global {
             builder.registerInputGates(port: "\(index)DATAI", gates: data)
         }
 
-        info.writeEnable = builder.addLogic(type: .and, keepTiming: false)
+        info.writeEnable = builder.addLogic(type: .and, into: .combinational)
         if global {
             builder.registerInputGates(port: "\(index)WE", gates: [info.writeEnable])
         }

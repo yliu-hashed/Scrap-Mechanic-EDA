@@ -20,9 +20,9 @@ private struct DFF {
 }
 
 private func generateDFF(builder: SMNetBuilder, clkPulse: UInt64) -> DFF {
-    let xlp0 = builder.addLogic(type: .xor, keepTiming: true)
-    let xlp1 = builder.addLogic(type: .xor, keepTiming: true)
-    let xlp2 = builder.addLogic(type: .xor, keepTiming: true)
+    let xlp0 = builder.addLogic(type: .xor, into: .sequential)
+    let xlp1 = builder.addLogic(type: .xor, into: .sequential)
+    let xlp2 = builder.addLogic(type: .xor, into: .sequential)
     builder.connect(chain: xlp0, xlp1, xlp2, xlp0)
 
     return DFF(xors: [xlp0, xlp1, xlp2])
@@ -35,13 +35,13 @@ public func genBRAMDFF(config: borrowing BRAMDFFConfig) -> SMModule {
 
     let builder = SMNetBuilder()
     // MARK: Clock Port
-    let clk = builder.addLogic(type: .and, keepTiming: true)
+    let clk = builder.addLogic(type: .and, into: .sequential)
     builder.registerInputGates(port: "CLK", gates: [clk])
-    let clkInv = builder.addLogic(type: .nor, keepTiming: true)
+    let clkInv = builder.addLogic(type: .nor, into: .sequential)
     builder.connect(clk, to: clkInv)
-    let clkPulse = builder.addLogic(type: .and, keepTiming: true)
+    let clkPulse = builder.addLogic(type: .and, into: .sequential)
     builder.connect([clk, clkInv], to: clkPulse)
-    let clkPulseTree = builder.buildDriveTree(srcId: clkPulse, fanout: dffCount * writePortCount, keepTiming: true)
+    let clkPulseTree = builder.buildDriveTree(srcId: clkPulse, fanout: dffCount * writePortCount, into: .sequential)
 
     // MARK: Generate DFF
     var memoryElements: [[DFF]] = []
@@ -117,7 +117,7 @@ public func genBRAMDFF(config: borrowing BRAMDFFConfig) -> SMModule {
                 let dffs = memoryElements[addr]
                 for (i, dff) in dffs.enumerated() {
                     let diff = builder.addLogic(type: .xor)
-                    let filt = builder.addLogic(type: .and, keepTiming: true)
+                    let filt = builder.addLogic(type: .and, into: .sequential)
                     builder.connect(chain: dff.xors[0], diff, filt)
                     builder.connect(filt, to: dff.xors)
                     builder.connect(clkPulseTree.use(), to: filt)

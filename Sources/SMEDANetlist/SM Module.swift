@@ -15,9 +15,6 @@ public struct SMModule: Codable {
     public var name: String
     /// The gates that's contained in the module
     public var gates: [UInt64: SMGate]
-    /// The gates that are part of the sequential circuit. This is for record keeping only. Used to
-    /// facilitate timing analysis.
-    public var sequentialNodes: Set<UInt64>
     /// The input ports and the gates that made up them
     public var inputs: [String: Port]
     /// The output ports and the gates that made up them
@@ -73,7 +70,6 @@ public struct SMModule: Codable {
     ) {
         self.name = name
         self.gates = gates
-        self.sequentialNodes = cycleGates
         self.inputs = inputs
         self.outputs = outputs
         self.colorHex = colorHex
@@ -86,7 +82,6 @@ public struct SMModule: Codable {
     public init() {
         name = "Untitled"
         gates = [:]
-        sequentialNodes = []
         inputs = [:]
         outputs = [:]
         colorHex = nil

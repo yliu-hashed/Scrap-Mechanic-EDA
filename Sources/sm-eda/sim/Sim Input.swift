@@ -31,10 +31,8 @@ extension SimulationModel {
             let gateId = gates[index]
             let state = (constant & 1 << i) != 0
             assert(overrideList.keys.contains(gateId))
-            overrideList[gateId] = state
+            setOverride(gateId: gateId, value: state)
         }
-
-        willChange = true
 
         return true
     }

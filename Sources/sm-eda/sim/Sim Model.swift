@@ -8,17 +8,17 @@ import SMEDANetlist
 
 class SimulationModel {
     let module: SMModule
-    var states: [UInt64: LogicState]
-    var overrideList: [UInt64: Bool]
+    internal private(set) var states: [UInt64: LogicState]
+    internal private(set) var overrideList: [UInt64: Bool]
 
-    var instableCount: Int = 0
-    var isInstable: Bool = true
-    var willChange: Bool = false
+    internal private(set) var instableCount: Int = 0
+    internal private(set) var isInstable: Bool = true
+    internal private(set) var willChange: Bool = false
 
-    var recordingTime: UInt64 = 0
-    var recordingGateSet: Set<UInt64>
-    var history: [LevelChangeRecord] = []
-    var recordingState: [UInt64: Bool]? = nil
+    internal private(set) var recordingTime: UInt64 = 0
+    internal private(set) var history: [LevelChangeRecord] = []
+    private var recordingGateSet: Set<UInt64>
+    private var recordingState: [UInt64: Bool]? = nil
 
     init(module: SMModule) {
         self.module = module
@@ -101,7 +101,7 @@ class SimulationModel {
         buildOverrideList()
     }
 
-    func resetInput() {
+    func resetOverrides() {
         buildOverrideList()
     }
 
@@ -109,25 +109,21 @@ class SimulationModel {
         buildState()
     }
 
-    func wrapToStable() {
+    func wrapToStable(time: Double) -> Bool {
         let startTime = Date()
-        while Date().timeIntervalSince(startTime) < 5 {
+        while Date().timeIntervalSince(startTime) < time {
             tick()
             if !isInstable { break }
         }
-        if isInstable {
-            print("Cannot reach stability in 5s")
-        }
+        return !isInstable
     }
 
-    func wrapToStable(limit: Int) {
-        for _ in 0..<limit {
+    func wrapToStable(ticks: Int) -> Bool {
+        for _ in 0..<ticks {
             tick()
             if !isInstable { break }
         }
-        if isInstable {
-            print("Cannot reach stability in \(limit) ticks")
-        }
+        return !isInstable
     }
 
     func tick() {

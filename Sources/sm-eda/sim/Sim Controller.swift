@@ -23,13 +23,17 @@ class Controller {
                 if isRepl { print("Does Nothing") }
                 return
             }
-            model.wrapToStable(limit: Int(amount))
+            if !model.wrapToStable(ticks: Int(amount)) {
+                print("Cannot reach stability in \(amount) ticks")
+            }
         case .wrap:
             guard model.isInstable || model.willChange else {
                 if isRepl { print("Already Stable") }
                 return
             }
-            model.wrapToStable()
+            if !model.wrapToStable(time: 5) {
+                print("Cannot reach stability in 5s")
+            }
         case .reset:
             model.resetAll()
         case .input(let value, let port):

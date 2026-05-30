@@ -160,7 +160,7 @@ private func driveGate(gateType: SMLogicType, drive: Bool) -> DriveResolution {
     case .logicalOr:
         // if driven by true, OR produce true, output is whether it's not inverter
         return drive ? .dominate(state: !gateType.isInverter) : .convert(type: gateType)
-    case .logicalChain:
+    case .logicalParity:
         // if driven by true, XOR or XNOR is negated
         return .convert(type: drive ? gateType.negatedGate : gateType)
     }

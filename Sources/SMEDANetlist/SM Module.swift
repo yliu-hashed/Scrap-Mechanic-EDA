@@ -119,7 +119,7 @@ extension SMLogicType {
         switch self {
         case .or,  .nor:  return .logicalOr
         case .and, .nand: return .logicalAnd
-        case .xor, .xnor: return .logicalChain
+        case .xor, .xnor: return .logicalParity
         }
     }
 
@@ -168,14 +168,17 @@ extension SMLogicType {
 public enum SourceAggrigationType: Int {
     case logicalAnd
     case logicalOr
-    case logicalChain
+    case logicalParity
 
     /// the equivalent front part of the gate
     public var equivGate: SMLogicType {
         switch self {
-        case .logicalAnd:   return .and
-        case .logicalOr:    return .or
-        case .logicalChain: return .xor
+        case .logicalAnd:
+            return .and
+        case .logicalOr:
+            return .or
+        case .logicalParity:
+            return .xor
         }
     }
 }

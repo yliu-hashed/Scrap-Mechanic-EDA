@@ -6,11 +6,19 @@
 public class SMNetBuilder {
     private var nodeIdCounter: UInt64 = 0
     public private(set) var module: SMModule
+    public private(set) var inputIds: Set<UInt64> = []
+    public private(set) var outputIds: Set<UInt64> = []
 
     public var defaultDomain: SMGate.Domain = .combinational
 
     public init(module: SMModule = SMModule()) {
         nodeIdCounter = module.nextId()
+        for port in module.inputs.values {
+            inputIds.formUnion(port.gates)
+        }
+        for port in module.outputs.values {
+            outputIds.formUnion(port.gates)
+        }
         self.module = module
     }
 
@@ -20,18 +28,22 @@ public class SMNetBuilder {
 
     public func registerInputGates(port: String, gates: [UInt64], isClock: Bool = false) {
         module.inputs[port] = SMModule.Port(gates: gates)
+        inputIds.formUnion(gates)
     }
 
     public func unregisterInputGates(port: String) {
-        module.inputs.removeValue(forKey: port)
+        guard let port = module.inputs.removeValue(forKey: port) else { return }
+        inputIds.subtract(port.gates)
     }
 
     public func registerOutputGates(port: String, gates: [UInt64], isClock: Bool = false) {
         module.outputs[port] = SMModule.Port(gates: gates)
+        outputIds.formUnion(gates)
     }
 
     public func unregisterOutputGates(port: String) {
-        module.outputs.removeValue(forKey: port)
+        guard let port = module.outputs.removeValue(forKey: port) else { return }
+        outputIds.subtract(port.gates)
     }
 
     @discardableResult public func addLogic(type: SMLogicType, into domain: SMGate.Domain? = nil) -> UInt64 {
@@ -60,6 +72,8 @@ public class SMNetBuilder {
     public func removeGate(_ id: UInt64) {
         let gate = module.gates.removeValue(forKey: id)
         guard let gate = gate else { return }
+        assert(!inputIds.contains(id), "Cannot delete an registered input")
+        assert(!outputIds.contains(id), "Cannot delete an registered output")
 
         for nodeId in gate.srcs { module.gates[nodeId]!.dsts.remove(id) }
         for nodeId in gate.dsts { module.gates[nodeId]!.srcs.remove(id) }

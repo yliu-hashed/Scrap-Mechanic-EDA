@@ -10,9 +10,9 @@ struct OptimizerArgGroup: ParsableArguments {
     @Flag(name: [.customLong("no-opt")])
     var noOptimize: Bool = false
 
-    func work(module: inout SMModule) throws {
+    func work(module: inout SMModule, printlevel: PrintLevel) throws {
         if !noOptimize {
-            optimize(&module)
+            algebraicOptimize(&module, verbose: printlevel == .verbose)
         } else {
             syncClock(&module)
         }

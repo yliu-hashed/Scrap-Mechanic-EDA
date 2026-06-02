@@ -137,7 +137,7 @@ struct EditCMD: ParsableCommand {
             module.name = newName
         }
 
-        try optimizerOptions.work(module: &module)
+        try optimizerOptions.work(module: &module, printlevel: printlevel)
 
         try storeModuleOptions.work(module: module, printlevel: printlevel)
     }

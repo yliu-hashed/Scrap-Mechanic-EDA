@@ -33,7 +33,7 @@ struct FlowCMD: AsyncParsableCommand {
 
     func run() async throws {
         var module = try transformOptions.work(printlevel: printlevel)
-        try optimizerOptions.work(module: &module)
+        try optimizerOptions.work(module: &module, printlevel: printlevel)
         let config = try autoPlanOptions.work(module: module)
         let placementReport = try await placementOptions.work(module: module, config: config, printlevel: printlevel)
         try analyzeOptions.work(module: module, placementReport: placementReport, printlevel: printlevel)

@@ -3,34 +3,44 @@
 //  Scrap Mechanic EDA
 //
 
-public func syncClock(_ module: inout SMModule) {
+public func syncClock(_ module: inout SMModule, domains: Set<UInt64>? = nil) {
     var clockDomains: Set<UInt64> = []
-    for input in module.inputs.values {
-        if input.isClock { clockDomains.formUnion(input.gates) }
+    if let domains = domains {
+        clockDomains = domains
+    } else {
+        for input in module.inputs.values {
+            if input.isClock { clockDomains.formUnion(input.gates) }
+        }
     }
+
+    let builder = SMNetBuilder(module: module)
 
     for domain in clockDomains {
-        syncClock(&module, clockComain: domain)
+        ensureClockSync(builder: builder, clockComain: domain)
     }
+
+    var live: Set<UInt64> = []
+    for (gateId, gate) in module.gates {
+        guard gate.isClockTree else { continue }
+        live.insert(gateId)
+    }
+
+    while !live.isEmpty {
+        var newLive: Set<UInt64> = []
+        algebraicMergeIdentical(
+            builder: builder,
+            intrest: live,
+            updated: &newLive
+        )
+        live = newLive
+    }
+
+    module = builder.module
 }
 
-public func syncClock(_ module: inout SMModule, clockComain: UInt64) {
+func syncClock(_ module: inout SMModule, clockComain: UInt64) {
     let builder = SMNetBuilder(module: module)
     ensureClockSync(builder: builder, clockComain: clockComain)
-
-    let inputGates = module.inputs.values.lazy.map(\.gates).joined()
-    let outputGates = module.outputs.values.lazy.map(\.gates).joined()
-    let keepingGates = Set(inputGates).union(outputGates)
-
-    while true {
-        var changed = false
-        if peepoptJoinIdenticalSibings(
-            builder: builder,
-            keeping: keepingGates
-        ) { changed = true }
-        if !changed { break }
-    }
-
     module = builder.module
 }
 

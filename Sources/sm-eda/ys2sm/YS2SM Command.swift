@@ -31,7 +31,7 @@ struct YS2SMCMD: ParsableCommand {
     func run() throws {
         var module = try transformOptions.work(printlevel: printlevel)
 
-        try optimizerOptions.work(module: &module)
+        try optimizerOptions.work(module: &module, printlevel: printlevel)
 
         try storeModuleOptions.work(module: module, printlevel: printlevel)
 

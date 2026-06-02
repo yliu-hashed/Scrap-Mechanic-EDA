@@ -8,9 +8,9 @@ import Subprocess
 import SMEDABlueprint
 import SMEDAResult
 #if canImport(System)
-@preconcurrency import System
+import System
 #else
-@preconcurrency import SystemPackage
+import SystemPackage
 #endif
 
 private func estimatePacketSize(dataSize: Int, facade: Bool) -> Float {
@@ -75,17 +75,28 @@ private func lz4BlueprintSize(data: Data, lz4Path: String?, verbose: Bool) async
 
     let result = try? await run(
         executable,
-        arguments: ["-1", "--no-frame-crc", "-BD", "stdin"]
-    ) { (execution, input, output, _) in
-        _ = try await input.write(data)
-        try await input.finish()
+        arguments: ["-1", "--no-frame-crc", "-BD", "stdin"],
+        input: .inputWriter,
+        output: .sequence,
+        error: .string(limit: 1024, encoding: UTF8.self)
+    ) { execution in
+        // write blueprint into the input stream
+        let writer = execution.standardInputWriter
+        _ = try await writer.write(data)
+        try await writer.finish()
+        // collect output by summing
         var sum: Int = 0
-        for try await chunk in output {
+        for try await chunk in execution.standardOutput {
             sum += chunk.count
         }
         try? execution.send(signal: .kill)
         return sum - 2
     }
 
-    return result?.value
+    if let error = result?.standardError, !error.isEmpty {
+        print("LZ4 has returned error:")
+        print(error)
+    }
+
+    return result?.closureOutput
 }

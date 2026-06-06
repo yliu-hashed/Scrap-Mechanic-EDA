@@ -16,6 +16,18 @@ struct Port: Equatable {
         self.msb = msb
         self.lsb = lsb
     }
+
+    init(port: String) {
+        self.port = port
+        self.msb = .max
+        self.lsb = .min
+    }
+
+    init(port: String, bit: Int) {
+        self.port = port
+        self.msb = bit
+        self.lsb = bit
+    }
 }
 
 func parsePort(argument: Substring) -> Port? {

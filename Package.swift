@@ -44,6 +44,15 @@ let package = Package(
                 .target(name: "SMEDANetlist"),
                 .target(name: "SMEDAResult"),
             ]
+        ),
+        .testTarget(
+            name: "Tests",
+            dependencies: [
+                .target(name: "sm-eda"),
+                .target(name: "SMEDABlueprint"),
+                .target(name: "SMEDANetlist"),
+                .target(name: "SMEDAResult"),
+            ],
         )
     ]
 )

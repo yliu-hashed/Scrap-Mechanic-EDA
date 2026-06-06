@@ -26,7 +26,7 @@ struct TransformTable {
         for (portName, port) in ysModule.ports where port.direction == .input {
             for (index, bit) in port.bits.enumerated() {
                 guard case .shared(let connId) = bit else {
-                    fatalError("Input \"\(portName)\" contains fixed state.")
+                    preconditionFailure("Input \"\(portName)\" contains fixed state.")
                 }
                 let store = TransformTable.InputPort(name: portName, bit: index)
                 inputPorts.updateValue(store, forKey: connId)

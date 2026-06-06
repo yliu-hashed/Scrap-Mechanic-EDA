@@ -72,14 +72,14 @@ class SimulationModel {
         if let overrideState = overrideList[id] {
             return overrideState
         }
-        switch states[id] {
+        switch states[id]! {
         case .basic(let basicState):
             return basicState
         case .timer(let timerState):
-            guard case .timer(let delay) = module.gates[id]?.type else { fatalError() }
+            guard case .timer(let delay) = module.gates[id]?.type else {
+                preconditionFailure("Impossible")
+            }
             return timerStateGetValue(state: timerState, delay: delay)
-        case .none:
-            fatalError()
         }
     }
 
@@ -195,7 +195,7 @@ class SimulationModel {
                 }
                 newStates[gateId] = .basic(newState)
             case .timer(let delay):
-                guard case .timer(let timerState) = states[gateId] else { fatalError() }
+                guard case .timer(let timerState) = states[gateId] else { preconditionFailure() }
                 let value: Bool
                 if let gateId = gate.srcs.first {
                     value = outputOfGate(id: gateId)

@@ -43,7 +43,7 @@ func checkBRAMTimer(
         try checkAndRemove(portName)
         // add read data to output table
         let outputStore = TransformTable.Output(cell: name, port: portName, bit: 0)
-        guard case .shared(let id) = bits[0] else { fatalError() }
+        guard case .shared(let id) = bits[0] else { preconditionFailure("Impossible") }
         outputLUTs.updateValue(outputStore, forKey: id)
     }
 

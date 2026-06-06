@@ -122,7 +122,7 @@ public enum SMDirection: Int, Codable, CaseIterable, Sendable {
         case (-1,  0,  0): return .negX
         case ( 0, -1,  0): return .negY
         case ( 0,  0, -1): return .negZ
-        default: fatalError()
+        default: preconditionFailure("Impossible")
         }
     }
 
@@ -144,7 +144,7 @@ public enum SMDirection: Int, Codable, CaseIterable, Sendable {
         case 3: return .negX
         case 4: return .negY
         case 5: return .negZ
-        default: fatalError()
+        default: preconditionFailure("Impossible")
         }
     }
 }
@@ -156,7 +156,7 @@ public struct SMRotation: Equatable, Hashable, Sendable {
     public var alignZ: SMDirection
 
     public init(alignX: SMDirection, alignZ: SMDirection) {
-        guard alignX.isPerpendicular(to: alignZ) else { fatalError() }
+        precondition(alignX.isPerpendicular(to: alignZ))
         self.alignX = alignX
         self.alignZ = alignZ
     }
@@ -165,8 +165,7 @@ public struct SMRotation: Equatable, Hashable, Sendable {
     /// direction. For a logic gate, the pointing side is the gate's arrow, for a switch, the
     /// pointing direction is the side of the LEDs on the face of the switch.
     public static func device(facing face: SMDirection, pointing point: SMDirection) -> SMRotation {
-        guard face.isPerpendicular(to: point) else { fatalError() }
-
+        precondition(face.isPerpendicular(to: point))
         let gateAlignX = point
         let gateAlignZ = gateAlignX.rotated(around: face)
         return SMRotation(alignX: gateAlignX, alignZ: gateAlignZ)
@@ -224,7 +223,7 @@ public struct SMRotation: Equatable, Hashable, Sendable {
         case ( 3, -1): return .init(x: 1, y: 0, z: 0)
         case ( 3,  1): return .init(x: 0, y: 1, z: 0)
         case ( 3,  2): return .init(x: 0, y: 0, z: 0)
-        default: fatalError()
+        default: preconditionFailure("Impossible")
         }
     }
 
@@ -255,7 +254,7 @@ public struct SMRotation: Equatable, Hashable, Sendable {
         case ( 3, -1): return .init(x: 0, y: 3, z: 0)
         case ( 3,  1): return .init(x: 2, y: 1, z: 0)
         case ( 3,  2): return .init(x: 3, y: 0, z: 3)
-        default: fatalError()
+        default: preconditionFailure("Impossible")
         }
     }
 

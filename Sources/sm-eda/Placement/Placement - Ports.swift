@@ -74,7 +74,9 @@ func placementPorts(
             let rotation = SMRotation.device(facing: directionFace, pointing: directionPoint)
 
             // add gate
-            guard case .logic(let logicType) = module.gates[gateId]!.type else { fatalError() }
+            guard case .logic(let logicType) = module.gates[gateId]!.type else {
+                preconditionFailure("Impossible")
+            }
             let controllerId = builder.addGate(
                 type: logicType.rawValue,
                 position: position,

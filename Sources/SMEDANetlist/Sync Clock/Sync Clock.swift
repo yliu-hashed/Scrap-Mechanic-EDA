@@ -113,7 +113,7 @@ func calcShortestPath(_ module: SMModule, clockDomain: UInt64) -> Int {
         }
 
         if newVisited.isEmpty {
-            fatalError()
+            preconditionFailure("Impossible")
             break
         }
         iterations += 1

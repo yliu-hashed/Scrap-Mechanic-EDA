@@ -63,9 +63,7 @@ public class SMNetBuilder {
     }
 
     public func changeGateType(of id: UInt64, to newType: SMGateType) {
-        guard module.gates.keys.contains(id) else {
-            fatalError()
-        }
+        assert(module.gates.keys.contains(id))
         module.gates[id]?.type = newType
     }
 

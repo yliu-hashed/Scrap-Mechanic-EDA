@@ -18,7 +18,7 @@ extension SMNetBuilder {
         }
 
         public func useAndConnect(dstId: UInt64) {
-            guard counter < capacity else { fatalError("Capacity violated") }
+            precondition(counter < capacity, "Capacity violated")
             let index = counter / SMModule.gateOutputLimit
             let srcId = handles[index]
             builder.connect(srcId, to: dstId)
@@ -26,7 +26,7 @@ extension SMNetBuilder {
         }
 
         public func use() -> UInt64 {
-            guard counter < capacity else { fatalError("Capacity violated") }
+            precondition(counter < capacity, "Capacity violated")
             let index = counter / SMModule.gateOutputLimit
             let srcId = handles[index]
             counter += 1
@@ -37,11 +37,9 @@ extension SMNetBuilder {
     // Build a delay-wise symmetric fanout starting from `src`.
     public func buildDriveTree(srcId: UInt64, fanout: Int, into domain: SMGate.Domain? = nil) -> TreeHandle {
         guard let srcGate = module.gates[srcId] else {
-            fatalError("Gate \(srcId) doesn't exist")
+            preconditionFailure("Gate \(srcId) doesn't exist")
         }
-        guard srcGate.dsts.isEmpty else {
-            fatalError("Cannot built tree from \(srcId). It already have outputs.")
-        }
+        precondition(srcGate.dsts.isEmpty, "Cannot built tree from \(srcId). It already have outputs.")
 
         if fanout == 1 {
             return TreeHandle(handles: [srcId], builder: self, capacity: fanout)

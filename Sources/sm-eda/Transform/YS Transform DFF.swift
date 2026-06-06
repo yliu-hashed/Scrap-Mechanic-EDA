@@ -98,7 +98,7 @@ struct LoweredDFFTarget: LoweredCell {
         case "E":
             return [filt]
         default:
-            fatalError()
+            preconditionFailure("Port `\(port)` for DFF does not exist")
         }
     }
 
@@ -215,7 +215,7 @@ struct LoweredDFFWithAsyncReset: LoweredCell {
         case "E":
             return [rFlt]
         default:
-            fatalError()
+            preconditionFailure("Port `\(port)` for DFFAR does not exist")
         }
     }
 

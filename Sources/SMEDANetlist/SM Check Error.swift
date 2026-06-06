@@ -3,7 +3,7 @@
 //  Scrap Mechanic EDA
 //
 
-enum NetlistError: Error, CustomStringConvertible {
+public enum NetlistError: Error, CustomStringConvertible {
     case danglingGate(gateId: UInt64)
     case asymDst(gateId: UInt64, dstId: UInt64)
     case asymSrc(gateId: UInt64, srcId: UInt64)
@@ -17,7 +17,11 @@ enum NetlistError: Error, CustomStringConvertible {
     case tooManyOutput(gateId: UInt64, count: Int)
     case timerManyInput(gateId: UInt64)
 
-    var description: String {
+    case missingPortGate(port: String, index: Int, gateId: UInt64)
+    case inputIsInverter(port: String, index: Int, gateId: UInt64)
+    case portIsTimer(port: String, index: Int, gateId: UInt64)
+
+    public var description: String {
         switch self {
         case .danglingGate(let gateId):
             return "Dangling gate \(gateId)"
@@ -39,6 +43,12 @@ enum NetlistError: Error, CustomStringConvertible {
             return "Gate \(gateId) have \(count) output, over the limit of \(SMModule.gateOutputLimit)"
         case .timerManyInput(let gateId):
             return "Timer \(gateId) cannot have more than one input"
+        case .missingPortGate(let port, let index, let gateId):
+            return "Port \(port)[\(index)] (which is gate \(gateId)) is missing"
+        case .inputIsInverter(let port, let index, let gateId):
+            return "Input port \(port)[\(index)] (which is gate \(gateId)) cannot be a inverter"
+        case .portIsTimer(let port, let index, let gateId):
+            return "Input port \(port)[\(index)] (which is gate \(gateId)) cannot be a timer"
         }
     }
 }

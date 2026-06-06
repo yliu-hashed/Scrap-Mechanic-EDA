@@ -4,7 +4,7 @@
 //
 
 extension SMModule {
-    public func check() throws {
+    public func check() throws(NetlistError) {
         // check connections
         for (gateId, gate) in gates {
             for dstId in gate.dsts {
@@ -73,6 +73,41 @@ extension SMModule {
             // check timer has one input
             if case .timer(_) = gate.type, gate.srcs.count > 1 {
                 throw NetlistError.timerManyInput(gateId: gateId)
+            }
+        }
+
+        // check inputs
+        for (name, port) in inputs {
+            for (index, gateId) in port.gates.enumerated() {
+                // check input exists
+                guard let gate = gates[gateId] else {
+                    throw NetlistError.missingPortGate(port: name, index: index, gateId: gateId)
+                }
+                switch gate.type {
+                case .timer(_):
+                    throw NetlistError.portIsTimer(port: name, index: index, gateId: gateId)
+                case .logic(let logicType):
+                    // inputs must be non-inverting
+                    if logicType.isInverter {
+                        throw NetlistError.inputIsInverter(port: name, index: index, gateId: gateId)
+                    }
+                }
+            }
+        }
+
+        // check outputs
+        for (name, port) in outputs {
+            for (index, gateId) in port.gates.enumerated() {
+                // check output exists
+                guard let gate = gates[gateId] else {
+                    throw NetlistError.missingPortGate(port: name, index: index, gateId: gateId)
+                }
+                switch gate.type {
+                case .timer(_):
+                    throw NetlistError.portIsTimer(port: name, index: index, gateId: gateId)
+                case .logic(_):
+                    break
+                }
             }
         }
     }

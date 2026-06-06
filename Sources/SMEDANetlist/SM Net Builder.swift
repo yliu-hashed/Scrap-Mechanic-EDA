@@ -64,6 +64,13 @@ public class SMNetBuilder {
 
     public func changeGateType(of id: UInt64, to newType: SMGateType) {
         assert(module.gates.keys.contains(id))
+        if inputIds.contains(id) {
+            guard case .logic(let logicType) = newType,
+                  !logicType.isInverter
+            else {
+                preconditionFailure("Changing input type to \(newType) is not allowed")
+            }
+        }
         module.gates[id]?.type = newType
     }
 

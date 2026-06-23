@@ -18,7 +18,7 @@ public struct BRAMTimerPortsInfo {
 
 func genBRAMTimerPorts(config: borrowing BRAMTimerConfig, builder: SMNetBuilder, global: Bool) -> BRAMTimerPortsInfo {
 
-    let clk = builder.addLogic(type: .and)
+    let clk = builder.addLogic(type: .and, into: .clockTree)
     if global { builder.registerInputGates(port: "CLK", gates: [clk]) }
     // build clock edge
     let clkNeg = builder.addLogic(type: .nand)

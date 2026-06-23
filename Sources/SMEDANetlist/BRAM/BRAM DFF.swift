@@ -35,7 +35,7 @@ public func genBRAMDFF(config: borrowing BRAMDFFConfig) -> SMModule {
 
     let builder = SMNetBuilder()
     // MARK: Clock Port
-    let clk = builder.addLogic(type: .and, into: .sequential)
+    let clk = builder.addLogic(type: .and, into: .clockTree)
     builder.registerInputGates(port: "CLK", gates: [clk])
     let clkInv = builder.addLogic(type: .nor, into: .sequential)
     builder.connect(clk, to: clkInv)

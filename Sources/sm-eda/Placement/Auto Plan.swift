@@ -61,7 +61,7 @@ func autoPlan(
         } else {
             forcedWidth = nil
             forcedDepth = nil
-            print("Warning: No specified sizing can contain the design of \(volumeCount) blocks. Falling back to fully automatic placement.")
+            print(for: .error, "No specified sizing can contain \(volumeCount) blocks. Falling back to fully automatic placement.")
         }
     }
 
@@ -130,7 +130,7 @@ func autoPlan(
     }
 
     if timerCount + logicCount < planDepth {
-        print("WARNING: Depth argument is too large. The gate body will be detached from the ports.")
+        print(for: .warning, "Depth argument is too large. The gate body will be detached from the ports.")
     }
 
     return PlacementConfig(

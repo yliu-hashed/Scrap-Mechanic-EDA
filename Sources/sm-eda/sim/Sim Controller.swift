@@ -20,19 +20,20 @@ class Controller {
             return
         case .tick(let amount):
             guard amount > 0 else {
-                if isRepl { print("Does Nothing") }
                 return
             }
             if !model.wrapToStable(ticks: Int(amount)) {
-                print("Cannot reach stability in \(amount) ticks")
+                print(for: .warning, "Cannot reach stability in \(amount) ticks.")
             }
         case .wrap:
             guard model.isInstable || model.willChange else {
-                if isRepl { print("Already Stable") }
+                if isRepl {
+                    print("Already stable!")
+                }
                 return
             }
             if !model.wrapToStable(time: 5) {
-                print("Cannot reach stability in 5s")
+                print(for: .warning, "Cannot reach stability in 5s!")
             }
         case .reset:
             model.resetAll()
@@ -43,15 +44,23 @@ class Controller {
         case .assert(let constant, let port):
             guard let value = model.getOutput(port: port) else { return }
             if value != constant {
-                fatalError("Assertion Failed: \(port) == \(value) != \(constant)")
+                let text = "Assertion '\(port)' == '\(constant)' failed. Got '\(value)' instead."
+                print(for: .error, text)
+                if !isRepl {
+                    fatalError("Assertion failed.")
+                }
             }
         case .record:
             model.beginRecording()
-            if isRepl { print("Recording Started") }
+            if isRepl {
+                print("Recording started.")
+            }
             return
         case .stopRecord:
             model.stopRecording()
-            if isRepl { print("Recording Stopped") }
+            if isRepl {
+                print("Recording stopped.")
+            }
             return
         case .saveRecord(let path):
             let url = URL(filePath: path, directoryHint: .notDirectory)
@@ -60,14 +69,14 @@ class Controller {
             do {
                 try data.write(to: url)
             } catch {
-                print("Error: Cannot save file: \(error.localizedDescription)")
+                print(for: .error, "Cannot save with error: \(error.localizedDescription)")
             }
             return
         case .help:
             if isRepl {
                 print(subCommandHelp)
             } else {
-                print("Warning: Command `help` does nothing in scripting mode")
+                print(for: .warning, "Command 'help' does nothing in scripting mode.")
             }
             return
         }

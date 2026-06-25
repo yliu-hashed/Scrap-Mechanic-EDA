@@ -13,15 +13,15 @@ extension SimulationModel {
         print()
         print("==== SIM STATE ===================================")
         if isInstable || willChange {
-            setColor(color: .red)
+            setPrintColor(to: .red)
             print(" INSTABLE ", terminator: "")
-            setColor(color: .default)
+            setPrintColor(to: .default)
             let justBegan = !isInstable && willChange
             print("(for \(justBegan ? 0 : instableCount) ticks)")
         } else {
-            setColor(color: .green)
+            setPrintColor(to: .green)
             print(" STABLE ", terminator: "")
-            setColor(color: .default)
+            setPrintColor(to: .default)
             print("(was instable for \(instableCount) ticks)")
         }
         // print outputs
@@ -64,14 +64,9 @@ extension SimulationModel {
                 if gates.indices.contains(index) {
                     let gateId = gates[i]
                     let state = outputOfGate(id: gateId)
-                    if state {
-                        setColor(color: .cyan)
-                    } else {
-                        setColor(color: .blue)
-                    }
-
+                    setPrintColor(to:  state ? .cyan : .blue)
                     print(state ? "1" : "0", terminator: "")
-                    setColor(color: .default)
+                    setPrintColor(to: .default)
                 } else {
                     print(" ", terminator: "")
                 }

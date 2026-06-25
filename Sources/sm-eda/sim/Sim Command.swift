@@ -25,7 +25,7 @@ record
 stop-record|stop
     Stop recording
 save-record|save <path>
-    Save recording data as a `.vcd` file to `path`
+    Save recording data as a '.vcd' file to 'path'
 help
     Print out this help
 """
@@ -61,7 +61,7 @@ struct SimCMD: ParsableCommand {
                 throw CommandError.invalidFormat(path: inputScriptFile)
             }
             if printlevel != .none {
-                print("Running script `\(inputScriptFile)`")
+                print("Running script '\(inputScriptFile)'.")
             }
             try runScript(controller: controller, script: script)
         } else {
@@ -94,7 +94,7 @@ struct SimCMD: ParsableCommand {
 
     func repl(controller: Controller) {
         print("Welcome to sm-eda sim!")
-        print("Use `help` to explore possible commands")
+        print("Use 'help' to explore possible commands.")
         while true {
             guard let line = readLine() else { return }
             guard let command = SimStep(Substring(line)) else { continue }

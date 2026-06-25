@@ -9,7 +9,7 @@ import SMEDANetlist
 
 private let kSrcYSJsonFileArgHelp = ArgumentHelp(
     "The path of the yosys json file to read",
-    discussion: "SM-EDA uses Yosys as its detached HDL frontend. Use `write_json` in Yosys to generate a json file.",
+    discussion: "SM-EDA uses Yosys as its detached HDL frontend. Use 'write_json' in Yosys to generate a json file.",
     valueName: "in-yosys-json"
 )
 
@@ -34,7 +34,7 @@ struct TransformArgGroup: ParsableArguments {
         let yosysData = try Data(contentsOf: yosysJsonURL)
         let design = try decoder.decode(YSDesign.self, from: yosysData)
         if printlevel == .verbose {
-            print("Parsed Yosys Design Successful")
+            print("Parsed Yosys design successfully.")
         }
 
         // identify top level module
@@ -49,7 +49,7 @@ struct TransformArgGroup: ParsableArguments {
         }
 
         if printlevel == .verbose {
-            print("Loaded top level module named \"\(name)\"")
+            print("Loaded top level module '\(name)'.")
         }
 
         // transform into SMModule
@@ -61,7 +61,7 @@ struct TransformArgGroup: ParsableArguments {
         )
 
         if printlevel == .verbose {
-            print("Transformation Complete")
+            print("Netlist transformation complete.")
         }
 
         return module

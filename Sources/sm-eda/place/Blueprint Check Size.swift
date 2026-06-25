@@ -31,7 +31,7 @@ func checkSize(data: Data, facade: Bool, report: inout PlacementReport, verbose:
         curSize = Float(value)
         tolarence = 0.05
     } else {
-        print("Warning: Cannot find lz4, using estimations instead.")
+        print(for: .warning, "Cannot find lz4, using estimations instead.")
         curSize = estimatePacketSize(dataSize: data.count, facade: facade)
         tolarence = 0.0
     }
@@ -50,18 +50,18 @@ func checkSize(data: Data, facade: Bool, report: inout PlacementReport, verbose:
     let maxString = maxRatio.formatted(ratioFormat)
 
     if verbose {
-        print("Blueprint    Utilization: \(curString)")
-        print("Conservative Utilization: \(maxString)")
+        print("Blueprint utilization is \(curString).")
+        print("Conservative utilization is \(maxString).")
     }
 
     if curRatio > 1.0 {
         let overSizeRatio = curRatio - 1.0
         let string = overSizeRatio.formatted(ratioFormat)
-        print("Warning: Blueprint is above the limit by \(string). It will likely fail to import.")
+        print(for: .warning, "Blueprint is above the limit by \(string). It will likely fail to import.")
     } else if curRatio > (1.0 - tolarence) {
-        print("Warning: Blueprint is very large (\(curString)). It will likely fail to import. Please proceed with caution.")
-    } else if maxRatio > 1.0 {
-        print("Warning: Blueprint is below the limit (\(curString)), but it may fail to import spontaneously later. Conservative utilization is \(maxString). Please proceed with caution.")
+        print(for: .warning, "Blueprint is very large (\(curString)). It will likely fail to import. Please proceed with caution.")
+    } else if maxRatio > 1.0 && curRatio > 0.8 {
+        print(for: .warning, "Blueprint is below the limit (\(curString)), but it may fail to import spontaneously later. Conservative utilization is \(maxString). Please proceed with caution.")
     }
 }
 
@@ -94,8 +94,7 @@ private func lz4BlueprintSize(data: Data, lz4Path: String?, verbose: Bool) async
     }
 
     if let error = result?.standardError, !error.isEmpty {
-        print("LZ4 has returned error:")
-        print(error)
+        print(for: .error, "LZ4 has returned error: \(error)")
     }
 
     return result?.closureOutput

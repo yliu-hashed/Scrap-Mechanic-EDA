@@ -135,13 +135,13 @@ struct BRAMCMD: ParsableCommand {
                 let maxLoopP2 = Int.bitWidth - (maxLoopDelayTarget - 1).leadingZeroBitCount
                 let targetMultiplexityP2 = abits - maxLoopP2
                 if targetMultiplexityP2 > 7 {
-                    print("WARNING: Maximum loop delay of \(maxLoopDelayTarget) cannot achieved as more than 2^7 of multiplexity is required.")
+                    print(for: .warning, "Maximum loop delay of \(maxLoopDelayTarget) cannot achieved as more than 2^7 of multiplexity is required.")
                     multiplexity = 7
                 } else {
                     multiplexity = max(multiplexity, targetMultiplexityP2)
                 }
             } else if printlevel != .none {
-                print("WARNING: Maximum loop delay argument is only supported for timer memory.")
+                print(for: .warning, "Maximum loop delay argument is only supported for timer memory.")
             }
         }
 
@@ -172,7 +172,7 @@ struct BRAMCMD: ParsableCommand {
             )
             module = genBRAMTimer(config: config)
             if printlevel != .none {
-                print("timer cycle: \(config.timerCycleLength)(\(config.timerCycleLengthS)s)")
+                print("Timer cycle is \(config.timerCycleLength)(\(config.timerCycleLengthS)s).")
             }
         }
 
@@ -180,7 +180,7 @@ struct BRAMCMD: ParsableCommand {
         module.name = name
 
         if printlevel != .none {
-            print("\(module.gates.count) gates generated")
+            print("\(module.gates.count) gates generated.")
         }
 
         // write

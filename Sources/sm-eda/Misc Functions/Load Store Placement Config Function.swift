@@ -42,6 +42,8 @@ struct StorePlacementConfigArgGroup: ParsableArguments {
         // write netlist
         let outData = try encoder.encode(config)
         try outData.write(to: url)
-        if printlevel == .verbose { print("Placement Config written successfully to \"\(configFile)\"") }
+        if printlevel == .verbose {
+            print("Placement configuration written successfully to '\(configFile)'.")
+        }
     }
 }

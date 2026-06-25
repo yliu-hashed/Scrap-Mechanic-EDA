@@ -9,7 +9,7 @@ public enum EditScriptError: Error, CustomStringConvertible {
     public var description: String {
         switch self {
         case .cannotParseScript(let line, let content):
-            return "Cannot parse line \(line) `\(content)`"
+            return "Cannot parse line \(line) '\(content)'."
         }
     }
 }

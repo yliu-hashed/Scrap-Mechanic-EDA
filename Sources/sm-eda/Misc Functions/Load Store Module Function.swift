@@ -40,6 +40,8 @@ struct StoreModuleArgGroup: ParsableArguments {
         // write netlist
         let outData = try encoder.encode(module)
         try outData.write(to: url)
-        if printlevel == .verbose { print("Netlist written successfully to \"\(netlistFile)\"") }
+        if printlevel == .verbose {
+            print("Netlist '\(module.name)' written successfully to '\(netlistFile)'.")
+        }
     }
 }

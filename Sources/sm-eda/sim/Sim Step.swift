@@ -21,7 +21,7 @@ enum SimStep: Equatable {
         switch tokens.first! {
         case "quit":
             guard tokens.count == 1 else {
-                print("Invalid: Command `quit` or `q` does not accept any argument.")
+                print(for: .error, "Command 'quit' or 'q' does not accept any arguments.")
                 return nil
             }
             self = .quit
@@ -31,18 +31,18 @@ enum SimStep: Equatable {
             } else if tokens.count == 2, let amount = UInt32(tokens[1]) {
                 self = .tick(tickCount: amount)
             } else {
-                print("Invalid: Usage is `tick/t [<amount>]`")
+                print(for: .error, "Usage of 'tick' is 'tick/t [<amount>]'.")
                 return nil
             }
         case "wrap", "w":
             guard tokens.count == 1 else {
-                print("Invalid: Command `wrap` or `w` does not accept any argument.")
+                print(for: .error, "Command 'wrap' or 'w' does not accept any arguments.")
                 return nil
             }
             self = .wrap
         case "reset", "r":
             guard tokens.count == 1 else {
-                print("Invalid: Command `reset` or `r` does not accept any argument.")
+                print(for: .error, "Command 'reset' or 'r' does not accept any arguments.")
                 return nil
             }
             self = .reset
@@ -51,7 +51,7 @@ enum SimStep: Equatable {
                   let port = parsePort(argument: tokens[1]),
                   let constant = parseConstant(argument: tokens[2])
             else {
-                print("Invalid: Usage is `input/i port[lsb:msb] <value>` or `input/i port[bit] <value>`")
+                print(for: .error, "Usage is 'input/i port[lsb:msb] <value>' or 'input/i port[bit] <value>'.")
                 return nil
             }
             self = .input(constant: constant, port: port)
@@ -60,19 +60,19 @@ enum SimStep: Equatable {
                   let port = parsePort(argument: tokens[1]),
                   let constant = parseConstant(argument: tokens[2])
             else {
-                print("Invalid: Usage is `assert/a port[lsb:msb] <value>` or `assert/a port[bit] <value>`")
+                print(for: .error, "Usage is 'assert/a port[lsb:msb] <value>' or 'assert/a port[bit] <value>'.")
                 return nil
             }
             self = .assert(constant: constant, port: port)
         case "record":
             guard tokens.count == 1 else {
-                print("Invalid: Command `record` does not accept any argument.")
+                print(for: .error, "Command 'record' does not accept any arguments.")
                 return nil
             }
             self = .record
         case "stop-record", "stop":
             guard tokens.count == 1 else {
-                print("Invalid: Command `stop-record` or `stop` does not accept any argument.")
+                print(for: .error, "Command 'stop-record' or 'stop' does not accept any arguments.")
                 return nil
             }
             self = .stopRecord
@@ -84,7 +84,7 @@ enum SimStep: Equatable {
         case "help", "h":
             self = .help
         default:
-            print("Invalid: Command `\(tokens.first!)` not found. Try `help` instead?")
+            print(for: .error, "Command '\(tokens.first!)' not found. Try 'help' instead?")
             return nil
         }
     }

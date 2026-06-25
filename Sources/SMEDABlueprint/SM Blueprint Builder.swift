@@ -128,7 +128,7 @@ public class SMBlueprintBuilder {
 
         let newCount = blueprintBody.childs[index].controller!.controllers?.count ?? 0 + newControllerItems.count
         if newCount > SMBlueprint.controllerLimit {
-            print("Warning: controller \(targetControllerId) will have \(newCount) controllees")
+            print("Warning: controller \(targetControllerId) will have \(newCount) controllees.")
         }
 
         if blueprintBody.childs[index].controller!.controllers == nil {

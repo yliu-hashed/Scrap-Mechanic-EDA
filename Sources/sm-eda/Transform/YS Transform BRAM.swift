@@ -15,10 +15,10 @@ func checkBRAMTimer(
 
     func checkAndRemove(_ name: String, length: Int = 1) throws {
         guard names.contains(name) else {
-            throw TransformError.malformedCellPorts(cellName: name, description: "Port `\(name)` cannot be found.")
+            throw TransformError.malformedCellPorts(cellName: name, description: "Port '\(name)' cannot be found.")
         }
         guard cell.conns[name]?.count == length else {
-            throw TransformError.malformedCellPorts(cellName: name, description: "Port `\(name)` has the wrong number of bits.")
+            throw TransformError.malformedCellPorts(cellName: name, description: "Port '\(name)' has the wrong number of bits.")
         }
         names.remove(name)
     }
@@ -38,7 +38,7 @@ func checkBRAMTimer(
         let index = Int(match.1)!
         let addrName = "B\(index)ADDR"
         guard names.contains(addrName) else {
-            throw TransformError.malformedCellPorts(cellName: name, description: "Address `\(addrName)` of read port `\(index)` cannot be found.")
+            throw TransformError.malformedCellPorts(cellName: name, description: "Address '\(addrName)' of read port '\(index)' cannot be found.")
         }
         try checkAndRemove(portName)
         // add read data to output table

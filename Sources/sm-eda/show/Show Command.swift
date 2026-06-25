@@ -40,7 +40,7 @@ struct ShowCMD: ParsableCommand {
             let outputDotURL = URL(fileURLWithPath: outputDotFile, isDirectory: false)
             let dotData = dotFile.data(using: .utf8)!
             try dotData.write(to: outputDotURL)
-            print("Dot file written successfully to \"\(outputDotURL)\"")
+            print("Dot file written successfully to '\(outputDotURL)'")
         } else {
             print(dotFile)
         }

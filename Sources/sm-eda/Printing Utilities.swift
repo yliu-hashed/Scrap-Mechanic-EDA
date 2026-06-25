@@ -3,6 +3,7 @@
 //  Scrap Mechanic EDA
 //
 
+import Foundation
 import SMEDANetlist
 
 func printItems(
@@ -38,4 +39,78 @@ func timeFromTicks(_ time: Int?, nilName: String = "--") -> String {
     } else {
         return nilName
     }
+}
+
+enum PrintingPurpose {
+    case warning
+    case error
+
+    var color: ANSIColor {
+        switch self {
+        case .warning:
+            return ANSIColor.yellow
+        case .error:
+            return ANSIColor.red
+        }
+    }
+
+    var prefix: String {
+        switch self {
+        case .warning:
+            return "Warning: "
+        case .error:
+            return "Error: "
+        }
+    }
+
+    var printingPrefix: String {
+        if terminalSupportsColor {
+            return color.wrap(around: prefix)
+        } else {
+            return prefix
+        }
+    }
+}
+
+func print(for purpose: PrintingPurpose, _ string: consuming String) {
+    switch purpose {
+    case .warning:
+        setPrintColor(to: .yellow)
+        print("Warning:", terminator: " ")
+    case .error:
+        setPrintColor(to: .red)
+        print("Error:", terminator: " ")
+    }
+    setPrintColor(to: .default)
+    print(string)
+}
+
+enum ANSIColor: String {
+    case black = "\u{001B}[0;30m"
+    case red = "\u{001B}[0;31m"
+    case green = "\u{001B}[0;32m"
+    case yellow = "\u{001B}[0;33m"
+    case blue = "\u{001B}[0;34m"
+    case magenta = "\u{001B}[0;35m"
+    case cyan = "\u{001B}[0;36m"
+    case white = "\u{001B}[0;37m"
+    case `default` = "\u{001B}[0;0m"
+
+    func wrap(around string: String) -> String {
+        return "\(rawValue)\(string)\(ANSIColor.default.rawValue)"
+    }
+}
+
+func setPrintColor(to color: ANSIColor) {
+    if terminalSupportsColor {
+        print(color.rawValue, terminator: "")
+    }
+}
+
+let terminalSupportsColor: Bool = detectTerminalColor()
+
+private func detectTerminalColor() -> Bool {
+    let term = ProcessInfo.processInfo.environment["TERM"]?.lowercased() ?? ""
+    let colorterm = ProcessInfo.processInfo.environment["COLORTERM"]?.lowercased() ?? ""
+    return term.contains("color") || colorterm.contains("color")
 }

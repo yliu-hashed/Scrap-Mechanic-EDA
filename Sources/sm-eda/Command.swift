@@ -23,4 +23,8 @@ private let discussion = "This is the Scrap Mechanic EDA command line toolset."
             ShowCMD.self,
         ]
     )
+
+    static var _errorPrefix: String {
+        return PrintingPurpose.error.printingPrefix
+    }
 }

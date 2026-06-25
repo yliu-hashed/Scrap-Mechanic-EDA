@@ -142,9 +142,9 @@ struct AutoPlanArgGroup: ParsableArguments {
             case .nonPositiveWidth:
                 return "Width must be a positive integer."
             case .redundantDepth:
-                return "Depth must not be specified when volumes are used"
+                return "Depth must not be specified when volumes are used."
             case .redundantWidth:
-                return "Width must not be specified when volumes are used"
+                return "Width must not be specified when volumes are used."
             }
         }
     }

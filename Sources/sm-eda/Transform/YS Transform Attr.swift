@@ -16,7 +16,7 @@ func recordColorToAttribute(ysModule: YSModule, smModule: inout SMModule) {
         if let color = extractColor(literal: colorString), color.validate() {
             smModule.colorHex = color.hex
         } else {
-            print("Warning: module color literal \(colorString) is invalid. Using default color")
+            print(for: .warning, "module color literal \(colorString) is invalid. Using default color.")
         }
     }
 
@@ -33,7 +33,7 @@ func recordColorToAttribute(ysModule: YSModule, smModule: inout SMModule) {
                 smModule.outputs[portName]?.colorHex = color.hex
             }
         } else {
-            print("Warning: color literal \(colorString) for port \(portName) is invalid. Using default color")
+            print(for: .warning, "Color literal '\(colorString)' for port '\(portName)' is invalid. Using default color.")
         }
     }
 }
@@ -52,7 +52,7 @@ func recordInputDeviceTypeToAttribute(ysModule: YSModule, smModule: inout SMModu
         } else if let device = SMInputDevice(rawValue: deviceString) {
             dev = device.rawValue
         } else {
-            print("Warning: module input device literal \(deviceString) is invalid. Using default device")
+            print(for: .warning, "Module input device literal '\(deviceString)' is invalid for port '\(portName)'.")
             continue
         }
 

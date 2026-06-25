@@ -14,7 +14,9 @@ func place(
     connectionMinimizationEffort: Float,
     verbose: Bool
 ) throws -> SMBlueprint {
-    if verbose { print("Placing Blueprint") }
+    if verbose {
+        print("Placing blueprint for '\(module.name)'.")
+    }
 
     let builder = SMBlueprintBuilder()
 
@@ -89,8 +91,8 @@ func place(
             effort: min(max(connectionMinimizationEffort, 0), 0.999),
             verbose: verbose
         )
-    } else {
-        print("   Connection minimization effort is 0, not optimizing connections.")
+    } else if verbose {
+        print("Connection minimization effort is 0, skipping connection optimizations.")
     }
 
     for (gateId, pos) in mapping {
@@ -155,11 +157,10 @@ func place(
     report.height = maxZ - minZ + 1
 
     if verbose {
-        print("Blueprint placed")
+        print("Blueprint placed with following dimentions:")
         print("   Depth  (X): \(report.depth)")
         print("   Width  (Y): \(report.width)")
         print("   Height (Z): \(report.height)")
-        print()
     }
 
     return SMBlueprint(bodies: [builder.blueprintBody])
@@ -178,21 +179,21 @@ enum PlacementError: Error, CustomStringConvertible {
     var description: String {
         switch self {
         case .portNotFound(let name):
-            return "Port \"\(name)\" does not exist"
+            return "Port '\(name)' does not exist."
         case .portOutOfRange(let portBit, let min, let max):
-            return "Port \"\(portBit)\" is out of the valid range of [\(min):\(max)]"
+            return "Port '\(portBit)' is out of the valid range of [\(min):\(max)]."
         case .invalidDevice(let name):
-            return "Cannot recognize specified device \"\(name)\""
+            return "Cannot recognize specified device '\(name)'."
         case .portNotLogic(let portBit):
-            return "Port \"\(portBit)\" is not a logic gate"
+            return "Port '\(portBit)' is not a logic gate."
         case .portCollide(let portBit, let other, let position):
-            return "Port \"\(portBit)\" collides with port \"\(other)\" at position \(position)"
+            return "Port '\(portBit)' collides with port '\(other)' at position \(position)."
         case .portRepeated(let portBit):
-            return "Port \"\(portBit)\" is repeated during placement"
+            return "Port '\(portBit)' is repeated during placement."
         case .inputIgnored(let portBit):
-            return "Input port \"\(portBit)\" never used in placement"
+            return "Input port '\(portBit)' never used in placement."
         case .spaceNotEnouph(let current):
-            return "The give volumes (\(current) blocks) are not enouph to fit the design"
+            return "The give volumes (\(current) blocks) are not enouph to fit the design."
         }
     }
 }

@@ -9,7 +9,7 @@ enum REPLError: Error, CustomStringConvertible {
     var description: String {
         switch self {
         case .invalidCommand:
-            return "Invalid Command"
+            return "Invalid command."
         }
     }
 }

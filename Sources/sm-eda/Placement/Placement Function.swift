@@ -17,7 +17,7 @@ private let kConnectionMinimizationEffortArgHelp = ArgumentHelp(
 
 private let kLZ4PathArgHelp = ArgumentHelp(
     "The path to the LZ4 executable",
-    discussion: "Use this parameter to specify the path to LZ4 to accurately estimate blueprint size. If not specified, the path to the LZ4 executable is searched by asking the shell `which lz4`.",
+    discussion: "Use this parameter to specify the path to LZ4 to accurately estimate blueprint size. If not specified, the path to the LZ4 executable is searched from the PATH environment variable.",
     valueName: "lz4-path"
 )
 
@@ -61,7 +61,6 @@ struct PlacementArgGroup: ParsableArguments {
             connectionMinimizationEffort: connectionMinimizationEffort,
             verbose: printlevel == .verbose
         )
-        if printlevel == .verbose { print("Blueprint Generation Successfully") }
 
         // check size & write blueprint
         let blueprintData = try encoder.encode(blueprint)
@@ -73,7 +72,9 @@ struct PlacementArgGroup: ParsableArguments {
             lz4Path: lz4Path
         )
         try blueprintData.write(to: URL(fileURLWithPath: blueprintFile, isDirectory: false))
-        if printlevel == .verbose { print("Blueprint written successfully to \"\(blueprintFile)\"") }
+        if printlevel == .verbose {
+            print("Blueprint written successfully to '\(blueprintFile)'.")
+        }
 
         return placementReport
     }

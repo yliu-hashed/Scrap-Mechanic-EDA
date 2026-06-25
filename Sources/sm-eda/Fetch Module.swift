@@ -21,7 +21,7 @@ func fetchModule(files: [String]) throws -> [SMModule] {
         let module = try fetchModule(file: file)
         guard !mergeNameTable.keys.contains(module.name) else {
             let oldPath = mergeNameTable[module.name]!
-            print("Warning: Skipping module \(module.name) from \(file). Module of the same name already exist in \(oldPath).")
+            print(for: .warning, "Skipping module \(module.name) from \(file). Module of the same name already exist in \(oldPath).")
             continue
         }
         mergeNameTable[module.name] = file

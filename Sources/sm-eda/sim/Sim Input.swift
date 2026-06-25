@@ -6,7 +6,7 @@
 extension SimulationModel {
     func setInput(constant: UInt64, port: Port) -> Bool {
         guard let gates = module.inputs[port.port]?.gates else {
-            print("Invalid: Port `\(port.port)` not found")
+            print(for: .error, "Port '\(port.port)' cannot be found.")
             return false
         }
 
@@ -19,7 +19,7 @@ extension SimulationModel {
             msb = gates.count - 1
         } else {
             guard gates.indices.contains(port.lsb...port.msb) else {
-                print("Invalid: Port `\(port.port)` does not contain all of index of \(port.lsb)...\(port.msb)")
+                print(for: .error, "Port '\(port.port)' does not contain all of index of \(port.lsb)...\(port.msb).")
                 return false
             }
             msb = port.msb
@@ -39,7 +39,7 @@ extension SimulationModel {
 
     func getOutput(port: Port) -> UInt64? {
         guard let gates = module.outputs[port.port]?.gates else {
-            print("Invalid: Port `\(port.port)` not found")
+            print(for: .error, "Port '\(port.port)' cannot be found.")
             return nil
         }
 
@@ -52,7 +52,7 @@ extension SimulationModel {
             msb = gates.count - 1
         } else {
             guard gates.indices.contains(port.lsb...port.msb) else {
-                print("Invalid: Port `\(port.port)` does not contain all of index of \(port.lsb)...\(port.msb)")
+                print(for: .error, "Port '\(port.port)' does not contain all of index of \(port.lsb)...\(port.msb).")
                 return nil
             }
             msb = port.msb

@@ -24,9 +24,9 @@ extension CNFBuilder {
         var description: String {
             switch self {
             case .solverError(let exitCode):
-                return "[SAT Solver] Solver exited with non-standard exit code \(exitCode)"
+                return "Solver exited with non-standard exit code \(exitCode)."
             case .terminated(let code):
-                return "[SAT Solver] Solver is terminated with exit code \(code)"
+                return "Solver is terminated with exit code \(code)."
             }
         }
     }
@@ -168,7 +168,7 @@ fileprivate class SATResultParser {
             }
         }
 
-        print("[Solver Parser] Bad input character \(character), skipping until end of line.")
+        print(for: .warning, "Solver parsor encountered bad input character '\(character)'. This line will not be parsed.")
         stopVariableIfNeeded()
         state = .seekEndOfLine
     }

@@ -222,9 +222,9 @@ private enum PortConfigParseError: Error, CustomStringConvertible {
     var description: String {
         switch self {
         case .cannotParsePort(let port):
-            return "Cannot parse port description \"\(port)\""
+            return "Cannot parse port description '\(port)'."
         case .repeatedPort(let portBit):
-            return "Port \(portBit) is repeated"
+            return "Port \(portBit) is repeated."
         }
     }
 }

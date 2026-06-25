@@ -35,7 +35,7 @@ struct AnalyzeArgGroup: ParsableArguments {
 
         // analyze timing and complexity
         if printlevel == .verbose {
-            print("Analyzing Design")
+            print("Analyzing module '\(module.name)'.")
         }
 
         report.timingReport = analyzeTiming(module)
@@ -67,7 +67,7 @@ struct AnalyzeArgGroup: ParsableArguments {
             let netData = try encoder.encode(report)
             try netData.write(to: url)
             if printlevel == .verbose {
-                print("Report written successfully to \"\(path)\"")
+                print("Report written successfully to '\(path)'.")
             }
         }
     }

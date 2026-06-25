@@ -3,9 +3,9 @@
 //  Scrap Mechanic EDA
 //
 
-public func algebraicOptimize(_ module: inout SMModule, verbose: Bool = false) {
+public typealias AlgebraicOptimizationProgress = (_ step: Int, _ reduction: Int)->Void
 
-    if verbose { print("Begin Optimization") }
+public func algebraicOptimize(_ module: inout SMModule, progress: AlgebraicOptimizationProgress? = nil) {
 
     let builder = SMNetBuilder(module: module)
     var live: Set<UInt64> = Set(module.gates.keys)
@@ -16,8 +16,6 @@ public func algebraicOptimize(_ module: inout SMModule, verbose: Bool = false) {
         var nextLive: Set<UInt64> = []
 
         let prevCount = builder.module.gates.count
-
-        if verbose { print("   Step \(stepCount):") }
 
         removeUnusedInputs(
             builder: builder
@@ -53,7 +51,10 @@ public func algebraicOptimize(_ module: inout SMModule, verbose: Bool = false) {
         )
 
         let currCount = builder.module.gates.count
-        print("      Optimized out \(prevCount - currCount) gates")
+
+        if let progress = progress {
+            progress(stepCount, prevCount - currCount)
+        }
         live = nextLive
         stepCount += 1
     }

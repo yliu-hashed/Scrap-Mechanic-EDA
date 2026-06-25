@@ -7,41 +7,41 @@ import Foundation
 import ArgumentParser
 import SMEDANetlist
 
-private let discussion = "This command can perform editions on a sm netlist file, like merging different modules and connecting (shorting) ports. When edit commands are specified by the command line arguments, edit commands are not specified in the order that they are declared. The order of the commands is `merge`, `connect`, `share`, `drive`, and `remove`. Use `--script <script>` specify a script, and to perform more complex edits."
+private let discussion = "This command can perform editions on a sm netlist file, like merging different modules and connecting (shorting) ports. When edit commands are specified by the command line arguments, edit commands are not specified in the order that they are declared. The order of the commands is 'merge', 'connect', 'share', 'drive', and 'remove'. Use '--script <script>' specify a script, and to perform more complex edits."
 
 private let mergeHelp = ArgumentHelp(
     "Merge many netlist into the main netlist.",
-    discussion: "Use this option to merge other netlists into this netlist. Inputs and outputs of the imported netlists will be appended to the inputs and outputs of the main netlist. The name of the ports of the imported netlists will be prefixed by their source module name in the form <module>.<port>. The ports of the main module will be unchanged. To wire the imported netlists together, use the \"--connect\" option",
+    discussion: "Use this option to merge other netlists into this netlist. Inputs and outputs of the imported netlists will be appended to the inputs and outputs of the main netlist. The name of the ports of the imported netlists will be prefixed by their source module name in the form '<module>.<port>'. The ports of the main module will be unchanged. To wire the imported netlists together, use the '--connect' option",
     valueName: "netlists"
 )
 
 private let portConnectHelp = ArgumentHelp(
     "Connect output ports back to input ports.",
-    discussion: "Use this option to drive input ports using output port values. Parameter is specified by an array of mappings, each in the form of <output-port>[<msb>:<lsb>]-><input-port>[<msb>:<lsb>]. Use this with caution as it may create unintended combinational loops.",
+    discussion: "Use this option to drive input ports using output port values. Parameter is specified by an array of mappings, each in the form of '<output-port>[<msb>:<lsb>]-><input-port>[<msb>:<lsb>]'. Use this with caution as it may create unintended combinational loops.",
     valueName: "routings"
 )
 
 private let portShareHelp = ArgumentHelp(
     "Share input value of one port with another.",
-    discussion: "Use this option to share(merge) input ports. Parameter is specified by an array of mappings, each in the form of <input-port>[<msb>:<lsb>]-><input-port>[<msb>:<lsb>].",
+    discussion: "Use this option to share(merge) input ports. Parameter is specified by an array of mappings, each in the form of '<input-port>[<msb>:<lsb>]-><input-port>[<msb>:<lsb>]'.",
     valueName: "routings"
 )
 
 private let portDriveHelp = ArgumentHelp(
     "Drive input ports by constant value.",
-    discussion: "Use this option to drive input ports using constant value. Parameter is specified by an array of mappings, each in the form of <value>-><input-port>[<msb>:<lsb>]. The <value> contains a integer value of base 10, 16, and 8. Use prefix \"0x\", \"0b\", and \"0o\" to specify the base. Decimal are used when no bases are specified.",
+    discussion: "Use this option to drive input ports using constant value. Parameter is specified by an array of mappings, each in the form of '<value>-><input-port>[<msb>:<lsb>]'. The <value> contains a integer value of base 10, 16, and 8. Use prefix '0x', '0b', and '0o' to specify the base. Decimal are used when no bases are specified.",
     valueName: "drivers"
 )
 
 private let portRemoveHelp = ArgumentHelp(
     "Remove output ports.",
-    discussion: "Use this option to remove output ports. Parameter is specified by an array of ports, each in the form of <output-port>[<msb>:<lsb>].",
+    discussion: "Use this option to remove output ports. Parameter is specified by an array of ports, each in the form of '<output-port>[<msb>:<lsb>]'.",
     valueName: "outputs"
 )
 
 private let editScriptHelp = ArgumentHelp(
     "The edit script to run.",
-    discussion: "Use this option to specify a text file as the edit script. The file contains a list of commands seperated by new lines and semicolon `;`. Each command is specified in the form of <operation> <argument>. The commands used in scripting is identical to the command line arguments. For example, the script `r A[7:0]` is the same as the command line argument `-r \"A[7:0]\"`. The editing command line arguments will be ignored if a script is specified. Commands are always executed in the program order.",
+    discussion: "Use this option to specify a text file as the edit script. The file contains a list of commands seperated by new lines and semicolon ';'. Each command is specified in the form of <operation> <argument>. The commands used in scripting is identical to the command line arguments. For example, the script 'r A[7:0]' is the same as the command line argument '-r \"A[7:0]\"'. The editing command line arguments will be ignored if a script is specified. Commands are always executed in the program order.",
     valueName: "script-file"
 )
 
@@ -101,7 +101,7 @@ struct EditCMD: ParsableCommand {
             // warn inhibit other operands
             let hasArgOps = !mergeNetlistFiles.isEmpty || !portConnect.isEmpty || !portShare.isEmpty || !portDrive.isEmpty || !portRemove.isEmpty
             if printlevel != .none, hasArgOps {
-                print("Warning: Edit arguments will be ignored when script file is specified")
+                print(for: .warning, "Edit arguments will be ignored when script file is specified.")
             }
 
             // parse script

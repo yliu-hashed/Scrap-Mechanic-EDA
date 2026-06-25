@@ -26,7 +26,7 @@ struct TransformTable {
         for (portName, port) in ysModule.ports where port.direction == .input {
             for (index, bit) in port.bits.enumerated() {
                 guard case .shared(let connId) = bit else {
-                    preconditionFailure("Input \"\(portName)\" contains fixed state.")
+                    preconditionFailure("Input '\(portName)' cannot be driven by a constant.")
                 }
                 let store = TransformTable.InputPort(name: portName, bit: index)
                 inputPorts.updateValue(store, forKey: connId)
@@ -105,7 +105,7 @@ fileprivate func createPorts(
 
         if port.direction == .output,
            port.bits.allSatisfy({ $0 == .fixed(state: false) }) {
-            print("Output port \(portName) is stripped, it is constant zero")
+            print(for: .warning, "Output port '\(portName)' is stripped, it is constant zero.")
             continue
         }
 
@@ -228,7 +228,7 @@ fileprivate func stripUnusedInputs(_ builder: SMNetBuilder) {
             for gate in gates {
                 builder.removeGate(gate)
             }
-            print("Input port \(inputName) is stripped, it has no connections")
+            print(for: .warning, "Input port '\(inputName)' is stripped, it has no connections.")
         }
     }
 }
@@ -242,22 +242,22 @@ fileprivate func inferAndMarkClockDomain(
     if hasSequential {
         var clocks: [String] = forceClockInputs
         if clocks.isEmpty {
-            print("Warning: Input contains sequential cells, but no clock domain is specified.")
+            print(for: .warning, "Input contains sequential cells, but no clock domain is specified.")
             let commonNames: Set<String> = ["clock", "clk"]
             let makeshiftClock = module.inputs.keys.first { commonNames.contains($0.lowercased()) }
             if let makeshiftClock = makeshiftClock {
                 clocks = [makeshiftClock]
-                print("   Input \"\(makeshiftClock)\" will be considered a clock.")
+                print("Input '\(makeshiftClock)' will be considered a clock.")
             } else {
-                print("   Net will be generated without a clock.")
+                print("Net will be generated without a clock.")
             }
-            print("   Indicate a clock domain using the '--clk <clock>' argument.\n")
+            print("Indicate a clock domain using the '--clk <clock>' argument.")
         }
 
         for clock in clocks {
             guard let gates = module.inputs[clock]?.gates else {
-                print("Warning: specified clock domain \(clock) is either doesn't exist or optimizeed away.")
-                print("   Generation will continue without it.\n")
+                print(for: .warning, "Specified clock domain '\(clock)' is either missing or optimizeed away.")
+                print("Generation will continue without clock '\(clock)'.")
                 continue
             }
             guard gates.count == 1 else {

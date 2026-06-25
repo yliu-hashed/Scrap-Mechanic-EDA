@@ -39,7 +39,6 @@ extension TimingReport {
 
 func printTimingReport(_ timing: TimingReport) {
     printItems(title: "Timing Report", timing.symbols, numbered: true)
-    print()
     printPortTimingReport(timing)
 }
 
@@ -53,7 +52,6 @@ private func printPortTimingReport(_ timing: TimingReport) {
         return (key, timeFromTicks(value))
     }
     printItems(title: "Outputs Timing", outputs, numbered: false)
-    print()
 }
 
 // MARK: Dump Complexity
@@ -75,7 +73,6 @@ extension ComplexityReport {
 
 func printComplexityReport(_ report: ComplexityReport) {
     printItems(title: "Design Statistics", report.symbols, numbered: true)
-    print()
 }
 
 // MARK: Lite Report
@@ -93,7 +90,7 @@ func printDifference(old: FullSynthesisReport, new: FullSynthesisReport) {
     if !oldUtil.isNaN, !newUtil.isNaN, oldUtil > 0, abs(newUtil - oldUtil) > 0.005 {
         let improvement = (newUtil - oldUtil) / oldUtil
         let improvementStr = improvement.formatted(.percent.sign(strategy: .always()).precision(.fractionLength(2)))
-        print("Utilization changed by \(improvementStr)")
+        print("Utilization changed by \(improvementStr).")
     }
     // check time difference
     let oldTime = old.timingReport.criticalDepth ?? 0
@@ -103,6 +100,6 @@ func printDifference(old: FullSynthesisReport, new: FullSynthesisReport) {
         let improvement = Float(change) / Float(oldTime)
         let changeStr = (newTime - oldTime).formatted(.number.sign(strategy: .always()))
         let improvementStr = improvement.formatted(.percent.sign(strategy: .always()).precision(.fractionLength(2)))
-        print("Critical depth changed by \(changeStr) (\(improvementStr))")
+        print("Critical depth changed by \(changeStr) (\(improvementStr)).")
     }
 }

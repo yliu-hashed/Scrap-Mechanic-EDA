@@ -104,16 +104,22 @@ func optimizeConnections(
     verbose: Bool
 ) {
 
-    if verbose { print("Optimizing connections with effort \(effort)") }
+    if verbose {
+        print("Optimizing connections with effort \(effort).")
+    }
 
     let initialCost = computeCost(for: mapping, in: module)
 
-    if verbose { print("   Initial cost: \(initialCost)") }
+    if verbose {
+        print("   Initial cost is \(initialCost).")
+    }
 
     var prevCost = initialCost
 
     func annealFineRound() {
-        if verbose { print("   Round Begin") }
+        if verbose {
+            print("   Starting a new round.")
+        }
         var working = logicGates
         var maxRangeEquared: Int = .max
         while !working.isEmpty, maxRangeEquared >= 2 {
@@ -126,7 +132,9 @@ func optimizeConnections(
             )
             let newCost = computeCost(for: mapping, in: module)
             let stop = Double(newCost) >= Double(prevCost) * Double(effort)
-            if verbose { print("   Step cost: \(newCost)") }
+            if verbose {
+                print("   Step cost is \(newCost).")
+            }
             prevCost = newCost
             if stop { break }
         }
@@ -138,7 +146,6 @@ func optimizeConnections(
 
     if verbose {
         let improvement = 1 - Float(prevCost) / Float(initialCost)
-        print("   Connections optimized by \(improvement.formatted(.percent.precision(.fractionLength(2))))")
-        print()
+        print("Connections optimized by \(improvement.formatted(.percent.precision(.fractionLength(2)))).")
     }
 }

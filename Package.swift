@@ -17,23 +17,20 @@ let package = Package(
         .executable(name: "sm-eda", targets: ["sm-eda"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "1.5.0"),
-        .package(url: "https://github.com/swiftlang/swift-subprocess.git", .upToNextMajor(from: "0.5.0")),
+        .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMajor(from: "1.8.0")),
+        .package(url: "https://github.com/swiftlang/swift-subprocess.git", .upToNextMinor(from: "0.5.0")),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "SMEDABlueprint",
-            packageAccess: true
         ),
         .target(
             name: "SMEDANetlist",
-            packageAccess: true
         ),
         .target(
             name: "SMEDAResult",
-            packageAccess: true
         ),
         .executableTarget(
             name: "sm-eda",

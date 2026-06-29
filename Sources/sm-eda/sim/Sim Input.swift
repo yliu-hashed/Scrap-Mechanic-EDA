@@ -1,9 +1,12 @@
 //
-//  Sim Simulation - Input.swift
+//  Sim Input.swift
 //  Scrap Mechanic EDA
 //
 
+import SMEDANetlist
+
 extension SimulationModel {
+
     func setInput(constant: UInt64, port: Port) -> Bool {
         guard let gates = module.inputs[port.port]?.gates else {
             print(for: .error, "Port '\(port.port)' cannot be found.")
@@ -30,8 +33,7 @@ extension SimulationModel {
             let index = lsb + i
             let gateId = gates[index]
             let state = (constant & 1 << i) != 0
-            assert(overrideList.keys.contains(gateId))
-            setOverride(gateId: gateId, value: state)
+            override(gateId, to: state)
         }
 
         return true
@@ -64,7 +66,7 @@ extension SimulationModel {
         for i in 0..<width {
             let index = lsb + i
             let gateId = gates[index]
-            let state = outputOfGate(id: gateId)
+            let state = output(of: gateId)
 
             value |= state ? (1 << i) : 0
         }

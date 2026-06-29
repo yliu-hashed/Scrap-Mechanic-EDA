@@ -6,7 +6,6 @@
 import Testing
 
 import SMEDANetlist
-@testable import sm_eda
 
 struct AlgebraicOptimizeAllTests {
 
@@ -32,9 +31,9 @@ struct AlgebraicOptimizeAllTests {
         let sim2 = SimulationModel(module: optimized)
 
         func eval(raw: UInt64, in sim: SimulationModel) -> UInt64 {
-            #expect(sim.setInput(constant: raw, port: .init(port: "in")))
+            #expect(sim.setInput("in", to: raw))
             #expect(sim.wrapToStable(ticks: 300))
-            return sim.getOutput(port: .init(port: "out"))!
+            return sim.getOutput(of: "out")
         }
 
         for input: UInt64 in 0..<(1 << 6) {
@@ -66,9 +65,9 @@ struct AlgebraicOptimizeAllTests {
         let sim2 = SimulationModel(module: optimized)
 
         func eval(raw: UInt64, in sim: SimulationModel) -> UInt64 {
-            #expect(sim.setInput(constant: raw, port: .init(port: "in")))
+            #expect(sim.setInput("in", to: raw))
             #expect(sim.wrapToStable(ticks: 300))
-            return sim.getOutput(port: .init(port: "out"))!
+            return sim.getOutput(of: "out")
         }
 
         for input: UInt64 in 0..<(1 << 6) {

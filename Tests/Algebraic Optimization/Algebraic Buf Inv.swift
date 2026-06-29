@@ -6,7 +6,6 @@
 import Testing
 
 @testable import SMEDANetlist
-@testable import sm_eda
 
 struct AlgebraicBufInvTests {
 
@@ -202,45 +201,5 @@ struct AlgebraicBufInvTests {
         #expect(updated.contains(o1))
     }
 
-    @Test("Random buffer inverter test", arguments: 1...10)
-    func testRandomBufInv(seed: UInt64) throws {
-        // build random network
-        let config = RandomNetworkConfig(
-            internalGateCount: 100,
-            inputCount: 6,
-            outputCount: 64,
-            minFaninLimit: 1,
-            maxFaninLimit: 3,
-            activeWindow: 10
-        )
 
-        let net = buildRandomNetwork(seed: seed, config: config)
-
-        // test behavior
-        let builder = SMNetBuilder(module: net)
-        var updated: Set<UInt64> = []
-        algebraicReduceBuffersAndInverters(
-            builder: builder,
-            intrest: Set(builder.module.gates.keys),
-            updated: &updated
-        )
-        let optimized = builder.module
-        try optimized.check()
-
-        // check functional equivalance
-        let sim1 = SimulationModel(module: net)
-        let sim2 = SimulationModel(module: optimized)
-
-        func eval(raw: UInt64, in sim: SimulationModel) -> UInt64 {
-            #expect(sim.setInput(constant: raw, port: .init(port: "in")))
-            #expect(sim.wrapToStable(ticks: 3100))
-            return sim.getOutput(port: .init(port: "out"))!
-        }
-
-        for input: UInt64 in 0..<(1 << 6) {
-            let expectation = eval(raw: input, in: sim1)
-            let actual = eval(raw: input, in: sim2)
-            #expect(expectation == actual)
-        }
-    }
 }

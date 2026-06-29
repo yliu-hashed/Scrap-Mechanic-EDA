@@ -3,6 +3,7 @@
 //  Scrap Mechanic EDA
 //
 
+import SMEDANetlist
 import Foundation
 
 class Controller {
@@ -64,7 +65,7 @@ class Controller {
             return
         case .saveRecord(let path):
             let url = URL(filePath: path, directoryHint: .notDirectory)
-            let string = vcdGen(module: model.module, duration: model.recordingTime, history: model.history)
+            let string = model.generateRecordedVCD()
             let data = string.data(using: .utf8)!
             do {
                 try data.write(to: url)

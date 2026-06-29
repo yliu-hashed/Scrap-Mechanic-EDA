@@ -63,7 +63,7 @@ extension SimulationModel {
 
                 if gates.indices.contains(index) {
                     let gateId = gates[i]
-                    let state = outputOfGate(id: gateId)
+                    let state = output(of: gateId)
                     setPrintColor(to:  state ? .cyan : .blue)
                     print(state ? "1" : "0", terminator: "")
                     setPrintColor(to: .default)

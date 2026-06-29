@@ -15,12 +15,14 @@ func algebraicConstFold(
         builder: builder
     )
 
+    // simplify all gates that uses at least one constant
     let redrives = foldConstantDrives(
         builder: builder,
         info: info,
         updated: &localUpdated
     )
 
+    // optimize constant drives
     optimizeDrives(
         builder: builder,
         info: info,
@@ -30,6 +32,7 @@ func algebraicConstFold(
 
     updated.formUnion(localUpdated)
 
+    // purge unused stuff that may be dangled as result of removing constants
     algebraicPurgeDangling(
         builder: builder,
         intrest: localUpdated,
@@ -48,6 +51,7 @@ private func optimizeDrives(
         var usage: Int
     }
 
+    // sort all usable existing immidiates by their usage
     var immidiates: [Immidiate] = []
     for gateId in info.immidiates {
         let gate = builder.module.gates[gateId]!
@@ -57,6 +61,7 @@ private func optimizeDrives(
     }
     immidiates.sort(by: { $0.usage < $1.usage })
 
+    // sort all usable existing inverter of immidiates by their usage
     var invertedImmidiates: [Immidiate] = []
     for gateId in info.invertedImmidiates {
         let gate = builder.module.gates[gateId]!
@@ -66,6 +71,7 @@ private func optimizeDrives(
     }
     invertedImmidiates.sort(by: { $0.usage < $1.usage })
 
+    /// Helper function to obtain a constant false drive
     func useNormal() -> UInt64 {
         guard let last = immidiates.last else {
             let gateId = builder.addGate(type: .logic(type: .or))
@@ -79,6 +85,7 @@ private func optimizeDrives(
         return last.gateId
     }
 
+    /// Helper function to obtain a constant true drive
     func useInverted() -> UInt64 {
         guard let last = invertedImmidiates.last else {
             let gateId = builder.addGate(type: .logic(type: .nor))
@@ -93,6 +100,7 @@ private func optimizeDrives(
         return last.gateId
     }
 
+    // drive everything that needs to be re-driven
     for (gateId, value) in redrives {
         let srcId = value ? useInverted() : useNormal()
         builder.connect(srcId, to: gateId)
@@ -102,9 +110,13 @@ private func optimizeDrives(
 }
 
 private struct ConstantInfo {
+    /// Gates that are detected to produce a constant value.
     var constants: [UInt64: Bool]
+    /// Gates that have no input and thus produce a constant false value.
     var immidiates: Set<UInt64>
+    /// Gates that have immidiates as the only input, and thus produces a constant true value.
     var invertedImmidiates: Set<UInt64>
+    /// Gates that have at least one constant input, and cannot be simplified away
     var users: Set<UInt64>
 
     func isOptimalConst(_ gateId: UInt64) -> Bool {
@@ -125,14 +137,18 @@ private func foldConstantDrives(
         var optimal: UInt64? = nil
         var changed: Bool = false
         for srcId in srcs {
+            // prefer immidiate and immediate inverters (optimals)
             if optimal == nil, info.isOptimalConst(srcId) {
+                // found optimal
                 optimal = srcId
             } else {
+                // disconnect remaining
                 builder.disconnect(srcId, to: gateId)
                 updated.insert(srcId)
                 changed = true
             }
         }
+        // if no optimal exists, mark to create one
         if optimal == nil {
             redrives[gateId] = value
         }
@@ -156,7 +172,7 @@ private func foldConstantDrives(
         case .logic(let logicType):
             assert(gate.srcs.count > 0)
 
-            // obtain all inputs and output constants for analysis
+            // obtain all true and false constants for analysis
             var trueConsts: Set<UInt64> = []
             var falseConsts: Set<UInt64> = []
             var others: Set<UInt64> = []
@@ -177,6 +193,11 @@ private func foldConstantDrives(
                 // preserve a true output if every input is true
                 if trueConsts.count == gate.srcs.count {
                     disconnectKeepOne(trueConsts, to: gateId, otherwiseRedrive: true)
+                    continue
+                }
+                // disconnect all inputs if gate is constant false
+                if !logicType.isInverter, falseConsts.count > 0 {
+                    disconnectAll(gate.srcs, to: gateId)
                     continue
                 }
                 // disconnect all trues (useless when there are other inputs)
@@ -202,28 +223,44 @@ private func foldConstantDrives(
                     disconnectAll(others, to: gateId)
                 }
             case .logicalParity:
-                // preserve a false input for an inverter
+                // check fanin state
                 if others.isEmpty {
+                    // all inputs are constant
+                    // check fanin values
                     if trueConsts.count.isMultiple(of: 2) {
+                        // fanin produces a false
+                        // check if the input
                         if logicType.isInverter {
+                            // keep negation and drive by a single false
                             disconnectKeepOne(falseConsts, to: gateId, otherwiseRedrive: false)
                             if falseConsts.isEmpty { redrives[gateId] = false }
                             disconnectAll(trueConsts, to: gateId)
                         } else {
+                            // disconnect all input to produce false
                             disconnectAll(gate.srcs, to: gateId)
                         }
                     } else {
+                        // fanin produces a true
+                        // keep a true value
                         disconnectAll(falseConsts, to: gateId)
                         disconnectKeepOne(trueConsts, to: gateId, otherwiseRedrive: true)
                     }
                 } else {
+                    // have some other input
+                    // disconnect all false inputs as they do nothing
                     disconnectAll(falseConsts, to: gateId)
+                    // check input parity
                     if trueConsts.count.isMultiple(of: 2) {
+                        // constant inputs produces a parity false
+                        // remove all true inputs
                         disconnectAll(trueConsts, to: gateId)
                     } else if gate.isCombinational {
+                        // constant inputs produces a parity true
+                        // flip gate type if is combinational (timing insensitive)
                         builder.changeGateType(of: gateId, to: .logic(type: logicType.negatedGate))
                         disconnectAll(trueConsts, to: gateId)
                     } else {
+                        // keep a true input to preserve timing
                         disconnectKeepOne(trueConsts, to: gateId, otherwiseRedrive: true)
                     }
                 }
